@@ -1,13 +1,21 @@
 require('dotenv').config()
 const { TruffleProvider } = require('@harmony-js/core')
-const url = process.env.LOCAL_URL;
-const account_1_mnemonic = process.env.MNEMONIC
-const account_1_private_key = process.env.PRIVATE_KEY
-const mainnet_private_key = process.env.MAINNET_PRIVATE_KEY
-const testnet_url = process.env.TESTNET_URL
+//Local
+const local_mnemonic = process.env.LOCAL_MNEMONIC
+const local_private_key = process.env.LOCAL_PRIVATE_KEY
+const local_url = process.env.LOCAL_0_URL;
+//Testnet
+const testnet_mnemonic = process.env.TESTNET_MNEMONIC
+const testnet_private_key = process.env.TESTNET_PRIVATE_KEY
+const testnet_url = process.env.TESTNET_0_URL
 const testnet_0_url = process.env.TESTNET_0_URL
 const testnet_1_url = process.env.TESTNET_1_URL
-const mainnet_0_url = process.env.MAINNET_0_URL
+//Mainnet
+const mainnet_mnemonic = process.env.MAINNET_MNEMONIC
+const mainnet_private_key = process.env.MAINNET_PRIVATE_KEY
+const mainnet_url = process.env.MAINNET_0_URL;
+
+//GAS - Currently using same GAS accross all environments
 gasLimit = process.env.GAS_LIMIT
 gasPrice = process.env.GAS_PRICE
 
@@ -15,16 +23,16 @@ module.exports = {
 
 
   networks: {
-    development: {
+    local: {
       network_id: '2', // Any network (default: none)
       provider: () => {
         const truffleProvider = new TruffleProvider(
-          url,
-          { memonic: account_1_mnemonic },
+          local_url,
+          { memonic: local_mnemonic },
           { shardID: 0, chainId: 2 },
           { gasLimit: gasLimit, gasPrice: gasPrice},
         );
-        const newAcc = truffleProvider.addByPrivateKey(account_1_private_key);
+        const newAcc = truffleProvider.addByPrivateKey(local_private_key);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
@@ -34,11 +42,11 @@ module.exports = {
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_url,
-          { memonic: account_1_mnemonic },
+          { memonic: testnet_mnemonic },
           { shardID: 0, chainId: 2 },
           { gasLimit: gasLimit, gasPrice: gasPrice},
         );
-        const newAcc = truffleProvider.addByPrivateKey(account_1_private_key);
+        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
