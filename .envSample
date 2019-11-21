@@ -1,10 +1,3 @@
-//one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
-//one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
-//0x3aea49553Ce2E478f1c0c5ACC304a84F5F4d1f98
-//01F903CE0C960FF3A9E68E80FF5FFC344358D80CE1C221C3F9711AF07F83A3BD
-// for local: 45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e
-// for testnet: 01F903CE0C960FF3A9E68E80FF5FFC344358D80CE1C221C3F9711AF07F83A3BD
-
 //LOCAL
 //Local uses account one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7 on Shard 0
 LOCAL_PRIVATE_KEY='45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e'
@@ -12,6 +5,7 @@ LOCAL_MNEMONIC='urge clog right example dish drill card maximum mix bachelor sec
 LOCAL_0_URL='http://localhost:9500'
 
 //TESTNET
+//Account: one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
 TESTNET_PRIVATE_KEY='01F903CE0C960FF3A9E68E80FF5FFC344358D80CE1C221C3F9711AF07F83A3BD'
 TESTNET_MNEMONIC='urge clog right example dish drill card maximum mix bachelor section select' 
 
@@ -19,11 +13,11 @@ TESTNET_0_URL='https://api.s0.b.hmny.io'
 TESTNET_1_URL='https://api.s1.b.hmny.io'
 
 //MAINNET
-//one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
+//Please replace MAINNET_PRIVATE_KEY and MAINNET_MNEMONIC with your own!
+//Account: one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
 MAINNET_PRIVATE_KEY='01F903CE0C960FF3A9E68E80FF5FFC344358D80CE1C221C3F9711AF07F83A3BD'
 MAINNET_MNEMONIC='urge clog right example dish drill card maximum mix bachelor section select' 
 MAINNET_0_URL='https://api.s0.t.hmny.io'
-
 
 GAS_LIMIT=3321900
 GAS_PRICE=1000000000

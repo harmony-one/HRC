@@ -56,11 +56,11 @@ module.exports = {
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_0_url,
-          { memonic: account_1_mnemonic },
+          { memonic: testnet_mnemonic },
           { shardID: 0, chainId: 2 },
           { gasLimit: gasLimit, gasPrice: gasPrice },
         );
-        const newAcc = truffleProvider.addByPrivateKey(account_1_private_key);
+        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
@@ -70,11 +70,11 @@ module.exports = {
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_1_url,
-          { memonic: account_1_mnemonic },
+          { memonic: testnet_mnemonic },
           { shardID: 1, chainId: 2 },
           { gasLimit: gasLimit, gasPrice: gasPrice },
         );
-        const newAcc = truffleProvider.addByPrivateKey(account_1_private_key);
+        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
@@ -83,8 +83,8 @@ module.exports = {
       network_id: '1', // Any network (default: none)
       provider: () => {
         const truffleProvider = new TruffleProvider(
-          mainnet_0_url,
-          { memonic: account_1_mnemonic },
+          mainnet_url,
+          { memonic: mainnet_mnemonic },
           { shardID: 0, chainId: 1 },
           { gasLimit: gasLimit, gasPrice: gasPrice },
         );
