@@ -1527,7 +1527,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2019-11-21T18:49:40.818Z",
+  "updatedAt": "2019-11-21T22:15:32.771Z",
   "devdoc": {
     "details": "Optional functions from the ERC20 standard.",
     "methods": {

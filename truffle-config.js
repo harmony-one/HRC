@@ -24,7 +24,7 @@ module.exports = {
 
   networks: {
     local: {
-      network_id: '2', // Any network (default: none)
+      network_id: '2', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           local_url,
@@ -38,7 +38,7 @@ module.exports = {
       },
     },
     testnet: {
-      network_id: '2', // Any network (default: none)
+      network_id: '2', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_url,
@@ -52,7 +52,7 @@ module.exports = {
       },
     },
     testnet0: {
-      network_id: '2', // Any network (default: none)
+      network_id: '2', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_0_url,
@@ -66,7 +66,7 @@ module.exports = {
       },
     },
     testnet1: {
-      network_id: '2', // Any network (default: none)
+      network_id: '2', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_1_url,
@@ -80,7 +80,7 @@ module.exports = {
       },
     },
     mainnet0: {
-      network_id: '1', // Any network (default: none)
+      network_id: '1', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           mainnet_url,
