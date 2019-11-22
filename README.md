@@ -1,4 +1,4 @@
-# H2O
+# HRC
 Harmony ERC20
 
 ## Overview
