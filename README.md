@@ -11,11 +11,12 @@ Please read the guideline for [Smart Contract Development using Truffle](https:/
 
 ```bash
 #install truffle
-$npm install -g truffle
+$npm install -g truffle@5.0.38
 
 #clone this project
-$git clone https://github.com/harmony-one/H2O.git
-$cd H2O
+$git clone https://github.com/harmony-one/HRC.git
+$cd HRC
+$cp .envSample .env
 
 #install modules
 $npm install
