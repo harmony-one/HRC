@@ -5,7 +5,7 @@ Harmony ERC20
 This sample project can be used to deploy an ERC20 token on Harmony's Testnet
 
 ## Pre-requisites
-Please read the guideline for [Smart Contract Development using Truffle](https://app.gitbook.com/@harmony-one/s/docs-internal/v/v1.1.2/developers-1/which-one-are-you/smart-contract-devel/smart-contract-development-using-truffle)
+Please read the guideline for [Smart Contract Development using Truffle](https://docs.harmony.one/home/developers-1/which-one-are-you/h2o)
 
 ## Install
 
