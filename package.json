@@ -4,9 +4,9 @@
   "description": "Harmony sample ERC20 deploy",
   "main": "truffle.js",
   "dependencies": {
-    "@harmony-js/core": "^0.1.22",
-    "tslib": "^1.10.0",
+    "@harmony-js/core": "^0.1.36",
     "dotenv": "^8.1.0",
-    "openzeppelin-solidity": "^2.2.0"
+    "openzeppelin-solidity": "^2.2.0",
+    "tslib": "^1.10.0"
   }
 }

@@ -48,15 +48,16 @@ Network: testnet (id: 2)
 ## Get the event logs of a transaction
 
 ```bash
+LOCAL=http://localhost:9500
 SHARD0=https://api.s0.b.hmny.io
 SHARD1=https://api.s1.b.hmny.io
 SHARD2=https://api.s2.b.hmny.io
 #your params
-SHARD=SHARD1
+SHARD=LOCAL
 #example is HRC20 mint and transfer
 TXID=0x039d2f87e6bdb81220e5a7490dc783ea835443f57f4e12d16d90dd0b3aa1f5af
 #curl
-curl -X POST $SHARD1 -H 'Accept: */*'   -H 'Accept-Encoding: gzip, deflate'   -H 'Cache-Control: no-cache'   -H 'Connection: keep-alive'   -H 'Content-Length: 162'   -H 'Content-Type: application/json'   -H 'Host: api.s0.b.hmny.io'   -H 'Postman-Token: d5415117-657a-49f9-9100-a5b7ebc70daf,cc2f3cb9-2d10-408c-a003-d6e0822ec985'   -H 'User-Agent: PostmanRuntime/7.19.0'   -H 'cache-control: no-cache'   -d '{
+curl -X POST $SHARD -H 'Accept: */*'   -H 'Accept-Encoding: gzip, deflate'   -H 'Cache-Control: no-cache'   -H 'Connection: keep-alive'   -H 'Content-Length: 162'   -H 'Content-Type: application/json'   -H 'Host: api.s0.b.hmny.io'   -H 'Postman-Token: d5415117-657a-49f9-9100-a5b7ebc70daf,cc2f3cb9-2d10-408c-a003-d6e0822ec985'   -H 'User-Agent: PostmanRuntime/7.19.0'   -H 'cache-control: no-cache'   -d '{
     "jsonrpc":"2.0",
     "method":"hmy_getTransactionReceipt",
     "params":["'$TXID'"],
