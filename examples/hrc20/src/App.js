@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
+import { Router } from "@reach/router"
 
-import { loadContracts } from './redux/contract'
+import { contractState, loadContracts } from './redux/contract'
+import Header from './components/Header/Header'
 import Home from './routes/Home/Home'
 
 
-export default function App() {
+export default connect(
+	(state) => ({
+		contractState: contractState(state),
+	})
+)(function App(props) {
 
 	const dispatch = useDispatch()
 
@@ -13,5 +19,12 @@ export default function App() {
 		dispatch(loadContracts())
 	}, [])
 
-	return (<Home />)
-}
+	return (
+		<div>
+			<Header {...props} />
+			<Router>
+				<Home {...props} path="/" />
+			</Router>
+		</div>
+	)
+})
