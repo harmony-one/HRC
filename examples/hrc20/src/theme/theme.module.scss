@@ -1,11 +1,15 @@
 
 @import './globals.scss';
 
+* {
+    outline-width: 0;
+}
+
 body, html {
     font-family: 'IBM Plex Mono', monospace;
     text-align:center;
     margin: 0;
-    background: #EFEFEF;
+    background: $light;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -43,14 +47,6 @@ section {
     padding: $margin;
 }
 
-.center {
-    text-align: center;
-}
-
-.marginTop {
-    margin-top: $margin;
-}
-
 button {
     margin: $margin;
     font-family: 'IBM Plex Mono', monospace;
@@ -62,4 +58,29 @@ button {
     padding: $half;
     color: #03b0e8;
     background: white;
+}
+
+input {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: $margin;
+    line-height: $margin;
+    height: 48px;
+    padding: $half;
+    width: 100%;
+    border: none;
+    border: 2px solid $light;
+}
+
+
+
+.center {
+    text-align: center;
+}
+
+.breakAll {
+    word-wrap: break-word;
+}
+
+.marginTop {
+    margin-top: $margin;
 }

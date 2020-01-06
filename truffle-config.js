@@ -21,7 +21,6 @@ gasPrice = process.env.GAS_PRICE
 
 module.exports = {
 
-
   networks: {
     local: {
       network_id: '2', 

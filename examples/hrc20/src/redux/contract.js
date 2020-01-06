@@ -1,7 +1,6 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import HarmonyERC20 from '../build/contracts/HarmonyERC20.json'
-
-
+import HarmonyMintable from '../build/contracts/HarmonyMintable.json'
+import HRC20Crowdsale from '../build/contracts/HRC20Crowdsale.json'
 
 //state
 const defaultState = {
@@ -9,7 +8,11 @@ const defaultState = {
     active: null,
     minter: null,
     account: null,
-    contract: null,
+    bech32Addresses: [],
+    addresses: [],
+    tokenContract: null,
+    saleContract: null,
+    processing: false,
 }
 const contractKeys = Object.keys(defaultState)
 export const contractState = ({ contractReducer: { ...keys } }) => {
@@ -18,13 +21,82 @@ export const contractState = ({ contractReducer: { ...keys } }) => {
     })
     return keys
 }
+
+const getContractInstance = (hmy, artifact) => {
+    console.log(artifact.networks)
+    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
+}
 /********************************
 Functions / Actions
 ********************************/
+export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
+    dispatch({ type: UPDATE, processing: true })
+    const { hmy } = getState().contractReducer
+    if (!hmy) {
+        console.log('call loadContracts first')
+        return
+    }
+    console.log(amount, address)
+    const tx = hmy.transactions.newTx({
+        to: address,
+        value: new hmy.utils.Unit(amount).asEther().toWei(),
+        gasLimit: '210000',
+        shardID: 0,
+        toShardID: 0,
+        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    });
+    const signedTX = await hmy.wallet.signTransaction(tx);
+    signedTX.observed().on('transactionHash', (txHash) => {
+        console.log('--- txHash ---', txHash);
+    })
+    .on('receipt', (receipt) => {
+        console.log('--- receipt ---', receipt);
+    })
+    .on('cxReceipt', (receipt) => {
+        console.log('--- cxReceipt ---', receipt);
+        const { active } = getState().contractReducer
+        dispatch(getBalances(active))
+        dispatch({ type: UPDATE, processing: false })
+    }).on('error', console.error)
+    const [sentTX, txHash] = await signedTX.sendTransaction();
+    const confirmedTX = await sentTX.confirm(txHash);
+    console.log(confirmedTX)
+}
+
+export const transferHRC = ({ amount, address }) => async (dispatch, getState) => {
+    dispatch({ type: UPDATE, processing: true })
+    const { hmy, active } = getState().contractReducer
+    if (!hmy) {
+        console.log('call loadContracts first')
+        return
+    }
+    console.log(amount, address)
+    const contract = await getContractInstance(hmy, HarmonyMintable)
+    const tx = contract.methods.transfer(address, parseInt(amount)).send({
+        from: active.address,
+        gasLimit: '1000000',
+        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    }).on('transactionHash', function(hash){
+        console.log(hash)
+    }).on('receipt', function(receipt){
+        console.log(receipt)
+    }).on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt)
+        const { active } = getState().contractReducer
+        dispatch(getBalances(active))
+        dispatch({ type: UPDATE, processing: false })
+    }).on('error', console.error)
+}
 export const setActive = (which) => async (dispatch, getState) => {
     const state = getState().contractReducer
     const active = state[which]
     if (!active) return
+    const { hmy } = state
+    if (!hmy) {
+        console.log('call loadContracts first')
+        return
+    }
+    hmy.wallet.setSigner(active.address);
     dispatch({ type: UPDATE, active })
     dispatch(getBalances(active))
 }
@@ -45,18 +117,23 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
     dispatch({ type: UPDATE, [account.name]: account })
 }
 export const getBalanceHRC = (account) => async (dispatch, getState) => {
-    const { contract } = getState().contractReducer
-    if (!contract) {
+    const { hmy } = getState().contractReducer
+    if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    account.balanceHRC = (await contract.methods.balanceOf(account.address).call({
+    const contract = await getContractInstance(hmy, HarmonyMintable)
+    const balance = await contract.methods.balanceOf(account.address).call({
         gasLimit: '210000',
         gasPrice: '100000',
-    })).toString()
+    })
+    account.balanceHRC = balance.toString()
     dispatch({ type: UPDATE, [account.name]: account })
 }
 export const loadContracts = () => async (dispatch) => {
+
+    console.log(window.harmony)
+    
     const { Harmony } = require('@harmony-js/core');
     const { ChainID, ChainType } = require('@harmony-js/utils');
 
@@ -73,45 +150,13 @@ export const loadContracts = () => async (dispatch) => {
     // 0xea877e7412c313cd177959600e655f8ba8c28b40
     const account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
     account.name = 'My Account'
-    dispatch({ type: UPDATE, minter, account })
-    hmy.wallet.setSigner(minter.address);
-    //get contract
-    const contract = await hmy.contracts.createContract(HarmonyERC20.abi, HarmonyERC20.networks[2].address)
-
-    // const tx = contract.methods.transfer(account.address, 20000).send({
-    //     from: account.address,
-    //     gasLimit: '1000000',
-    //     gasPrice: '500000',
-    // }).on('transactionHash', function(hash){
-    //     console.log(hash)
-    //     // debug in your harmony localnet root dir
-    //     // example: grep -rIn 0x35021f0e981f89fc24bbe46eb6ed26150beaf4e54f18c65a7068f4f21a841968.
-    // }).on('receipt', function(receipt){
-    //     console.log(receipt)
-    // }).on('confirmation', function(confirmationNumber, receipt){
-    //     console.log(confirmationNumber, receipt)
-    // }).on('error', console.error);
-
-    dispatch({ type: UPDATE, contract, active: account })
-    dispatch(getBalanceONE(minter))
-    dispatch(getBalanceONE(account))
-    dispatch(getBalanceHRC(minter))
-    dispatch(getBalanceHRC(account))
-
-    return
-
-    console.log(sender)
-
-    console.log(contract)
-    const balanceHRC = await contract.methods.balanceOf(harmony.wallet.accounts[0]).call({
-        gasLimit: '210000',
-        gasPrice: '100000',
+    dispatch({ type: UPDATE,
+        minter, account,
+        addresses: [account.address, minter.address],
+        bech32Addresses: [account.bech32Address, minter.bech32Address],
     })
-    console.log(balanceHRC.toString())
-
-    contract.events.Transfer({
-        fromBlock: 0
-    }, function (error, event) { console.log(event); })
+    dispatch(setActive('account'))
+    dispatch(setActive('minter'))
 }
 
 //reducer

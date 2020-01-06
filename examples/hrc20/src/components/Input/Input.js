@@ -1,16 +1,43 @@
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { useDispatch } from 'react-redux'
 import { root } from './Input.module.scss'
 
 export default function Input(props) {
-	const dispatch = useDispatch()
 
-    const [isMenuOpen, setMenuOpen] = useState(false)
+    const {
+        value: propValue,
+        reset,
+        name,
+        type,
+        placeholder,
+        onChange
+    } = props
+
+    const [val, setVal] = useState('')
+
+    const updateValue = (value) => {
+        setVal(value)
+        if (onChange) onChange(name, value)
+    }
+    
+    useEffect(() => {
+        if (propValue && propValue.length > 0 && propValue !== val) updateValue(propValue)
+    }, [propValue])
+
+    useEffect(() => {
+        if (reset) updateValue('')
+    }, [reset])
 
     return (
         <div className={root}>
-            <div contentEditable={true} suppressContentEditableWarning={true}>0</div>
+            <input
+                id="input"
+                value={val}
+                type={type}
+                placeholder={placeholder}
+                onChange={(e) => updateValue(e.target.value)}
+            />
         </div>
     )
 }

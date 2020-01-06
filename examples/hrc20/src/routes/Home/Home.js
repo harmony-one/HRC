@@ -1,31 +1,36 @@
 import React from 'react'
 
-import { route, gradient, bubble, marginTop, center } from './Home.module.scss'
-import Input from './../../components/Input/Input'
+import { transferHRC, transferONE } from './../../redux/contract'
+import Form from './../../components/Form/Form'
+import { route, gradient, bubble } from './Home.module.scss'
 
 export default function Home(props) {
 
     const {
-        contractState: { active }
+        contractState: { processing, active, addresses, bech32Addresses }
     } = props
 
     return (
         <div className={route}>
 
-            <section>
-                <h2>Harmony HRC20 Crowdsale</h2>
-            </section>
+            { processing &&
+            <div>
+                Processing
+            </div>
+            }
+           
 
             <section className={gradient}>
                 <h2>Balances</h2>
-                { active &&
+                {active &&
                     <div className={bubble}>
                         <h3>{active.name}</h3>
-                        <p>{active.balanceONE}</p>
-                        <p>{active.balanceHRC}</p>
+                        <p>ONE: {active.balanceONE}</p>
+                        <p>HRC: {active.balanceHRC}</p>
                     </div>
                 }
-                <h2 className={marginTop}>Buy HRC Tokens</h2>
+
+                {/* <h2 className={marginTop}>Buy HRC Tokens</h2>
                 { active &&
                     <div className={bubble}>
                         <h3>Amount</h3>
@@ -34,7 +39,28 @@ export default function Home(props) {
                 }
                 <div className={center}>
                     <button>Send Transaction</button>
-                </div>
+                </div> */}
+
+                <Form
+                    {...{
+                        active,
+                        addressType: 'address',
+                        title: 'Transfer HRC',
+                        addresses,
+                        submit: transferHRC
+                    }}
+                />
+
+                <Form
+                    {...{
+                        active,
+                        addressType: 'bech32Address',
+                        title: 'Transfer ONE',
+                        addresses: bech32Addresses,
+                        submit: transferONE
+                    }}
+                />
+
             </section>
         </div>
     )
