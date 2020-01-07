@@ -127,6 +127,9 @@ export const getBalanceHRC = (account) => async (dispatch, getState) => {
         gasLimit: '210000',
         gasPrice: '100000',
     })
+
+    console.log(account, contract, balance)
+    
     account.balanceHRC = balance.toString()
     dispatch({ type: UPDATE, [account.name]: account })
 }

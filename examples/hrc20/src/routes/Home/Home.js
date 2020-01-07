@@ -46,7 +46,7 @@ export default function Home(props) {
                         active,
                         addressType: 'address',
                         title: 'Transfer HRC',
-                        addresses,
+                        addresses: addresses,
                         submit: transferHRC
                     }}
                 />
