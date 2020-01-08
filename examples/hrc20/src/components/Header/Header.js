@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { useDispatch } from 'react-redux'
-import { setActive } from './../../redux/contract'
+import { setActive } from './../../redux/harmony'
 import { root, menu, menuOpen } from './Header.module.scss'
 
 export default function Header(props) {

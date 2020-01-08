@@ -1,22 +1,24 @@
 import React from 'react'
 
-import { transferHRC, transferONE } from './../../redux/contract'
+import { transferONE } from './../../redux/harmony'
+import { transferHRC } from './../../redux/hrc20'
 import Form from './../../components/Form/Form'
-import { route, gradient, bubble } from './Home.module.scss'
+import { route, gradient, bubble, processingCover } from './Home.module.scss'
+import LoadingGIF from '../../img/loading.gif'
 
 export default function Home(props) {
 
     const {
-        contractState: { processing, active, addresses, bech32Addresses }
+        harmonyState: { processing, active, addresses, bech32Addresses }
     } = props
 
     return (
         <div className={route}>
 
             { processing &&
-            <div>
-                Processing
-            </div>
+                <div className={processingCover}>
+                    <img src={LoadingGIF} />
+                </div>
             }
            
 

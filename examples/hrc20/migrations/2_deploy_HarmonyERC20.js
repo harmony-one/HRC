@@ -11,6 +11,7 @@ module.exports = function (deployer, network, accounts) {
 	const tokens = web3.utils.toWei(amount.toString(), 'ether')
 	const saleTokens = web3.utils.toWei(saleAmount.toString(), 'ether')
 
+
 	deployer.then(function () {
 		return deployer.deploy(HarmonyERC20, name, symbol, decimals, tokens).then(function (token) {
 			return deployer.deploy(HRC20Crowdsale, 1000, accounts[0], token.address, saleTokens).then(function (sale) {

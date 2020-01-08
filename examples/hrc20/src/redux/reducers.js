@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import { contractReducer } from './contract';
+import { hrc20Reducer } from './hrc20';
+import { harmonyReducer } from './harmony';
 
 export default combineReducers({
-    contractReducer,
+    hrc20Reducer,
+    harmonyReducer,
 });
