@@ -1319,12 +1319,12 @@
         }
       },
       "links": {},
-      "address": "0x4CEA5BcFd3877B421A4299FcaF7ff728dB76EA38",
-      "transactionHash": "0x3deb2cb9bd5a81a74624ba1ed8cc4b6aec5ad55346585de10c6520a40c969590"
+      "address": "0x918F32a1e358f5d23F529e10321830EB0CEC003E",
+      "transactionHash": "0xb8428e87cd8d88c526e6698ae62e40921a6c3d943e4c28a9f989e105585084de"
     }
   },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-01-07T23:10:03.635Z",
+  "updatedAt": "2020-01-08T23:34:33.642Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

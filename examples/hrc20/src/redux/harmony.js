@@ -49,9 +49,6 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
     })
     .on('receipt', (receipt) => {
         console.log('--- receipt ---', receipt);
-    })
-    .on('cxReceipt', (receipt) => {
-        console.log('--- cxReceipt ---', receipt);
         const { active } = getState().harmonyReducer
         dispatch(getBalances(active))
         dispatch(updateProcessing(false))

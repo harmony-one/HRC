@@ -1056,12 +1056,12 @@
         }
       },
       "links": {},
-      "address": "0xc677256a9e3bD008DC0fE89132EeA388Ff5B5Df5",
-      "transactionHash": "0x75cfdbbd6945bec1ce7f829fbfe7da610e10ef727c857364f6b4e75eef1a19cc"
+      "address": "0x58cbCC7171585868F400FC8aed6f42fC4db80744",
+      "transactionHash": "0x0ee9e3ad6f382c3ea59f44f56cf5bc2558a3c2976d49afa22515f55f2a1299b4"
     }
   },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-01-07T23:10:03.637Z",
+  "updatedAt": "2020-01-08T23:34:33.659Z",
   "devdoc": {
     "methods": {
       "buyTokens(address)": {

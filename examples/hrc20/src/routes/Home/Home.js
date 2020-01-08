@@ -2,6 +2,7 @@ import React from 'react'
 
 import { transferONE } from './../../redux/harmony'
 import { transferHRC } from './../../redux/hrc20'
+import { purchaseHRC } from './../../redux/crowdsale'
 import Form from './../../components/Form/Form'
 import { route, gradient, bubble, processingCover } from './Home.module.scss'
 import LoadingGIF from '../../img/loading.gif'
@@ -42,6 +43,17 @@ export default function Home(props) {
                 <div className={center}>
                     <button>Send Transaction</button>
                 </div> */}
+
+
+
+                <Form
+                    {...{
+                        active,
+                        title: 'Purchase HRC',
+                        submit: purchaseHRC
+                    }}
+                />
+
 
                 <Form
                     {...{

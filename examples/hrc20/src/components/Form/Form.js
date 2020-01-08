@@ -34,26 +34,30 @@ export default function Form(props) {
                     reset={resetInput}
                     onChange={handleInputChange}
                 />
-                <Input
-                    name="address"
-                    type="text"
-                    placeholder="to"
-                    value={toAddress}
-                    reset={resetInput}
-                    onChange={handleInputChange}
-                />
-                {
-                    addresses && addresses.filter((a) => a !== active[addressType]).map((a) => (
-                        <p
+                {addressType && addresses &&
+                    <div>
+                        <Input
                             name="address"
-                            key={a}
-                            className={breakAll}
-                            onClick={() => {
-                                setToAddress(a)
-                                setTimeout(() => setToAddress(''), 25)
-                            }}
-                        >{a}</p>
-                    ))
+                            type="text"
+                            placeholder="to"
+                            value={toAddress}
+                            reset={resetInput}
+                            onChange={handleInputChange}
+                        />
+                        {
+                            addresses.filter((a) => a !== active[addressType]).map((a) => (
+                                <p
+                                    name="address"
+                                    key={a}
+                                    className={breakAll}
+                                    onClick={() => {
+                                        setToAddress(a)
+                                        setTimeout(() => setToAddress(''), 25)
+                                    }}
+                                >{a}</p>
+                            ))
+                        }
+                    </div>
                 }
             </div>
             <div className={center}>
