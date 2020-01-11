@@ -1,0 +1,29 @@
+SHARD0=https://api.s0.b.hmny.io
+SHARD1=https://api.s1.b.hmny.io
+SHARD2=https://api.s2.b.hmny.io
+#your params
+SHARD=SHARD1
+#example is HRC20 mint and transfer
+TXID=0x039d2f87e6bdb81220e5a7490dc783ea835443f57f4e12d16d90dd0b3aa1f5af
+#curl
+
+
+curl -X GET http://localhost:9500 -H 'Content-Type: application/json' -d '{
+    "jsonrpc":"2.0",
+    "method":"hmy_getLogs",
+    "params":[{
+        "fromBlock": "0x0",
+        "toBlock": "latest",
+        "address":["0x58cbcc7171585868f400fc8aed6f42fc4db80744"],
+        "topics":["0x6faf93231a456e552dbc9961f58d9713ee4f2e69d15f1975b050ef0911053a7b"]
+    }],
+    "id": 1
+}'
+
+
+curl -X GET http://localhost:9500 -H 'Content-Type: application/json' -d '{
+    "jsonrpc":"2.0",
+    "method":"hmy_getLogs",
+    "params":[{"blockHash":"0x4b717e2d022fac1606c1096e6126a4775070c1f434bf06d8b24e4971ccdb2302"}],
+    "id": 1
+}'

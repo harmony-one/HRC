@@ -26,7 +26,7 @@ export const transferHRC = ({ amount, address }) => async (dispatch, getState) =
     }
     console.log(amount, address)
     const contract = await getContractInstance(hmy, HarmonyMintable)
-    const tx = contract.methods.transfer(address, parseInt(amount)).send({
+    const tx = contract.methods.transfer(address, new hmy.utils.Unit(amount).asEther().toWei()).send({
         from: active.address,
         gasLimit: '1000000',
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),

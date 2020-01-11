@@ -9,6 +9,7 @@
     "@harmony-js/contract": "^0.1.36",
     "@harmony-js/core": "^0.1.36",
     "@reach/router": "^1.2.1",
+    "chartist": "^0.11.4",
     "parcel": "^1.12.4",
     "parcel-bundler": "^1.12.4",
     "postcss-modules": "^1.4.1",

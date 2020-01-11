@@ -28,6 +28,7 @@ h1, h2, h3, h4, h5, h6, p {
     min-height: calc(100vh - #{$header-height});
     margin:auto;
     box-shadow: $shadow;
+    background: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);
 }
 
 .bubble {
@@ -39,7 +40,6 @@ h1, h2, h3, h4, h5, h6, p {
 
 .gradient {
     color: white;
-    background: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);
 }
 
 section {
@@ -70,8 +70,6 @@ input {
     border: none;
     border: 2px solid $light;
 }
-
-
 
 .center {
     text-align: center;

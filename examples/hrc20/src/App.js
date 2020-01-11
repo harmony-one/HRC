@@ -2,11 +2,12 @@ import React, { useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Router } from "@reach/router"
 
-import { crowdsaleState } from './redux/crowdsale'
+import { crowdsaleInit, crowdsaleState } from './redux/crowdsale'
 import { hrc20State } from './redux/hrc20'
 import { harmonyInit, harmonyState } from './redux/harmony'
 import Header from './components/Header/Header'
 import Home from './routes/Home/Home'
+import Sale from './routes/Sale/Sale'
 
 export default connect(
 	(state) => ({
@@ -20,6 +21,7 @@ export default connect(
 
 	useEffect(() => {
 		dispatch(harmonyInit())
+		dispatch(crowdsaleInit())
 	}, [])
 
 	return (
@@ -27,6 +29,7 @@ export default connect(
 			<Header {...props} />
 			<Router>
 				<Home {...props} path="/" />
+				<Sale {...props} path="/sale" />
 			</Router>
 		</div>
 	)

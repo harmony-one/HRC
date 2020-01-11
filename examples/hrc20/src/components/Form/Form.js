@@ -8,7 +8,7 @@ export default function Form(props) {
 
     const {
         active, addressType, addresses,
-        submit, title,
+        submit, title, subtitle = '', amountLabel,
     } = props
 
 
@@ -27,10 +27,11 @@ export default function Form(props) {
         <div className={root}>
             <h2 className={marginTop}>{title}</h2>
             <div className={bubble}>
+                {subtitle && <p>{subtitle}</p>}
                 <Input
                     name="amount"
                     type="number"
-                    placeholder="amount"
+                    placeholder={amountLabel || "amount"}
                     reset={resetInput}
                     onChange={handleInputChange}
                 />
