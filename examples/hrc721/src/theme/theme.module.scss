@@ -1,0 +1,84 @@
+
+@import './globals.scss';
+
+* {
+    outline-width: 0;
+}
+
+body, html {
+    font-family: 'IBM Plex Mono', monospace;
+    text-align:center;
+    margin: 0;
+    background: $light;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+    margin-bottom: $margin;
+}
+
+#root {
+    margin:auto;
+}
+
+.route {
+    background: white;
+    padding-top: $header-height;
+    max-width: 500px;
+    min-height: calc(100vh - #{$header-height});
+    margin:auto;
+    box-shadow: $shadow;
+    background: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);
+}
+
+.bubble {
+    padding: $margin;
+    background: white;
+    color: black;
+    border-radius: $half;
+}
+
+.gradient {
+    color: white;
+}
+
+section {
+    text-align: left;
+    padding: $margin;
+}
+
+button {
+    margin: $margin;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: $margin;
+    line-height: $margin;
+    height: 48px;
+    border-radius: 24px;
+    border: 2px solid white;
+    padding: $half;
+    color: #03b0e8;
+    background: white;
+}
+
+input {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: $margin;
+    line-height: $margin;
+    height: 48px;
+    padding: $half;
+    width: 100%;
+    border: none;
+    border: 2px solid $light;
+}
+
+.center {
+    text-align: center;
+}
+
+.breakAll {
+    word-wrap: break-word;
+}
+
+.marginTop {
+    margin-top: $margin;
+}
