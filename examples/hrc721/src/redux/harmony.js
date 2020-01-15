@@ -1,7 +1,7 @@
 import { UPDATE, reducer } from '../util/redux-util'
 import { Harmony } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
-import { getBalanceHRC } from './hrc20'
+import { getBalanceHRC } from './hrc721'
 import { getRaised } from './crowdsale'
 //state
 const defaultState = {

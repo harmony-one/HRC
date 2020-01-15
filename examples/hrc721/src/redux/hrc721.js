@@ -1,15 +1,15 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import HarmonyMintable from '../build/contracts/HarmonyMintable.json'
+import HarmonyMintable from '../build/contracts/HRC721.json'
 import {getBalances, updateProcessing} from './harmony'
 
 //state
 const defaultState = {
     tokenContract: null,
 }
-const hrc20Keys = Object.keys(defaultState)
-export const hrc20State = ({ hrc20Reducer: { ...keys } }) => {
+const hrc721Keys = Object.keys(defaultState)
+export const hrc721State = ({ hrc721Reducer: { ...keys } }) => {
     Object.keys(keys).forEach((k) => {
-        if (!hrc20Keys.includes(k)) delete keys[k]
+        if (!hrc721Keys.includes(k)) delete keys[k]
     })
     return keys
 }
@@ -61,6 +61,6 @@ export const getBalanceHRC = (account) => async (dispatch, getState) => {
 }
 
 //reducer
-export const hrc20Reducer = (state = {
+export const hrc721Reducer = (state = {
     ...defaultState
 }, action) => reducer(state, action)

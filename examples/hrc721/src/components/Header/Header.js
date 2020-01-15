@@ -34,7 +34,7 @@ export default function Header({history}) {
                 </div>
             </div>
             <div className={root}>
-                <p>HRC20 Crowdsale</p>
+                <p>HRC721 Crowdsale</p>
                 <i className={"fas fa-bars"} onClick={() => setMenuOpen(true)}></i>
             </div>
         </div>

@@ -1,4 +1,5 @@
 var HRC721 = artifacts.require("HRC721");
+var HRC721Crowdsale = artifacts.require("HRC721Crowdsale");
 
 module.exports = function (deployer, network, accounts) {
 
@@ -6,6 +7,10 @@ module.exports = function (deployer, network, accounts) {
 	const symbol = "HRC721"
 
 	deployer.then(function () {
-		return deployer.deploy(HRC721, name, symbol)
+		return deployer.deploy(HRC721, name, symbol).then(function (token) {
+			return deployer.deploy(HRC721Crowdsale, token.address).then(function (sale) {
+				return token.addMinter(sale.address)
+			})
+		});
 	});
 };

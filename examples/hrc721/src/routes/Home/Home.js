@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { transferONE } from './../../redux/harmony'
-import { transferHRC } from './../../redux/hrc20'
+import { transferHRC } from './../../redux/hrc721'
 import { purchaseHRC } from './../../redux/crowdsale'
 import Form from './../../components/Form/Form'
 import { route, gradient, bubble, marginTop, processingCover } from './Home.module.scss'
@@ -39,7 +39,7 @@ export default function Home(props) {
                     {...{
                         active,
                         title: 'Contribute ONE',
-                        subtitle: <span>Purchase HRC20 tokens by contributing to our crowdsale<br/>Rate:<br/>1 ONE = 1000 HRC</span>,
+                        subtitle: <span>Purchase HRC721 tokens by contributing to our crowdsale<br/>Rate:<br/>1 ONE = 1000 HRC</span>,
                         amountLabel: 'Amount in ONE',
                         submit: purchaseHRC
                     }}
