@@ -4,6 +4,8 @@ import { updateProcessing, getBalances } from './harmony'
 
 //state
 const defaultState = {
+    totalItems: 0,
+    items: [],
     raised: 0,
     minted: 0,
     tokenContract: null,
@@ -46,53 +48,76 @@ export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
 }
 
 export const getRaised = () => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    const contract = await getContractInstance(hmy, HRC721Crowdsale)
-    const raised = await contract.methods.weiRaised().call({
-        gasLimit: '210000',
-        gasPrice: '100000',
-    })
-    const one = new hmy.utils.Unit(raised).asWei().toEther()
-    dispatch({ type: UPDATE, raised: one, minted: one * 1000 })
+    // const { hmy } = getState().harmonyReducer
+    // const contract = await getContractInstance(hmy, HRC721Crowdsale)
+    // const raised = await contract.methods.weiRaised().call({
+    //     gasLimit: '210000',
+    //     gasPrice: '100000',
+    // })
+    // const one = new hmy.utils.Unit(raised).asWei().toEther()
+    // dispatch({ type: UPDATE, raised: one, minted: one * 1000 })
 
+}
+
+const getInventory = () => async (dispatch, getState) => {
+    const { hmy } = getState().harmonyReducer
+    const crowdsale = await getContractInstance(hmy, HRC721Crowdsale)
+    const args = {
+        gasLimit: '1000000',
+        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    }
+    const totalItems = parseInt((await crowdsale.methods.totalItems().call(args)).toNumber())
+    console.log(totalItems.toString())
+    const items = []
+    for (let i = 0; i < totalItems; i++) {
+        const limit = parseInt(await crowdsale.methods.getLimit(i).call(args), 16)
+        const minted = parseInt(await crowdsale.methods.getMinted(i).call(args), 16)
+        const url = await crowdsale.methods.getUrl(i).call(args)
+        items.push({
+            limit, minted, url
+        })
+    }
+    dispatch({type: UPDATE, items})
 }
 
 export const crowdsaleInit = () => async (dispatch, getState) => {
     const { hmy } = getState().harmonyReducer
-    const contract = await getContractInstance(hmy, HRC721Crowdsale)
+    const crowdsale = await getContractInstance(hmy, HRC721Crowdsale)
+    dispatch(getInventory())
+    
     //args TokensPurchased event
-    const args = {
-        fromBlock: '0x0',
-        toBlock: 'latest',
-        address: contract.options.address,
-        topics: [Object.keys(contract.events)[1]]
-    }
+    // const args = {
+    //     fromBlock: '0x0',
+    //     toBlock: 'latest',
+    //     address: contract.options.address,
+    //     topics: [Object.keys(contract.events)[1]]
+    // }
 
-    // contract.events.TokensPurchased(args)
-    hmy.blockchain.logs(args, hmy.blockchain.messenger, hmy.blockchain.messenger.currentShard)
-        .on('data', (logs) => {
-            // console.log(logs)
-            if (!logs) return
-            if (logs.params && logs.params.result) logs = logs.params.result
-            if (!logs.data) return
-            const args = contract.abiCoder.decodeParameters(['uint256', 'uint256'], logs.data)
-            const topics = logs.topics.map((topic, i) => {
-                if (i === 0) return
-                return contract.abiCoder.decodeParameters(['address'], topic)[0]
-            }).filter((a) => !!a)
-            // console.log(topics)
-            const values = Object.keys(args).map((k) => new hmy.utils.Unit(args[k]).asWei().toEther())
-            // console.log(values)
-            const event = {
-                one: values[0],
-                hrc: values[1],
-                purchaser: topics[0],
-                beneficiary: topics[1],
-            }
-            const events = getState().crowdsaleReducer.events.slice()
-            events.push(event)
-            dispatch({type: UPDATE, events})
-        })
+    // // contract.events.TokensPurchased(args)
+    // hmy.blockchain.logs(args, hmy.blockchain.messenger, hmy.blockchain.messenger.currentShard)
+    //     .on('data', (logs) => {
+    //         // console.log(logs)
+    //         if (!logs) return
+    //         if (logs.params && logs.params.result) logs = logs.params.result
+    //         if (!logs.data) return
+    //         const args = contract.abiCoder.decodeParameters(['uint256', 'uint256'], logs.data)
+    //         const topics = logs.topics.map((topic, i) => {
+    //             if (i === 0) return
+    //             return contract.abiCoder.decodeParameters(['address'], topic)[0]
+    //         }).filter((a) => !!a)
+    //         // console.log(topics)
+    //         const values = Object.keys(args).map((k) => new hmy.utils.Unit(args[k]).asWei().toEther())
+    //         // console.log(values)
+    //         const event = {
+    //             one: values[0],
+    //             hrc: values[1],
+    //             purchaser: topics[0],
+    //             beneficiary: topics[1],
+    //         }
+    //         const events = getState().crowdsaleReducer.events.slice()
+    //         events.push(event)
+    //         dispatch({type: UPDATE, events})
+    //     })
 }
 
 //reducer

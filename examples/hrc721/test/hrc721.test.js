@@ -18,7 +18,7 @@ contract("HRC721", (accounts) => {
 		const limit = await crowdsale.getLimit(0)
 		const minted = await crowdsale.getMinted(0)
 		const url = await crowdsale.getUrl(0)
-		console.log(totalItems.toString(), limit.toString(), minted.toString(), url)
+		// console.log(totalItems.toString(), limit.toString(), minted.toString(), url)
 		assert.equal(totalItems.toString(), '10')
 		assert.equal(limit.toString(), '10')
 		assert.equal(minted.toString(), '0')
@@ -36,7 +36,7 @@ contract("HRC721", (accounts) => {
 				await crowdsale.mint(alice, 0)
 			}
 		} catch (e) {
-			console.log(e)
+			// console.log(e)
 		}
 		const minted = await crowdsale.getMinted(0)
 		assert.equal(minted.toString(), '10')
@@ -51,7 +51,7 @@ contract("HRC721", (accounts) => {
 		for (let i = 0; i < tokens; i++) {
 			const tokenId = (await hrc721.tokenOfOwnerByIndex(alice, i)).toNumber()
 			const tokenData = await crowdsale.getTokenData(tokenId)
-			console.log(tokenId, tokenData)
+			// console.log(tokenId, tokenData)
 		}
 		assert.equal(tokens, 11)
 	})

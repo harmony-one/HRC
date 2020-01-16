@@ -9,3 +9,31 @@
     height: 100vh;
     padding-top: 48px;
 }
+.inventory {
+    > div {
+        margin-bottom: $margin;
+        > div:first-child {
+            background: white;
+            color: black;
+            p {
+                padding: $margin;
+            }
+        }
+    }
+}
+.image {
+    display: flex;
+    width: 100%;
+    height: 200px;
+    > img {
+        object-fit: cover;
+        width: 100%;
+    }
+}
+
+.button {
+    text-align: right;
+    button {
+        margin: 0;
+    }
+}

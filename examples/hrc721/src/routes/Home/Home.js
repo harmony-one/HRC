@@ -4,14 +4,14 @@ import { transferONE } from './../../redux/harmony'
 import { transferHRC } from './../../redux/hrc721'
 import { purchaseHRC } from './../../redux/crowdsale'
 import Form from './../../components/Form/Form'
-import { route, gradient, bubble, marginTop, processingCover } from './Home.module.scss'
+import { route, gradient, bubble, marginTop, processingCover, inventory, image, button } from './Home.module.scss'
 import LoadingGIF from '../../img/loading.gif'
 
 export default function Home(props) {
 
     const {
         harmonyState: { processing, active, addresses, bech32Addresses },
-        crowdsaleState: { raised }
+        crowdsaleState: { items }
     } = props
 
     return (
@@ -30,42 +30,29 @@ export default function Home(props) {
                     <div className={bubble}>
                         <h3>{active.name}</h3>
                         <p>ONE: {active.balanceONE}</p>
-                        <p>HRC: {active.balanceHRC}</p>
                     </div>
                 }
+            </section>
 
-
-                <Form
-                    {...{
-                        active,
-                        title: 'Contribute ONE',
-                        subtitle: <span>Purchase HRC721 tokens by contributing to our crowdsale<br/>Rate:<br/>1 ONE = 1000 HRC</span>,
-                        amountLabel: 'Amount in ONE',
-                        submit: purchaseHRC
-                    }}
-                />
-
-
-                <Form
-                    {...{
-                        active,
-                        addressType: 'address',
-                        title: 'Transfer HRC',
-                        addresses: addresses,
-                        submit: transferHRC
-                    }}
-                />
-
-                <Form
-                    {...{
-                        active,
-                        addressType: 'bech32Address',
-                        title: 'Transfer ONE',
-                        addresses: bech32Addresses,
-                        submit: transferONE
-                    }}
-                />
-
+            <section className={gradient}>
+                <h2>Items</h2>
+                <div className={inventory}>
+                {
+                    items.map((item, i) => 
+                        <div key={i}>
+                            <div>
+                                <div className={image}>
+                                    <img src={item.url} alt="dog" />
+                                </div>
+                                <p>{item.minted} / {item.limit} sold</p>
+                            </div>
+                            <div className={button}>
+                                <button onClick={() => console.log(i)}>Purchase</button>
+                            </div>
+                        </div>
+                    )
+                }
+                </div>
             </section>
         </div>
     )
