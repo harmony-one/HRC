@@ -17,6 +17,16 @@ h1, h2, h3, h4, h5, h6, p {
     margin-bottom: $margin;
 }
 
+.processingCover {
+    z-index: 9999;
+    position: fixed;
+    top:0; left: 0;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100vw;
+    height: 100vh;
+    padding-top: 48px;
+}
+
 #root {
     margin:auto;
 }
@@ -27,15 +37,14 @@ h1, h2, h3, h4, h5, h6, p {
     max-width: 500px;
     min-height: calc(100vh - #{$header-height});
     margin:auto;
-    box-shadow: $shadow;
-    background: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);
+    background: $gradient;
 }
 
 .bubble {
     padding: $margin;
     background: white;
     color: black;
-    border-radius: $half;
+    box-shadow: $shadow;
 }
 
 .gradient {

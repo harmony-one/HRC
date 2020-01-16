@@ -1,0 +1,62 @@
+
+
+@import './../../theme/theme.module.scss';
+
+.inventory {
+    width: 100vw;
+    margin-left: -$margin;
+    > div {
+        margin-bottom: $margin;
+        > div:first-child {
+            background: white;
+            color: black;
+            p {
+                padding: $margin;
+            }
+        }
+    }
+}
+.image {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    height: 300px;
+    box-shadow: $shadow;
+    > img {
+        object-fit: cover;
+        width: 100%;
+    }
+    > p {
+        background: white;
+        position: absolute;
+        margin: 0;
+        padding: $half !important;
+        top: 0;
+        right: 0;
+        z-index: 3;
+        font-weight: bold;
+    }
+}
+
+.stats {
+    box-shadow: $shadow;
+    position: relative;
+    background: white;
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    > p {
+        margin: 0;
+    }
+    margin-bottom: $margin;
+}
+
+.button {
+    margin-right: $margin;
+    margin-bottom: $double;
+    text-align: right;
+    button {
+        margin: 0;
+    }
+}

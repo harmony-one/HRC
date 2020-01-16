@@ -21,19 +21,18 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
 const getContractInstance = (hmy, artifact) => {
     return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
 }
-export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
+export const purchase = ({ index }) => async (dispatch, getState) => {
+    console.log(index)
     dispatch(updateProcessing(true))
-    dispatch({ type: UPDATE })
     const { hmy, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
     const contract = await getContractInstance(hmy, HRC721Crowdsale)
-
-    const tx = contract.methods.buyTokens(active.address).send({
+    const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
-        value: new hmy.utils.Unit(amount).asEther().toWei(),
+        value: new hmy.utils.Unit(1).asEther().toWei(),
         gasLimit: '1000000',
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
@@ -42,7 +41,7 @@ export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
         console.log('receipt', receipt)
     }).on('confirmation', async (confirmationNumber, receipt) => {
         console.log('confirmationNumber', confirmationNumber, receipt)
-        dispatch(getBalances(active))
+        dispatch(getInventory())
         dispatch(updateProcessing(false))
     }).on('error', console.error)
 }
@@ -56,8 +55,9 @@ export const getRaised = () => async (dispatch, getState) => {
     // })
     // const one = new hmy.utils.Unit(raised).asWei().toEther()
     // dispatch({ type: UPDATE, raised: one, minted: one * 1000 })
-
 }
+        
+
 
 const getInventory = () => async (dispatch, getState) => {
     const { hmy } = getState().harmonyReducer
@@ -72,9 +72,10 @@ const getInventory = () => async (dispatch, getState) => {
     for (let i = 0; i < totalItems; i++) {
         const limit = parseInt(await crowdsale.methods.getLimit(i).call(args), 16)
         const minted = parseInt(await crowdsale.methods.getMinted(i).call(args), 16)
+        const price = parseInt(await crowdsale.methods.getMinted(i).call(args))
         const url = await crowdsale.methods.getUrl(i).call(args)
         items.push({
-            limit, minted, url
+            limit, minted, price, url
         })
     }
     dispatch({type: UPDATE, items})

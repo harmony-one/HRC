@@ -1,7 +1,7 @@
 import { UPDATE, reducer } from '../util/redux-util'
 import { Harmony } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
-import { getBalanceHRC } from './hrc721'
+import { getTokens } from './hrc721'
 import { getRaised } from './crowdsale'
 //state
 const defaultState = {
@@ -86,7 +86,7 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
 }
 export const getBalances = (account) => async (dispatch, getState) => {
     dispatch(getBalanceONE(account))
-    dispatch(getBalanceHRC(account))
+    dispatch(getTokens(account))
     dispatch(getRaised(account))
 }
 

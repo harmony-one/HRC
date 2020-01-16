@@ -29,7 +29,7 @@ export default function Header({history}) {
                         <p onClick={() => {
                             navigate('/sale')
                             setMenuOpen(false)
-                        }}>Sale Stats</p>
+                        }}>Sale</p>
                     </section>
                 </div>
             </div>

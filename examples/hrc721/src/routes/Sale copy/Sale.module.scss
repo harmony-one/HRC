@@ -1,0 +1,38 @@
+
+@import './../../theme/theme.module.scss';
+
+.processingCover {
+    position: fixed;
+    top:0; left: 0;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100vw;
+    height: 100vh;
+    padding-top: 48px;
+}
+
+
+
+.chart {
+    margin-top: 32px;
+    padding: $margin;
+    border-radius: $margin;
+    background: white;
+}
+
+:global {
+    .ct-series-a .ct-point,
+    .ct-series-b .ct-point {
+        stroke: #03b0e8;
+        stroke-width: 7px;
+    }
+    .ct-series-a .ct-line,
+    .ct-series-b .ct-line {
+        stroke: #03b0e8;
+        stroke-width: 2px;
+    }
+
+    .ct-series-b .ct-point,
+    .ct-series-b .ct-line {
+        stroke: #4de6c8
+    }
+}
