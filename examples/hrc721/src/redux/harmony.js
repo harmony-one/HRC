@@ -5,6 +5,7 @@ import { getTokens } from './hrc721'
 import { getRaised } from './crowdsale'
 //state
 const defaultState = {
+    harmony: null,
     hmy: null,
     active: null,
     minter: null,
@@ -36,6 +37,28 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         return
     }
     console.log(amount, address)
+
+
+    /********************************
+    Testing Math Wallet
+    ********************************/
+    let harmony
+
+    await new Promise((resolve) => {
+        const check = () => {
+            if (!window.harmony) setTimeout(check, 250)
+            else {
+                harmony = window.harmony
+                resolve()
+            }
+        }
+        check()
+    })
+    const test = await harmony.getAccount()
+    console.log(harmony)
+    console.log(hmy)
+    console.log(hmy.wallet)
+
     const tx = hmy.transactions.newTx({
         to: address,
         value: new hmy.utils.Unit(amount).asEther().toWei(),
@@ -44,19 +67,26 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         toShardID: 0,
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     });
-    const signedTX = await hmy.wallet.signTransaction(tx);
-    signedTX.observed().on('transactionHash', (txHash) => {
-        console.log('--- txHash ---', txHash);
-    })
-    .on('receipt', (receipt) => {
-        console.log('--- receipt ---', receipt);
-        const { active } = getState().harmonyReducer
-        dispatch(getBalances(active))
-        dispatch(updateProcessing(false))
-    }).on('error', console.error)
-    const [sentTX, txHash] = await signedTX.sendTransaction();
-    const confirmedTX = await sentTX.confirm(txHash);
-    console.log(confirmedTX)
+
+    console.log(tx)
+
+    console.log(harmony.signTransaction)
+    const testSign = await harmony.signTransaction(tx);
+    console.log(testSign)
+
+    // const signedTX = await hmy.wallet.signTransaction(tx);
+    // signedTX.observed().on('transactionHash', (txHash) => {
+    //     console.log('--- txHash ---', txHash);
+    // })
+    // .on('receipt', (receipt) => {
+    //     console.log('--- receipt ---', receipt);
+    //     const { active } = getState().harmonyReducer
+    //     dispatch(getBalances(active))
+    //     dispatch(updateProcessing(false))
+    // }).on('error', console.error)
+    // const [sentTX, txHash] = await signedTX.sendTransaction();
+    // const confirmedTX = await sentTX.confirm(txHash);
+    // console.log(confirmedTX)
 }
 
 export const setActive = (which) => async (dispatch, getState) => {
@@ -91,6 +121,7 @@ export const getBalances = (account) => async (dispatch, getState) => {
 }
 
 export const harmonyInit = () => async (dispatch) => {
+
     const url = `ws://localhost:9800`
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
@@ -112,6 +143,8 @@ export const harmonyInit = () => async (dispatch) => {
     })
     dispatch(setActive('account'))
     dispatch(setActive('minter'))
+
+    dispatch(transferONE({ amount: 1, account: account.address }))
 }
 
 //reducer

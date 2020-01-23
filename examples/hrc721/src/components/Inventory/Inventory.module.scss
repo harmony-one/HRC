@@ -28,14 +28,19 @@
         width: 100%;
     }
     > p {
-        background: white;
         position: absolute;
+        top: 0;
+        background: white;
         margin: 0;
         padding: $half !important;
-        top: 0;
-        right: 0;
         z-index: 3;
         font-weight: bold;
+    }
+    > p:nth-child(2) {
+        left: 0;
+    }
+    > p:nth-child(3) {
+        right: 0;
     }
 }
 

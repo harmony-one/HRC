@@ -72,7 +72,8 @@ const getInventory = () => async (dispatch, getState) => {
     for (let i = 0; i < totalItems; i++) {
         const limit = parseInt(await crowdsale.methods.getLimit(i).call(args), 16)
         const minted = parseInt(await crowdsale.methods.getMinted(i).call(args), 16)
-        const price = parseInt(await crowdsale.methods.getMinted(i).call(args))
+        let price = (await crowdsale.methods.getPrice(i).call(args)).toString()
+        price = new hmy.utils.Unit(price).asWei().toEther().toString()
         const url = await crowdsale.methods.getUrl(i).call(args)
         items.push({
             limit, minted, price, url

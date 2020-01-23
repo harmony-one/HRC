@@ -23,7 +23,8 @@ export default function Inventory(props) {
                     <div>
                         <div className={image}>
                             <img src={item.url} alt="dog" />
-                            <p>ID {item.url.split('/')[3]}</p>
+                            <p>Price: {item.price}</p>
+                            <p>Item {index+1}</p>
                         </div>
                         <div className={stats}>
                             <p>{item.minted} / {item.limit} sold</p>
