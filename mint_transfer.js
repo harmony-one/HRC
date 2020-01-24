@@ -1,11 +1,11 @@
 var HarmonyERC20 = artifacts.require("HarmonyERC20");
 
-//mint amount address
-const myAddress =   "0x3aea49553Ce2E478f1c0c5ACC304a84F5F4d1f98";
-
 //test account address, keys under
 //https://github.com/harmony-one/harmony/blob/master/.hmy/keystore/one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7.key
 const testAccount = "0x7c41e0668b551f4f902cfaec05b5bdca68b124ce";
+// the account to transfer to
+// surge welcome lion goose gate consider taste injury health march debris kick
+const myAddress = "0xea877e7412c313cd177959600e655f8ba8c28b40";
 
 const transferAmount = 2000000;
 
@@ -17,7 +17,8 @@ module.exports = function() {
         let decimals = await instance.decimals();
         let mybalance = await instance.balanceOf(myAddress);
         
-        instance.transfer(testAccount, transferAmount);
+        const tx = await instance.transfer(myAddress, transferAmount);
+        console.log(tx)
         let testAccBalance = await instance.balanceOf(testAccount);
 
         console.log("HarmonyERC20 is deployed at address " + instance.address);

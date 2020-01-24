@@ -1,7 +1,9 @@
 var HarmonyERC20 = artifacts.require("HarmonyERC20");
 
 //mint amount address
-const myAddress =   "0x3aea49553Ce2E478f1c0c5ACC304a84F5F4d1f98";
+
+let myAddress =   "0x3aea49553Ce2E478f1c0c5ACC304a84F5F4d1f98";
+myAddress = "0xea877e7412c313cd177959600e655f8ba8c28b40";
 
 //test account address, keys under
 //https://github.com/harmony-one/harmony/blob/master/.hmy/keystore/one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7.key

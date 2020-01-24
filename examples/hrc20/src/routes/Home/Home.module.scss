@@ -1,0 +1,11 @@
+
+@import './../../theme/theme.module.scss';
+
+.processingCover {
+    position: fixed;
+    top:0; left: 0;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100vw;
+    height: 100vh;
+    padding-top: 48px;
+}

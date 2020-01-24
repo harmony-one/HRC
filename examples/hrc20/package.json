@@ -1,0 +1,29 @@
+{
+  "name": "hrc-dapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "https://github.com/mattlockyer",
+  "license": "ISC",
+  "dependencies": {
+    "@harmony-js/contract": "^0.1.36",
+    "@harmony-js/core": "^0.1.36",
+    "@reach/router": "^1.2.1",
+    "chartist": "^0.11.4",
+    "parcel": "^1.12.4",
+    "parcel-bundler": "^1.12.4",
+    "postcss-modules": "^1.4.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-redux": "^7.1.3",
+    "redux": "^4.0.4",
+    "redux-thunk": "^2.3.0",
+    "sass": "^1.23.7"
+  },
+  "scripts": {
+    "start": "pkill node; parcel ./src/index.html --open > output.log &"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
+}
