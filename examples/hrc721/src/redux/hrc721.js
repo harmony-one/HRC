@@ -1,6 +1,7 @@
 import { UPDATE, reducer } from '../util/redux-util'
 import HarmonyMintable from '../build/contracts/HRC721.json'
 import {getBalances, updateProcessing} from './harmony'
+import { getContractInstance } from '../util/hmy-util'
 
 //state
 const defaultState = {
@@ -14,10 +15,6 @@ export const hrc721State = ({ hrc721Reducer: { ...keys } }) => {
     })
     return keys
 }
-const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
-}
-
 
 export const getTokens = (account) => async (dispatch, getState) => {
     const { hmy } = getState().harmonyReducer

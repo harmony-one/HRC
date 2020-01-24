@@ -1,4 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
+import { getContractInstance } from '../util/hmy-util'
 import HRC721Crowdsale from '../build/contracts/HRC721Crowdsale.json'
 import { updateProcessing, getBalances } from './harmony'
 
@@ -18,18 +19,14 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
     })
     return keys
 }
-const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
-}
 export const purchase = ({ index }) => async (dispatch, getState) => {
-    console.log(index)
     dispatch(updateProcessing(true))
-    const { hmy, active } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    const contract = await getContractInstance(hmy, HRC721Crowdsale)
+    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HRC721Crowdsale)
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
         value: new hmy.utils.Unit(1).asEther().toWei(),
@@ -67,7 +64,6 @@ const getInventory = () => async (dispatch, getState) => {
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     }
     const totalItems = parseInt((await crowdsale.methods.totalItems().call(args)).toNumber())
-    console.log(totalItems.toString())
     const items = []
     for (let i = 0; i < totalItems; i++) {
         const limit = parseInt(await crowdsale.methods.getLimit(i).call(args), 16)

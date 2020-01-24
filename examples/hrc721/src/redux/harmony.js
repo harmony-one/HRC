@@ -1,5 +1,6 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import { Harmony } from '@harmony-js/core'
+import { waitForInjected, getExtAccount } from '../util/hmy-util'
+import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
 import { getTokens } from './hrc721'
 import { getRaised } from './crowdsale'
@@ -7,6 +8,7 @@ import { getRaised } from './crowdsale'
 const defaultState = {
     harmony: null,
     hmy: null,
+    hmyExt: null,
     active: null,
     minter: null,
     account: null,
@@ -29,6 +31,9 @@ export const updateProcessing = (processing) => async (dispatch) => {
     dispatch({ type: UPDATE, processing })
 }
 
+/********************************
+This is only enabled for localnet hmy e.g. Alice's account
+********************************/
 export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     const { hmy } = getState().harmonyReducer
@@ -37,27 +42,6 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         return
     }
     console.log(amount, address)
-
-
-    /********************************
-    Testing Math Wallet
-    ********************************/
-    let harmony
-
-    await new Promise((resolve) => {
-        const check = () => {
-            if (!window.harmony) setTimeout(check, 250)
-            else {
-                harmony = window.harmony
-                resolve()
-            }
-        }
-        check()
-    })
-    const test = await harmony.getAccount()
-    console.log(harmony)
-    console.log(hmy)
-    console.log(hmy.wallet)
 
     const tx = hmy.transactions.newTx({
         to: address,
@@ -68,50 +52,54 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     });
 
-    console.log(tx)
-
-    console.log(harmony.signTransaction)
-    const testSign = await harmony.signTransaction(tx);
-    console.log(testSign)
-
-    // const signedTX = await hmy.wallet.signTransaction(tx);
-    // signedTX.observed().on('transactionHash', (txHash) => {
-    //     console.log('--- txHash ---', txHash);
-    // })
-    // .on('receipt', (receipt) => {
-    //     console.log('--- receipt ---', receipt);
-    //     const { active } = getState().harmonyReducer
-    //     dispatch(getBalances(active))
-    //     dispatch(updateProcessing(false))
-    // }).on('error', console.error)
-    // const [sentTX, txHash] = await signedTX.sendTransaction();
-    // const confirmedTX = await sentTX.confirm(txHash);
-    // console.log(confirmedTX)
+    const signedTX = await hmy.wallet.signTransaction(tx);
+    signedTX.observed().on('transactionHash', (txHash) => {
+        console.log('--- txHash ---', txHash);
+    })
+    .on('receipt', (receipt) => {
+        console.log('--- receipt ---', receipt);
+        const { active } = getState().harmonyReducer
+        dispatch(getBalances(active))
+        dispatch(updateProcessing(false))
+    }).on('error', console.error)
+    const [sentTX, txHash] = await signedTX.sendTransaction();
+    const confirmedTX = await sentTX.confirm(txHash);
+    console.log(confirmedTX)
 }
 
 export const setActive = (which) => async (dispatch, getState) => {
     const state = getState().harmonyReducer
     const active = state[which]
     if (!active) return
-    const { hmy } = state
+    const { hmy, hmyExt } = state
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    hmy.wallet.setSigner(active.address);
+    if (!active.isExt) {
+        hmy.wallet.setSigner(active.address)
+    }
     dispatch({ type: UPDATE, active })
     dispatch(getBalances(active))
 }
 export const getBalanceONE = (account) => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
+    const { hmy, hmyExt } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    const { result } = await hmy.blockchain.getBalance({ address: account.address }).catch((err) => {
-        console.log(err);
-    })
+    let result
+    if (account.isExt) {
+        result = (await hmyExt.blockchain.getBalance({ address: account.address }).catch((err) => {
+            console.log(err);
+        })).result
+    } else {
+        result = (await hmy.blockchain.getBalance({ address: account.address }).catch((err) => {
+            console.log(err);
+        })).result
+    }
     account.balanceONE = new hmy.utils.Unit(result).asWei().toEther()
+
     dispatch({ type: UPDATE, [account.name]: account })
 }
 export const getBalances = (account) => async (dispatch, getState) => {
@@ -122,20 +110,33 @@ export const getBalances = (account) => async (dispatch, getState) => {
 
 export const harmonyInit = () => async (dispatch) => {
 
-    const url = `ws://localhost:9800`
+    // const url = `ws://localhost:9800`
+    const url = `http://127.0.0.1:9500`
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
         chainId: ChainID.HmyTestnet,
     })
     dispatch({ type: UPDATE, hmy })
+
     // console.log(hmy.wallet)
 
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
-    // 0xea877e7412c313cd177959600e655f8ba8c28b40
-    const account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
+    /********************************
+    Testing Math Wallet
+    ********************************/
+    const harmony = await waitForInjected()
+    const hmyExt = new HarmonyExtension(harmony, {
+        chainId: hmy.chainId
+    });
+    dispatch({ type: UPDATE, hmyExt })
+
+
+    const account = await getExtAccount(hmyExt)
     account.name = 'Bob'
+    console.log(account)
+
     dispatch({ type: UPDATE,
         minter, account,
         addresses: [account.address, minter.address],
@@ -143,8 +144,6 @@ export const harmonyInit = () => async (dispatch) => {
     })
     dispatch(setActive('account'))
     dispatch(setActive('minter'))
-
-    dispatch(transferONE({ amount: 1, account: account.address }))
 }
 
 //reducer
