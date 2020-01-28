@@ -1,6 +1,8 @@
 # Dapp Lottery
 
-# Lottery Contract
+Here is the Tutorial, teaching you to build a dapp step by step, you can follow it, or to downlaod the code directly! 
+
+# Part 1: Lottery Contract
 ```
 $ truffle init
 ```
@@ -172,6 +174,237 @@ module.exports = function(deployer) {
 ```
 
 ### Compile and deploy the contract!
+```
+$ truffle compile
 
+$ truffle migrate --network local --reset
+$ truffle migrate --network testnet --reset
+```
 
-# Lottery Frontend
+# Part 2: Lottery Frontend
+
+## Using react to create an front-end module
+We used the create-react-app to generate a simple front-end for our app
+```C
+// do that if you never used create-react-app before
+$ sudo npm install -g create-react-app
+
+$ create-react-app frontend(NAME)
+```
+Install Harmony js SDK
+```
+$ npm install @harmony-js/core@next
+$ npm install tslib
+```
+
+After that, Create a file named lottery.js, which would be used for create the instance of contract
+
+***remember to replace the address to your smart-contract address***  
+***which could be found when you deploy your contract***
+
+```C
+const { Harmony, HarmonyExtension } = require('@harmony-js/core');
+const { ChainID, ChainType } = require('@harmony-js/utils');
+
+const url = 'http://localhost:9500';
+const hmy = new Harmony(url, {
+  chainType: ChainType.Harmony,
+  chainId: ChainID.HmyLocal
+});
+
+const address = '0x2C85312662258F7cc063E421DCF16bb0189b0531';
+const abi = [
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "manager",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "players",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "enter",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "pickWinner",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getPlayers",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
+export const waitForInjected = () => new Promise((resolve) => {
+  const check = () => {
+      if (!window.harmony) setTimeout(check, 250);
+      else resolve(window.harmony);
+  }
+  check();
+});
+
+let harmonyEx, extLottery;
+export const initExtension = async() => {
+  harmonyEx = await new HarmonyExtension(window.harmony);
+
+  extLottery = harmonyEx.contracts.createContract(abi, address);
+  return extLottery;
+};
+
+export { hmy };
+```
+
+Then, change the content in App.js
+```javascript
+import React, { Component } from 'react';
+import './App.css';
+import { waitForInjected, initExtension, hmy } from './lottery';
+
+class App extends Component {
+  state = {
+    manager: '',
+    players: [],
+    balance: '',
+    value: '',
+    message: ''
+  };
+
+  async componentDidMount() {
+    await waitForInjected()
+
+    const extLottery = await initExtension()
+    const manager = await extLottery.methods.manager().call({
+      gasLimit: '1000000',
+      gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    });
+    const players = await extLottery.methods.getPlayers().call({
+      gasLimit: '1000000',
+      gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    });
+    const balance = await hmy.blockchain.getBalance({address: extLottery.address});
+
+    this.setState({ manager, players, balance });
+  }
+
+  onSubmit = async event => {
+    event.preventDefault();
+    this.setState({ message: 'Waiting on transaction success...' })
+
+    const extLottery = await initExtension()
+    await extLottery.methods.enter().send({
+      value: new hmy.utils.Unit(this.state.value).asOne().toWei(),
+      gasLimit: '1000001',
+      gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    });
+
+    this.setState({ message: 'You have been entered!' })
+  };
+
+  onClick = async () => {
+    this.setState({ message: 'Waiting on transaction success...' });
+
+    const extLottery = await initExtension()
+    await extLottery.methods.pickWinner().send({
+      gasLimit: '1000000',
+      gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    });
+
+    this.setState({ message: 'A winner has been picked!' });
+  };
+
+  render() {
+    return (
+      <div>
+        <h2> Lottery Contract </h2>
+        <p> 
+          This contract is managed by {this.state.manager}. <br />
+          There are currently {this.state.players.length} people entered, <br />
+        </p>
+
+        <hr />
+        <form onSubmit={this.onSubmit}>
+          <h4>Want to try your luck?</h4>
+          <div>
+            <label>Amount of ONE to enter</label>
+            <input
+              value={this.state.value}
+              onChange={event => this.setState({ value: event.target.value })}
+            />
+          </div>
+          <button>Enter</button>
+        </form>
+
+        <hr />
+        <h4> Ready to pick a winner?</h4>
+        <button onClick={this.onClick}>Pick a Winner!</button>
+
+        <hr />
+        <h1>{this.state.message}</h1>
+      </div>
+    );
+  };
+}
+
+export default App;
+```
+
+Now the dapp should be finished! Using npm start to try it!
+```
+npm start
+```
+
+It will require you to used Mathwallet to sign the transaction!
+
+## Much more details will list in the subFolders: frontend and lotteryContract!!!
