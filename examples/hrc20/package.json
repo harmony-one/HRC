@@ -21,7 +21,7 @@
     "sass": "^1.23.7"
   },
   "scripts": {
-    "start": "pkill node; parcel ./src/index.html --open > output.log &"
+    "start": "pkill node; REACT_APP_ENV=local parcel ./src/index.html --open > output.log &"
   },
   "browserslist": [
     "last 2 Chrome versions"

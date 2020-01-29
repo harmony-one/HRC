@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux'
 import { setActive } from './../../redux/harmony'
 import { root, menu, menuOpen } from './Header.module.scss'
 
-export default function Header({history}) {
-	const dispatch = useDispatch()
+export default function Header({history, harmonyState: { network }}) {
+    const dispatch = useDispatch()
 
     const [isMenuOpen, setMenuOpen] = useState(false)
 
@@ -16,11 +16,13 @@ export default function Header({history}) {
                 <div>
                     <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
                     <section>
-                        <p onClick={() => {
-                            navigate('/')
-                            dispatch(setActive('minter'))
-                            setMenuOpen(false)
-                        }}>Alice</p>
+                        { !network && // for any network that's not 0 (local)
+                            <p onClick={() => {
+                                navigate('/')
+                                dispatch(setActive('minter'))
+                                setMenuOpen(false)
+                            }}>Alice</p>
+                        }
                         <p onClick={() => {
                             navigate('/')
                             dispatch(setActive('account'))

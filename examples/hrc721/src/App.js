@@ -23,7 +23,7 @@ export default connect(
 		dispatch(harmonyInit())
 		dispatch(crowdsaleInit())
 	}, [])
-
+	
 	return (
 		<div>
 			<Header {...props} />

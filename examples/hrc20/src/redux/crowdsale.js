@@ -1,4 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
+import { getContractInstance } from '../util/hmy-util'
 import HRC20Crowdsale from '../build/contracts/HRC20Crowdsale.json'
 import { updateProcessing, getBalances } from './harmony'
 import { ChainID, ChainType } from '@harmony-js/utils'
@@ -17,24 +18,21 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
     })
     return keys
 }
-const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
-}
 export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     dispatch({ type: UPDATE })
-    const { hmy, active } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    const contract = await getContractInstance(hmy, HRC20Crowdsale)
+    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HRC20Crowdsale)
 
     const tx = contract.methods.buyTokens(active.address).send({
         from: active.address,
         value: new hmy.utils.Unit(amount).asEther().toWei(),
         gasLimit: '1000000',
-        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
         console.log('hash', hash)
     }).on('receipt', function (receipt) {
