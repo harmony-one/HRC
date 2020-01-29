@@ -24,6 +24,9 @@ export default connect(
 		dispatch(crowdsaleInit())
 	}, [])
 
+	if (!props.harmonyState.active) return null
+
+
 	return (
 		<div>
 			<Header {...props} />

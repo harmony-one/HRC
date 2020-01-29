@@ -71,7 +71,7 @@ export const setActive = (which) => async (dispatch, getState) => {
     const state = getState().harmonyReducer
     const active = state[which]
     if (!active) return
-    const { hmy, hmyExt } = state
+    const { hmy } = state
     if (!hmy) {
         console.log('call loadContracts first')
         return

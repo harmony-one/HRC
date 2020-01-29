@@ -1,11 +1,17 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import { Harmony } from '@harmony-js/core'
+import { waitForInjected, getExtAccount } from '../util/hmy-util'
+import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
 import { getBalanceHRC } from './hrc20'
 import { getRaised } from './crowdsale'
+
+import config from '../../config'
+const { ENV, network } = config
 //state
 const defaultState = {
+    network,
     hmy: null,
+    hmyExt: null,
     active: null,
     minter: null,
     account: null,
@@ -68,7 +74,9 @@ export const setActive = (which) => async (dispatch, getState) => {
         console.log('call loadContracts first')
         return
     }
-    hmy.wallet.setSigner(active.address);
+    if (!active.isExt) {
+        hmy.wallet.setSigner(active.address)
+    }
     dispatch({ type: UPDATE, active })
     dispatch(getBalances(active))
 }
@@ -91,7 +99,9 @@ export const getBalances = (account) => async (dispatch, getState) => {
 }
 
 export const harmonyInit = () => async (dispatch) => {
-    const url = `ws://localhost:9800`
+
+    const url = config[ENV + 'Url']
+
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
         chainId: ChainID.HmyTestnet,
@@ -99,19 +109,47 @@ export const harmonyInit = () => async (dispatch) => {
     dispatch({ type: UPDATE, hmy })
     // console.log(hmy.wallet)
 
+    /********************************
+    Testing Math Wallet
+    ********************************/
+    const harmony = await waitForInjected(2)
+    let hmyExt
+    if (harmony) {
+        hmyExt = new HarmonyExtension(harmony, {
+            chainId: hmy.chainId
+        });
+        dispatch({ type: UPDATE, hmyExt })
+    }
+
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
     // 0xea877e7412c313cd177959600e655f8ba8c28b40
-    const account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
-    account.name = 'Bob'
+    let account
+    if (!hmyExt) {
+        account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
+        account.name = 'Bob'
+    } else {
+        account = await getExtAccount(hmyExt)
+        account.name = 'Bob'
+    }
+    console.log(account)
+
+    const addresses = [account.address, minter.address]
+    const bech32Addresses = [account.bech32Address, minter.bech32Address]
+
+    if (network) {
+        addresses.pop()
+        bech32Addresses.pop()
+    }
     dispatch({ type: UPDATE,
         minter, account,
-        addresses: [account.address, minter.address],
-        bech32Addresses: [account.bech32Address, minter.bech32Address],
+        addresses,
+        bech32Addresses
     })
+
     dispatch(setActive('account'))
-    dispatch(setActive('minter'))
+    if (!network) dispatch(setActive('minter'))
 }
 
 //reducer

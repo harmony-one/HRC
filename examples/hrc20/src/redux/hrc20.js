@@ -1,4 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
+import { getContractInstance } from '../util/hmy-util'
 import HarmonyMintable from '../build/contracts/HarmonyMintable.json'
 import {getBalances, updateProcessing} from './harmony'
 
@@ -13,19 +14,16 @@ export const hrc20State = ({ hrc20Reducer: { ...keys } }) => {
     })
     return keys
 }
-const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
-}
 export const transferHRC = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     dispatch({ type: UPDATE })
-    const { hmy, active } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
     console.log(amount, address)
-    const contract = await getContractInstance(hmy, HarmonyMintable)
+    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HarmonyMintable)
     const tx = contract.methods.transfer(address, new hmy.utils.Unit(amount).asEther().toWei()).send({
         from: active.address,
         gasLimit: '1000000',
