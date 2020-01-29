@@ -1,8 +1,21 @@
+import config from '../../config'
+const { net } = config
 
 
-
+//TODO: naming
+export const getContract = (state, artifact) => {
+    const { hmy, hmyExt, active } = state
+    if (!hmy) {
+        console.log('call loadContracts first')
+        return
+    }
+    const harmony = active && active.isExt ? hmyExt : hmy
+    const contract = getContractInstance(harmony, artifact)
+    return { hmy, contract, active }
+}
 export const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
+    const contract = hmy.contracts.createContract(artifact.abi, artifact.networks[net].address)
+    return contract
 }
 export const getExtAccount = async (hmyExt) => {
     const account = await hmyExt.wallet.getAccount().catch((err) => {
@@ -14,7 +27,6 @@ export const getExtAccount = async (hmyExt) => {
     return account
 }
 export const waitForInjected = (sec) => new Promise((resolve) => {
-    console.log(sec)
     const max = sec * 1000 / 250
     let tries = 0
     const check = () => {

@@ -1,5 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import { getContractInstance } from '../util/hmy-util'
+import { getContract } from '../util/hmy-util'
 import HarmonyMintable from '../build/contracts/HarmonyMintable.json'
 import {getBalances, updateProcessing} from './harmony'
 
@@ -17,13 +17,7 @@ export const hrc20State = ({ hrc20Reducer: { ...keys } }) => {
 export const transferHRC = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     dispatch({ type: UPDATE })
-    const { hmy, hmyExt, active } = getState().harmonyReducer
-    if (!hmy) {
-        console.log('call loadContracts first')
-        return
-    }
-    console.log(amount, address)
-    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HarmonyMintable)
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
     const tx = contract.methods.transfer(address, new hmy.utils.Unit(amount).asEther().toWei()).send({
         from: active.address,
         gasLimit: '1000000',
@@ -40,15 +34,10 @@ export const transferHRC = ({ amount, address }) => async (dispatch, getState) =
 }
 
 export const getBalanceHRC = (account) => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    if (!hmy) {
-        console.log('call loadContracts first')
-        return
-    }
-    const contract = await getContractInstance(hmy, HarmonyMintable)
+    const { hmy, contract } = await getContract(getState().harmonyReducer, HarmonyMintable)
     const balance = await contract.methods.balanceOf(account.address).call({
-        gasLimit: '210000',
-        gasPrice: '100000',
+        gasLimit: '2100000',
+        gasPrice: '1000000000',
     })
     if (balance === null) {
         console.log('contracts not deployed, use ./deploy.sh')
