@@ -70,10 +70,10 @@ export default function Form(props) {
                         alert('Please enter a value')
                         return
                     }
-                    if (!inputValues.address || inputValues.address.length === 0) {
-                        alert('Please enter an address')
-                        return
-                    }
+//                    if (!inputValues.address || inputValues.address.length === 0) {
+//                        alert('Please enter an address')
+//                        return
+//                    }
                     dispatch(submit(inputValues))
                     setInputValues({})
                     setResetInput(Math.random().toString())

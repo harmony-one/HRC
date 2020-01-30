@@ -1,0 +1,14 @@
+
+Network: local (id: 2)
+  No contracts deployed.
+
+Network: mainnet0 (id: 1)
+  HRC20Crowdsale: 0x68aC62E3ed67faC6A0df4c5DC9f6423e2d454EED
+  HarmonyMintable: 0xBcF2Be2474DB5A08B4B25D921729FC424c74F583
+  Migrations: 0x6D904b33A4Af28353BEEb65D0a65bb7CD4B6Dc91
+
+Network: testnet (id: 2)
+  HRC20Crowdsale: 0x2FF6EB68B34D4e3c8e2B2b2f485ad6BB0531116F
+  HarmonyMintable: 0xD1c6B0f49A934BFc40e57e9953913fAB30C728cB
+  Migrations: 0x91AFbAd45ebbeC130c479dC3faF2A9fB8066DE92
+

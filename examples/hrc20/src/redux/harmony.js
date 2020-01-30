@@ -6,8 +6,8 @@ import { getBalanceHRC } from './hrc20'
 import { getRaised } from './crowdsale'
 
 import config from '../../config'
-const { ENV, network, net } = config
-const url = config[ENV + 'Url']
+const { ENV, network, net, url } = config
+
 //state
 const defaultState = {
     network,

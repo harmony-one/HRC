@@ -7,8 +7,7 @@ import { getRaised } from './crowdsale'
 
 
 import config from '../../config'
-const { ENV, network, net } = config
-const url = config[ENV + 'Url']
+const { ENV, network, net, url } = config
 
 //state
 const defaultState = {
@@ -116,6 +115,7 @@ export const getBalances = (account) => async (dispatch, getState) => {
 }
 
 export const harmonyInit = () => async (dispatch) => {
+    console.log(url)
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
         chainId: net,
