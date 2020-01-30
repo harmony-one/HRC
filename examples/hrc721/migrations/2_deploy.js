@@ -17,7 +17,7 @@ module.exports = function (deployer, network, accounts) {
 	deployer.then(function () {
 		return deployer.deploy(HRC721, name, symbol).then(function (token) {
 			return deployer.deploy(HRC721Crowdsale, token.address).then(async function (sale) {
-				for (let i = 0; i < 10; i++) {
+				for (let i = 0; i < 2; i++) {
 					console.log(urls[i])
 					await sale.addItem(10, price, urls[i])
 				}

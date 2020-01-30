@@ -1023,45 +1023,9 @@
     "name": "solc",
     "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
-  "networks": {
-    "2": {
-      "events": {
-        "0x6faf93231a456e552dbc9961f58d9713ee4f2e69d15f1975b050ef0911053a7b": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "purchaser",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "name": "beneficiary",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "name": "value",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "name": "amount",
-              "type": "uint256"
-            }
-          ],
-          "name": "TokensPurchased",
-          "type": "event",
-          "signature": "0x6faf93231a456e552dbc9961f58d9713ee4f2e69d15f1975b050ef0911053a7b"
-        }
-      },
-      "links": {},
-      "address": "0x503328321E10272584856e2f6c06b955ca9A89a3",
-      "transactionHash": "0xfec39e0c0c2ccfb9e1ea79db509535e1217e8772283db47257697697c33a46b6"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-01-29T19:42:25.707Z",
+  "updatedAt": "2020-01-30T05:04:13.590Z",
   "devdoc": {
     "methods": {
       "buyTokens(address)": {

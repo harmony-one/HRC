@@ -2002,7 +2002,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-01-07T22:49:43.379Z",
+  "updatedAt": "2020-01-30T05:04:13.599Z",
   "devdoc": {
     "details": "Crowdsale with a limit for total contributions.",
     "methods": {

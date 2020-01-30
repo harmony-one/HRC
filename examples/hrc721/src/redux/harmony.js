@@ -4,6 +4,12 @@ import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
 import { getTokens } from './hrc721'
 import { getRaised } from './crowdsale'
+
+
+import config from '../../config'
+const { ENV, network, net } = config
+const url = config[ENV + 'Url']
+
 //state
 const defaultState = {
     harmony: null,
@@ -34,25 +40,26 @@ export const updateProcessing = (processing) => async (dispatch) => {
 /********************************
 This is only enabled for localnet hmy e.g. Alice's account
 ********************************/
+
 export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
-    const { hmy } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    console.log(amount, address)
-
-    const tx = hmy.transactions.newTx({
+    console.log(new hmy.utils.Unit(amount).asEther().toWei(),address)
+    const harmony = active.isExt ? hmyExt : hmy
+    const tx = harmony.transactions.newTx({
         to: address,
         value: new hmy.utils.Unit(amount).asEther().toWei(),
         gasLimit: '210000',
         shardID: 0,
         toShardID: 0,
-        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     });
-
-    const signedTX = await hmy.wallet.signTransaction(tx);
+    console.log(harmony)
+    const signedTX = await harmony.wallet.signTransaction(tx);
     signedTX.observed().on('transactionHash', (txHash) => {
         console.log('--- txHash ---', txHash);
     })
@@ -109,41 +116,49 @@ export const getBalances = (account) => async (dispatch, getState) => {
 }
 
 export const harmonyInit = () => async (dispatch) => {
-
-    // const url = `ws://localhost:9800`
-    const url = `http://127.0.0.1:9500`
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
-        chainId: ChainID.HmyTestnet,
+        chainId: net,
     })
     dispatch({ type: UPDATE, hmy })
 
-    // console.log(hmy.wallet)
+    const harmony = await waitForInjected(1)
+    let hmyExt
+    if (harmony) {
+        hmyExt = new HarmonyExtension(harmony, {
+            chainId: net
+        });
+        dispatch({ type: UPDATE, hmyExt })
+    }
 
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
-    /********************************
-    Testing Math Wallet
-    ********************************/
-    const harmony = await waitForInjected()
-    const hmyExt = new HarmonyExtension(harmony, {
-        chainId: hmy.chainId
-    });
-    dispatch({ type: UPDATE, hmyExt })
+    // 0xea877e7412c313cd177959600e655f8ba8c28b40
+    let account
+    if (!hmyExt) {
+        account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
+        account.name = 'Bob'
+    } else {
+        account = await getExtAccount(hmyExt)
+        account.name = 'Bob'
+    }
 
+    const bech32Addresses = [account.bech32Address, minter.bech32Address]
 
-    const account = await getExtAccount(hmyExt)
-    account.name = 'Bob'
-    console.log(account)
-
+    if (network) {
+        bech32Addresses.pop()
+    }
     dispatch({ type: UPDATE,
         minter, account,
-        addresses: [account.address, minter.address],
-        bech32Addresses: [account.bech32Address, minter.bech32Address],
+        bech32Addresses
     })
+
     dispatch(setActive('account'))
-    dispatch(setActive('minter'))
+    if (ENV === 'local') {
+        console.log("setting minter")
+        dispatch(setActive('minter'))
+    }
 }
 
 //reducer

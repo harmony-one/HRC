@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import Input from './../Input/Input'
 import { root, bubble, marginTop, center, breakAll } from './Form.module.scss'
+import config from '../../../config'
+const { filterMyAddress } = config
 
 export default function Form(props) {
 
@@ -46,8 +48,7 @@ export default function Form(props) {
                             onChange={handleInputChange}
                         />
                         {
-                            //addresses.filter((a) => a !== active[addressType]).map((a) => (
-                            addresses.map((a) => (
+                            (filterMyAddress ? addresses.filter((a) => a !== active[addressType]) : addresses).map((a) => (
                                 <p
                                     name="address"
                                     key={a}
@@ -65,6 +66,14 @@ export default function Form(props) {
             <div className={center}>
                 <button onClick={() => setResetInput(Math.random().toString())}>Clear</button>
                 <button onClick={() => {
+                    if (!inputValues.amount) {
+                        alert('Please enter a value')
+                        return
+                    }
+                    if (!inputValues.address || inputValues.address.length === 0) {
+                        alert('Please enter an address')
+                        return
+                    }
                     dispatch(submit(inputValues))
                     setInputValues({})
                     setResetInput(Math.random().toString())

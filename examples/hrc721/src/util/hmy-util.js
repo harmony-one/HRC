@@ -1,9 +1,30 @@
+import config from '../../config'
+const { net } = config
 
 
 
-export const getContractInstance = (hmy, artifact) => {
-    return hmy.contracts.createContract(artifact.abi, artifact.networks[2].address)
+
+//TODO: naming
+export const getContract = (state, artifact) => {
+
+    const { hmy, hmyExt, active } = state
+    if (!hmy) {
+        console.trace('call loadContracts first')
+        return {}
+    }
+    const harmony = active && active.isExt ? hmyExt : hmy
+    const contract = getContractInstance(harmony, artifact)
+    console.log(contract)
+    return { hmy, contract, active }
 }
+export const getContractInstance = (hmy, artifact) => {
+    const contract = hmy.contracts.createContract(
+        artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
+    )
+    return contract
+}
+export const oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
+
 export const getExtAccount = async (hmyExt) => {
     const account = await hmyExt.wallet.getAccount().catch((err) => {
         console.log(err);
@@ -13,8 +34,15 @@ export const getExtAccount = async (hmyExt) => {
     account.address = hmyExt.crypto.getAddress(account.address).basicHex
     return account
 }
-export const waitForInjected = () => new Promise((resolve) => {
+export const waitForInjected = (sec) => new Promise((resolve) => {
+    const max = sec * 1000 / 250
+    let tries = 0
     const check = () => {
+        tries++
+        if (tries >= max) {
+            resolve(false)
+            return
+        }
         if (!window.harmony) setTimeout(check, 250)
         else resolve(window.harmony)
     }

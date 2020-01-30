@@ -1324,7 +1324,7 @@
     }
   },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-01-29T19:42:25.703Z",
+  "updatedAt": "2020-01-30T04:12:19.902Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

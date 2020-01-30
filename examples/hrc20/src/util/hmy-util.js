@@ -2,8 +2,12 @@ import config from '../../config'
 const { net } = config
 
 
+
+
 //TODO: naming
 export const getContract = (state, artifact) => {
+
+
     const { hmy, hmyExt, active } = state
     if (!hmy) {
         console.log('call loadContracts first')
@@ -14,9 +18,13 @@ export const getContract = (state, artifact) => {
     return { hmy, contract, active }
 }
 export const getContractInstance = (hmy, artifact) => {
-    const contract = hmy.contracts.createContract(artifact.abi, artifact.networks[net].address)
+    const contract = hmy.contracts.createContract(
+        artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
+    )
     return contract
 }
+export const oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
+
 export const getExtAccount = async (hmyExt) => {
     const account = await hmyExt.wallet.getAccount().catch((err) => {
         console.log(err);

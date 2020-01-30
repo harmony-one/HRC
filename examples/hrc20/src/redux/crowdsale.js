@@ -63,30 +63,30 @@ export const crowdsaleInit = () => async (dispatch, getState) => {
     }
 
     // contract.events.TokensPurchased(args)
-    hmy.blockchain.logs(args, hmy.blockchain.messenger, hmy.blockchain.messenger.currentShard)
-        .on('data', (logs) => {
-            // console.log(logs)
-            if (!logs) return
-            if (logs.params && logs.params.result) logs = logs.params.result
-            if (!logs.data) return
-            const args = contract.abiCoder.decodeParameters(['uint256', 'uint256'], logs.data)
-            const topics = logs.topics.map((topic, i) => {
-                if (i === 0) return
-                return contract.abiCoder.decodeParameters(['address'], topic)[0]
-            }).filter((a) => !!a)
-            // console.log(topics)
-            const values = Object.keys(args).map((k) => new hmy.utils.Unit(args[k]).asWei().toEther())
-            // console.log(values)
-            const event = {
-                one: values[0],
-                hrc: values[1],
-                purchaser: topics[0],
-                beneficiary: topics[1],
-            }
-            const events = getState().crowdsaleReducer.events.slice()
-            events.push(event)
-            dispatch({type: UPDATE, events})
-        })
+    // hmy.blockchain.logs(args, hmy.blockchain.messenger, hmy.blockchain.messenger.currentShard)
+    //     .on('data', (logs) => {
+    //         // console.log(logs)
+    //         if (!logs) return
+    //         if (logs.params && logs.params.result) logs = logs.params.result
+    //         if (!logs.data) return
+    //         const args = contract.abiCoder.decodeParameters(['uint256', 'uint256'], logs.data)
+    //         const topics = logs.topics.map((topic, i) => {
+    //             if (i === 0) return
+    //             return contract.abiCoder.decodeParameters(['address'], topic)[0]
+    //         }).filter((a) => !!a)
+    //         // console.log(topics)
+    //         const values = Object.keys(args).map((k) => new hmy.utils.Unit(args[k]).asWei().toEther())
+    //         // console.log(values)
+    //         const event = {
+    //             one: values[0],
+    //             hrc: values[1],
+    //             purchaser: topics[0],
+    //             beneficiary: topics[1],
+    //         }
+    //         const events = getState().crowdsaleReducer.events.slice()
+    //         events.push(event)
+    //         dispatch({type: UPDATE, events})
+    //     })
 }
 
 //reducer

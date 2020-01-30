@@ -1,5 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import { getContractInstance } from '../util/hmy-util'
+import { getContract } from '../util/hmy-util'
 import HRC721Crowdsale from '../build/contracts/HRC721Crowdsale.json'
 import { updateProcessing, getBalances } from './harmony'
 
@@ -21,12 +21,10 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
 }
 export const purchase = ({ index }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
-    const { hmy, hmyExt, active } = getState().harmonyReducer
-    if (!hmy) {
-        console.log('call loadContracts first')
-        return
-    }
-    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HRC721Crowdsale)
+    
+    //const { hmy, hmyExt, active } = getState().harmonyReducer
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
         value: new hmy.utils.Unit(1).asEther().toWei(),
@@ -57,20 +55,22 @@ export const getRaised = () => async (dispatch, getState) => {
 
 
 const getInventory = () => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    const crowdsale = await getContractInstance(hmy, HRC721Crowdsale)
+    
+    //const { hmy, hmyExt, active } = getState().harmonyReducer
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const args = {
         gasLimit: '1000000',
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     }
-    const totalItems = parseInt((await crowdsale.methods.totalItems().call(args)).toNumber())
+    const totalItems = parseInt((await contract.methods.totalItems().call(args)).toNumber())
     const items = []
     for (let i = 0; i < totalItems; i++) {
-        const limit = parseInt(await crowdsale.methods.getLimit(i).call(args), 16)
-        const minted = parseInt(await crowdsale.methods.getMinted(i).call(args), 16)
-        let price = (await crowdsale.methods.getPrice(i).call(args)).toString()
+        const limit = parseInt(await contract.methods.getLimit(i).call(args), 16)
+        const minted = parseInt(await contract.methods.getMinted(i).call(args), 16)
+        let price = (await contract.methods.getPrice(i).call(args)).toString()
         price = new hmy.utils.Unit(price).asWei().toEther().toString()
-        const url = await crowdsale.methods.getUrl(i).call(args)
+        const url = await contract.methods.getUrl(i).call(args)
         items.push({
             limit, minted, price, url
         })
@@ -79,8 +79,8 @@ const getInventory = () => async (dispatch, getState) => {
 }
 
 export const crowdsaleInit = () => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    const crowdsale = await getContractInstance(hmy, HRC721Crowdsale)
+    // const { hmy } = getState().harmonyReducer
+    // const crowdsale = await getContractInstance(hmy, HRC721Crowdsale)
     dispatch(getInventory())
     
     //args TokensPurchased event

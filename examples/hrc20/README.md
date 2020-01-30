@@ -6,7 +6,7 @@ This example will help you deploy an HRC-20 (ERC-20 compatible) token on Harmony
 
 1. Install packages `npm i`
 2. [Set up your harmony localnet](https://app.gitbook.com/@harmony-one/s/onboarding-wiki/interns-onboarding-guide/onboarding-overview/setting-up-the-go-environment)
-3. Run `./deploy.sh` to deploy the contracts
+3. Run `./deploy.sh local` to deploy the contracts on *the local network*
 4. Use `npm start` to run the dapp
 
 ## Making Changes

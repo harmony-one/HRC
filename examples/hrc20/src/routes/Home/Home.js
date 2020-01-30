@@ -49,9 +49,9 @@ export default function Home(props) {
                 <Form
                     {...{
                         active,
-                        addressType: 'address',
+                        addressType: 'bech32Address',
                         title: 'Transfer HRC',
-                        addresses: addresses,
+                        addresses: bech32Addresses,
                         submit: transferHRC
                     }}
                 />

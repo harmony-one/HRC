@@ -1,7 +1,7 @@
 import { UPDATE, reducer } from '../util/redux-util'
 import HarmonyMintable from '../build/contracts/HRC721.json'
 import {getBalances, updateProcessing} from './harmony'
-import { getContractInstance } from '../util/hmy-util'
+import { getContract, oneToHexAddress } from '../util/hmy-util'
 
 //state
 const defaultState = {
@@ -17,13 +17,17 @@ export const hrc721State = ({ hrc721Reducer: { ...keys } }) => {
 }
 
 export const getTokens = (account) => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
+    // const { hmy } = getState().harmonyReducer
     let { balances } = getState().hrc721Reducer
+    
+    // const hrc721 = await getContractInstance(hmy, HarmonyMintable)
+
+
+    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
     if (!hmy) {
-        console.log('call loadContracts first')
         return
     }
-    const hrc721 = await getContractInstance(hmy, HarmonyMintable)
+
     const tokens = (await hrc721.methods.balanceOf(account.address).call({
         gasLimit: '210000',
         gasPrice: '100000',
