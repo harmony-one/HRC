@@ -36,13 +36,15 @@ export const updateProcessing = (processing) => async (dispatch) => {
 
 export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
-    const { hmy } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
     console.log(amount, address)
-    const tx = hmy.transactions.newTx({
+
+    const harmony = active.isExt ? hmyExt : hmy
+    const tx = harmony.transactions.newTx({
         to: address,
         value: new hmy.utils.Unit(amount).asEther().toWei(),
         gasLimit: '210000',
@@ -50,7 +52,7 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         toShardID: 0,
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     });
-    const signedTX = await hmy.wallet.signTransaction(tx);
+    const signedTX = await harmony.wallet.signTransaction(tx);
     signedTX.observed().on('transactionHash', (txHash) => {
         console.log('--- txHash ---', txHash);
     })
@@ -104,19 +106,15 @@ export const harmonyInit = () => async (dispatch) => {
 
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
-        chainId: ChainID.HmyTestnet,
+        chainId: ChainID.HmyMainnet,
     })
     dispatch({ type: UPDATE, hmy })
-    // console.log(hmy.wallet)
 
-    /********************************
-    Testing Math Wallet
-    ********************************/
     const harmony = await waitForInjected(2)
     let hmyExt
     if (harmony) {
         hmyExt = new HarmonyExtension(harmony, {
-            chainId: hmy.chainId
+            chainId: 1
         });
         dispatch({ type: UPDATE, hmyExt })
     }
@@ -133,7 +131,6 @@ export const harmonyInit = () => async (dispatch) => {
         account = await getExtAccount(hmyExt)
         account.name = 'Bob'
     }
-    console.log(account)
 
     const addresses = [account.address, minter.address]
     const bech32Addresses = [account.bech32Address, minter.bech32Address]
@@ -149,7 +146,10 @@ export const harmonyInit = () => async (dispatch) => {
     })
 
     dispatch(setActive('account'))
-    if (!network) dispatch(setActive('minter'))
+    if (!network) {
+        console.log("setting minter")
+        dispatch(setActive('minter'))
+    }
 }
 
 //reducer

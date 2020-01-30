@@ -46,7 +46,8 @@ export default function Form(props) {
                             onChange={handleInputChange}
                         />
                         {
-                            addresses.filter((a) => a !== active[addressType]).map((a) => (
+                            //addresses.filter((a) => a !== active[addressType]).map((a) => (
+                            addresses.map((a) => (
                                 <p
                                     name="address"
                                     key={a}
