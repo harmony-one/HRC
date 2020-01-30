@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import { transferONE,  } from './../../redux/harmony'
 import { getTokens } from './../../redux/hrc721'
+import { addItem } from './../../redux/crowdsale'
 import Form from './../../components/Form/Form'
 import Inventory from './../../components/Inventory/Inventory'
 
@@ -43,8 +44,26 @@ export default function Home(props) {
             </section>
 
 
+
+            { active &&
+            <section>
+                <Form
+                    {...{
+                        active,
+                        title: 'Add Item',
+                        fields: [
+                            { label: 'Limit', type: 'number'},
+                            { label: 'Price', type: 'number'},
+                            { label: 'Link', type: 'text'},
+                        ],
+                        submit: addItem
+                    }}
+                />
+            </section>
+            }
+
             
-            { active && active.name === 'Alice' && 
+            { active && 
             <section>
                 <Form
                     {...{

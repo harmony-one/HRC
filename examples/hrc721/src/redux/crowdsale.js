@@ -19,6 +19,41 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
     })
     return keys
 }
+
+
+/********************************
+Hooks
+********************************/
+export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) => {
+
+    console.log(Limit, Price, Link)
+
+    // dispatch(updateProcessing(true))
+    
+    // //const { hmy, hmyExt, active } = getState().harmonyReducer
+    // const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    // //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
+    // const tx = contract.methods.purchase(active.address, index).send({
+    //     from: active.address,
+    //     value: new hmy.utils.Unit(1).asEther().toWei(),
+    //     gasLimit: '1000000',
+    //     gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+    // }).on('transactionHash', function (hash) {
+    //     console.log('hash', hash)
+    // }).on('receipt', function (receipt) {
+    //     console.log('receipt', receipt)
+    // }).on('confirmation', async (confirmationNumber, receipt) => {
+    //     console.log('confirmationNumber', confirmationNumber, receipt)
+    //     dispatch(getInventory())
+    //     dispatch(updateProcessing(false))
+    // }).on('error', console.error)
+
+    /********************************
+    You won't see an update unless you refresh or call dispatch(getInventory())
+    ********************************/
+}
+
+
 export const purchase = ({ index }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     

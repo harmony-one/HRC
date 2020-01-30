@@ -9,6 +9,7 @@ const { filterMyAddress } = config
 export default function Form(props) {
 
     const {
+        fields,
         active, addressType, addresses,
         submit, title, subtitle = '', amountLabel,
     } = props
@@ -30,13 +31,28 @@ export default function Form(props) {
             <h2 className={marginTop}>{title}</h2>
             <div className={bubble}>
                 {subtitle && <p>{subtitle}</p>}
-                <Input
-                    name="amount"
-                    type="number"
-                    placeholder={amountLabel || "amount"}
-                    reset={resetInput}
-                    onChange={handleInputChange}
-                />
+                
+
+                { fields ? 
+                    <div>
+                        {fields.map((f) => <Input
+                            key={f.label}
+                            name={f.label}
+                            type={f.type}
+                            placeholder={f.label}
+                            reset={resetInput}
+                            onChange={handleInputChange}
+                        />)}
+                    </div>
+                :
+                    <Input
+                        name="amount"
+                        type="number"
+                        placeholder={amountLabel || "amount"}
+                        reset={resetInput}
+                        onChange={handleInputChange}
+                    />
+                }
                 {addressType && addresses &&
                     <div>
                         <Input
@@ -66,11 +82,11 @@ export default function Form(props) {
             <div className={center}>
                 <button onClick={() => setResetInput(Math.random().toString())}>Clear</button>
                 <button onClick={() => {
-                    if (!inputValues.amount) {
+                    if (!fields && !inputValues.amount) {
                         alert('Please enter a value')
                         return
                     }
-                    if (!inputValues.address || inputValues.address.length === 0) {
+                    if (addresses && (!inputValues.address || inputValues.address.length === 0)) {
                         alert('Please enter an address')
                         return
                     }

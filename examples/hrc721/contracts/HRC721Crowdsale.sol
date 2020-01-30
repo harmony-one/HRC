@@ -11,7 +11,6 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 	//721 tokens
 	HRC721 token;
 	//sales
-    address payable private wallet;
 	mapping(address => uint256) public contributions;
 	uint256 public raised;
 	//inventory
@@ -21,13 +20,13 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 		uint8 limit;
 		uint128 price;
 		//end tight pack
+		address payable owner;
 		string url;
     }
 	Item[] private items;
 	uint256 public totalItems;
 
 	constructor(HRC721 _token) public {
-		wallet = msg.sender;
 		token = _token;
 	}
 
@@ -40,7 +39,8 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
         require(weiAmount == price, "Crowdsale: weiAmount does not equal price");
 		_mint(to, index);
         raised = raised.add(weiAmount);
-        wallet.transfer(msg.value);
+		//transfer funds to owner
+        items[index].owner.transfer(msg.value);
     }
 	function mint(address to, uint256 index) public onlyMinter {
 		_mint(to, index);
@@ -54,8 +54,8 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 	}
 
 	//inventory management
-	function addItem(uint8 limit, uint128 price, string memory url) public onlyMinter {
-		items.push(Item(0, limit, price, url));
+	function addItem(uint8 limit, uint128 price, string memory url) public {
+		items.push(Item(0, limit, price, msg.sender, url));
 		totalItems++;
 	}
 
