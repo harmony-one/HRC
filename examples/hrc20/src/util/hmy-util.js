@@ -14,7 +14,6 @@ export const getExtAccount = async (hmyExt) => {
     return account
 }
 export const waitForInjected = (sec) => new Promise((resolve) => {
-    console.log(sec)
     const max = sec * 1000 / 250
     let tries = 0
     const check = () => {

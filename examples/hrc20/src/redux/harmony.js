@@ -36,13 +36,13 @@ export const updateProcessing = (processing) => async (dispatch) => {
 
 export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
-    const { hmy } = getState().harmonyReducer
+    const { hmy, hmyExt, active } = getState().harmonyReducer
     if (!hmy) {
         console.log('call loadContracts first')
         return
     }
-    console.log(amount, address)
-    const tx = hmy.transactions.newTx({
+    const harmony = active.isExt ? hmyExt : hmy
+    const tx = harmony.transactions.newTx({
         to: address,
         value: new hmy.utils.Unit(amount).asEther().toWei(),
         gasLimit: '210000',
@@ -50,7 +50,7 @@ export const transferONE = ({ amount, address }) => async (dispatch, getState) =
         toShardID: 0,
         gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
     });
-    const signedTX = await hmy.wallet.signTransaction(tx);
+    const signedTX = await harmony.wallet.signTransaction(tx);
     signedTX.observed().on('transactionHash', (txHash) => {
         console.log('--- txHash ---', txHash);
     })
@@ -120,6 +120,7 @@ export const harmonyInit = () => async (dispatch) => {
         });
         dispatch({ type: UPDATE, hmyExt })
     }
+    console.log(hmyExt)
 
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
