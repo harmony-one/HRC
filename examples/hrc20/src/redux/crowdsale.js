@@ -1,5 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import { getContractInstance } from '../util/hmy-util'
+import { getContract } from '../util/hmy-util'
 import HRC20Crowdsale from '../build/contracts/HRC20Crowdsale.json'
 import { updateProcessing, getBalances } from './harmony'
 import { ChainID, ChainType } from '@harmony-js/utils'
@@ -21,12 +21,9 @@ export const crowdsaleState = ({ crowdsaleReducer: { ...keys } }) => {
 export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     dispatch({ type: UPDATE })
-    const { hmy, hmyExt, active } = getState().harmonyReducer
-    if (!hmy) {
-        console.log('call loadContracts first')
-        return
-    }
-    const contract = await getContractInstance(active.isExt ? hmyExt : hmy, HRC20Crowdsale)
+    //const { hmy, hmyExt, active } = getState().harmonyReducer
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC20Crowdsale)
+    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
 
     const tx = contract.methods.buyTokens(active.address).send({
         from: active.address,
@@ -45,20 +42,18 @@ export const purchaseHRC = ({ amount }) => async (dispatch, getState) => {
 }
 
 export const getRaised = () => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    const contract = await getContractInstance(hmy, HRC20Crowdsale)
+    const { hmy, contract } = await getContract(getState().harmonyReducer, HRC20Crowdsale)
     const raised = await contract.methods.weiRaised().call({
         gasLimit: '210000',
         gasPrice: '100000',
     })
-    const one = new hmy.utils.Unit(raised).asWei().toEther()
+    const one = new hmy.utils.Unit(raised || '0').asWei().toEther()
     dispatch({ type: UPDATE, raised: one, minted: one * 1000 })
 
 }
 
 export const crowdsaleInit = () => async (dispatch, getState) => {
-    const { hmy } = getState().harmonyReducer
-    const contract = await getContractInstance(hmy, HRC20Crowdsale)
+    const { hmy, contract } = await getContract(getState().harmonyReducer, HRC20Crowdsale)
     //args TokensPurchased event
     const args = {
         fromBlock: '0x0',
