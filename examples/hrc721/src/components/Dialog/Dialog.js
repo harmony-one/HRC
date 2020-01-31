@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import { navigate } from "@reach/router"
 import { useDispatch } from 'react-redux'
 import { updateDialogState } from '../../redux/harmony'
-import { dialog, dialogOpen } from './Dialog.module.scss'
+import { dialog, dialogOpen, center } from './Dialog.module.scss'
 
 export default function Dialog({
     history,
@@ -19,6 +19,9 @@ export default function Dialog({
                         {
                             dialogState.content
                         }
+                        <div className={center}>
+                            <button onClick={() => dispatch(updateDialogState({ open: false }))}>Close</button>
+                        </div>
                     </section>
                 </div>
             </div>

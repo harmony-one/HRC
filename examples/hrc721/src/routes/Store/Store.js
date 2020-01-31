@@ -1,9 +1,9 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { setActive } from './../../redux/harmony'
-import Inventory from './../../components/Inventory/Inventory'
+import { setActive } from '../../redux/harmony'
+import Inventory from '../../components/Inventory/Inventory'
 
-import { route, gradient, bubble, processingCover, button } from './Sale.module.scss'
+import { route, gradient, bubble, processingCover, button } from './Store.module.scss'
 import LoadingGIF from '../../img/loading.gif'
 
 export default function Sale(props) {

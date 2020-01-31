@@ -82,7 +82,7 @@ export default function Home(props) {
                     <h2>Items</h2>
                     <Inventory {...props}
                         balance={active && balances && balances[active.name]}
-                        filter={true}
+                        wallet={true}
                     />
                 </section>
             }

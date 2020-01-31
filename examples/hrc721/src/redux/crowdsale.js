@@ -42,7 +42,7 @@ export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) =>
 
     const tx = contract.methods.addItem(Limit, Price, Link).send({
         from: active.address,
-        gasLimit: '30000000',
+        gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
         console.log('hash', hash)
@@ -70,7 +70,7 @@ export const purchase = ({ index }) => async (dispatch, getState) => {
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
         value: new hmy.utils.Unit(items[index].price).asEther().toWei(),
-        gasLimit: '30000000',
+        gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
         console.log('hash', hash)
@@ -102,7 +102,7 @@ const getInventory = () => async (dispatch, getState) => {
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const args = {
-        gasLimit: '30000000',
+        gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
     const totalItems = parseInt((await contract.methods.totalItems().call(args)).toNumber())

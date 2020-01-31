@@ -27,9 +27,11 @@ contract HRC721 is ERC721Full, ERC721Mintable {
 		uint256 price = salePrice[tokenId];
         require(price != 0, "buyToken: price equals 0");
         require(msg.value == price, "buyToken: price doesn't equal salePrice[tokenId]");
-		address owner = ownerOf(tokenId);
+		address payable owner = address(uint160(ownerOf(tokenId)));
 		// approve(address(this), tokenId);
+		salePrice[tokenId] = 0;
 		_transferFrom(owner, msg.sender, tokenId);
+        owner.transfer(msg.value);
 	}
 
 	function mintWithIndex(address to, uint256 index) public onlyMinter {

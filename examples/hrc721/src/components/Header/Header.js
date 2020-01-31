@@ -27,9 +27,13 @@ export default function Header({history}) {
                             setMenuOpen(false)
                         }}>Bob</p>
                         <p onClick={() => {
-                            navigate('/sale')
+                            navigate('/store')
                             setMenuOpen(false)
-                        }}>Sale</p>
+                        }}>Store</p>
+                        <p onClick={() => {
+                            navigate('/market')
+                            setMenuOpen(false)
+                        }}>Market</p>
                     </section>
                 </div>
             </div>

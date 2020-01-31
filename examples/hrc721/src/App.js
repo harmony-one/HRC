@@ -8,7 +8,8 @@ import { harmonyInit, harmonyState } from './redux/harmony'
 import Header from './components/Header/Header'
 import Dialog from './components/Dialog/Dialog'
 import Home from './routes/Home/Home'
-import Sale from './routes/Sale/Sale'
+import Store from './routes/Store/Store'
+import Market from './routes/Market/Market'
 
 export default connect(
 	(state) => ({
@@ -22,7 +23,6 @@ export default connect(
 
 	useEffect(() => {
 		dispatch(harmonyInit())
-		dispatch(crowdsaleInit())
 	}, [])
 	
 	return (
@@ -31,7 +31,8 @@ export default connect(
 			<Dialog {...props} />
 			<Router>
 				<Home {...props} path="/" />
-				<Sale {...props} path="/sale" />
+				<Store {...props} path="/store" />
+				<Market {...props} path="/market" />
 			</Router>
 		</div>
 	)

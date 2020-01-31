@@ -2,8 +2,8 @@ import { UPDATE, reducer } from '../util/redux-util'
 import { waitForInjected, getExtAccount } from '../util/hmy-util'
 import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
-import { getTokens } from './hrc721'
-import { getRaised } from './crowdsale'
+import { getTokens, getMarket } from './hrc721'
+import { crowdsaleInit, getRaised } from './crowdsale'
 
 import config from '../../config'
 const { ENV, network, net, url } = config
@@ -142,6 +142,7 @@ export const harmonyInit = () => async (dispatch) => {
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
+    console.log(minter)
     // 0xea877e7412c313cd177959600e655f8ba8c28b40
     let account
     if (!hmyExt) {
@@ -167,6 +168,9 @@ export const harmonyInit = () => async (dispatch) => {
         console.log("setting minter")
         dispatch(setActive('minter'))
     }
+
+    dispatch(crowdsaleInit())
+    dispatch(getMarket())
 }
 
 //reducer
