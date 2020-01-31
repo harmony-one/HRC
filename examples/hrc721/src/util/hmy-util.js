@@ -13,6 +13,7 @@ export const getContract = (state, artifact) => {
         return {}
     }
     const harmony = active && active.isExt ? hmyExt : hmy
+    console.log(harmony)
     const contract = getContractInstance(harmony, artifact)
     console.log(contract)
     return { hmy, contract, active }
