@@ -63,7 +63,6 @@ contract("HRC721", (accounts) => {
 	/********************************
 	Alice: 11
 	Bob: 0
-	
 	********************************/
 	it("should allow alice to put a token for sale", async () => {
 		const tokenId = 1

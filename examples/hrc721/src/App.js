@@ -6,6 +6,7 @@ import { crowdsaleInit, crowdsaleState } from './redux/crowdsale'
 import { hrc721State } from './redux/hrc721'
 import { harmonyInit, harmonyState } from './redux/harmony'
 import Header from './components/Header/Header'
+import Dialog from './components/Dialog/Dialog'
 import Home from './routes/Home/Home'
 import Sale from './routes/Sale/Sale'
 
@@ -27,6 +28,7 @@ export default connect(
 	return (
 		<div>
 			<Header {...props} />
+			<Dialog {...props} />
 			<Router>
 				<Home {...props} path="/" />
 				<Sale {...props} path="/sale" />

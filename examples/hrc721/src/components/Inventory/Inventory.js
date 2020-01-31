@@ -34,6 +34,12 @@ export default function Inventory(props) {
                     {!filter && <div className={button}>
                         <button onClick={() => dispatch(purchase({ index }))}>Purchase</button>
                     </div>}
+                    {filter && <div className={button}>
+                        <button onClick={() => dispatch(updateDialogState({
+                            open: false,
+                            content: <h1>Hey</h1>
+                        }))}>Sell</button>
+                    </div>}
                 </div>
             })
         }

@@ -27,6 +27,7 @@ contract HRC721 is ERC721Full, ERC721Mintable {
 		uint256 price = salePrice[tokenId];
         require(price != 0, "buyToken: price equals 0");
         require(msg.value == price, "buyToken: price doesn't equal salePrice[tokenId]");
+		address owner = ownerOf(tokenId);
 		// approve(address(this), tokenId);
 		_transferFrom(owner, msg.sender, tokenId);
 	}

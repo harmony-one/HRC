@@ -5,7 +5,6 @@ import { ChainID, ChainType } from '@harmony-js/utils'
 import { getTokens } from './hrc721'
 import { getRaised } from './crowdsale'
 
-
 import config from '../../config'
 const { ENV, network, net, url } = config
 
@@ -19,7 +18,13 @@ const defaultState = {
     account: null,
     bech32Addresses: [],
     addresses: [],
+    //app ui state, should be in app.js reducer (TBD)
     processing: false,
+    dialogState: {
+        open: false,
+        title: '',
+        content: null,
+    },
 }
 const harmonyKeys = Object.keys(defaultState)
 export const harmonyState = ({ harmonyReducer: { ...keys } }) => {
@@ -32,6 +37,9 @@ export const harmonyState = ({ harmonyReducer: { ...keys } }) => {
 Functions / Actions
 ********************************/
 
+export const updateDialogState = (dialogState) => async (dispatch) => {
+    dispatch({ type: UPDATE, dialogState })
+}
 export const updateProcessing = (processing) => async (dispatch) => {
     dispatch({ type: UPDATE, processing })
 }

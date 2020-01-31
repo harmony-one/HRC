@@ -1,0 +1,41 @@
+
+@import './../../theme/theme.module.scss';
+
+
+.dialog {
+    z-index: 3000;
+    position: fixed;
+    top: 0; right: 0;
+    width: 0;
+    transition: 0s;
+    > div {
+        transition: cubic-bezier(0.215, 0.610, 0.355, 1) .32s;
+    }
+    > div:nth-child(1) {
+        opacity: 0;
+        height: 100vh;
+        background: #000;
+    }
+    > div:nth-child(2) {
+        width: 100%;
+        position: absolute;
+        top: $margin; left: $margin;
+        width: calc(100vw - 32px);
+        transform: translateY(-100vw);
+        > section {
+            background: #FFF;
+            height: 100px;
+            box-shadow: $shadow;
+        }
+    }
+}
+
+.dialogOpen {
+    width: 100%;
+    > div:nth-child(1) {
+        opacity: 0.5;
+    }
+    > div:nth-child(2) {
+        transform: translateY(0);
+    }
+}
