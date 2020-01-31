@@ -28,25 +28,31 @@ export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) =>
 
     console.log(Limit, Price, Link)
 
-    // dispatch(updateProcessing(true))
+     dispatch(updateProcessing(true))
     
-    // //const { hmy, hmyExt, active } = getState().harmonyReducer
-    // const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
-    // //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
-    // const tx = contract.methods.purchase(active.address, index).send({
-    //     from: active.address,
-    //     value: new hmy.utils.Unit(1).asEther().toWei(),
-    //     gasLimit: '1000000',
-    //     gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
-    // }).on('transactionHash', function (hash) {
-    //     console.log('hash', hash)
-    // }).on('receipt', function (receipt) {
-    //     console.log('receipt', receipt)
-    // }).on('confirmation', async (confirmationNumber, receipt) => {
-    //     console.log('confirmationNumber', confirmationNumber, receipt)
-    //     dispatch(getInventory())
-    //     dispatch(updateProcessing(false))
-    // }).on('error', console.error)
+    //const { hmy, hmyExt, active } = getState().harmonyReducer
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
+    
+    Limit = parseInt(Limit)
+    Limit = Limit > 0 ? Limit : 1
+    Price = parseInt(Price)
+    Price = Price > 0 ? Price : 0
+    Price = new hmy.utils.Unit(Price).asEther().toWei()
+
+    const tx = contract.methods.addItem(Limit, Price, Link).send({
+        from: active.address,
+        gasLimit: '30000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+    }).on('transactionHash', function (hash) {
+        console.log('hash', hash)
+    }).on('receipt', function (receipt) {
+        console.log('receipt', receipt)
+    }).on('confirmation', async (confirmationNumber, receipt) => {
+        console.log('confirmationNumber', confirmationNumber, receipt)
+        dispatch(getInventory())
+        dispatch(updateProcessing(false))
+    }).on('error', console.error)
 
     /********************************
     You won't see an update unless you refresh or call dispatch(getInventory())
@@ -57,14 +63,15 @@ export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) =>
 export const purchase = ({ index }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     
+    const { items } = getState().crowdsaleReducer
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
-        value: new hmy.utils.Unit(1).asEther().toWei(),
-        gasLimit: '1000000',
-        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+        value: new hmy.utils.Unit(items[index].price).asEther().toWei(),
+        gasLimit: '30000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
         console.log('hash', hash)
     }).on('receipt', function (receipt) {
@@ -95,8 +102,8 @@ const getInventory = () => async (dispatch, getState) => {
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const args = {
-        gasLimit: '1000000',
-        gasPrice: new hmy.utils.Unit('10').asGwei().toWei(),
+        gasLimit: '30000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
     const totalItems = parseInt((await contract.methods.totalItems().call(args)).toNumber())
     const items = []
