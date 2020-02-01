@@ -67,6 +67,7 @@ export const purchase = ({ index }) => async (dispatch, getState) => {
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
+    console.log(index)
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
         value: new hmy.utils.Unit(items[index].price).asEther().toWei(),

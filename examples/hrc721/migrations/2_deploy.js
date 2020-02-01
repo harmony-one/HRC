@@ -21,7 +21,7 @@ module.exports = function (deployer, network, accounts) {
 				// 	console.log(urls[i])
 				// 	await sale.addItem(10, price, urls[i])
 				// }
-				// return token.addMinter(sale.address)
+				return token.addMinter(sale.address)
 			})
 		});
 	});

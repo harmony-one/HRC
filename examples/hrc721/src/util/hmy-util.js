@@ -21,10 +21,6 @@ export const getContract = (state, artifact) => {
 }
 export const getContractInstance = (hmy, artifact) => {
 
-    console.log(artifact.contractName, config[artifact.contractName])
-    
-    console.log(artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName])
-
     const contract = hmy.contracts.createContract(
         artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
     )

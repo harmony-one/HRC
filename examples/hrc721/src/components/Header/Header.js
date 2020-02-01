@@ -50,7 +50,7 @@ export default function Header({history, harmonyState: { network }}) {
                 </div>
             </div>
             <div className={root}>
-                <p>HRC721 Doggy Demo Dapp</p>
+                <p>The Dapp-tastic Harmony NFT Demo</p>
                 <i className={"fas fa-bars"} onClick={() => setMenuOpen(true)}></i>
             </div>
         </div>
