@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { setActive } from './../../redux/harmony'
 import { root, menu, menuOpen } from './Header.module.scss'
 
-export default function Header({history}) {
+export default function Header({history, harmonyState: { network }}) {
 	const dispatch = useDispatch()
 
     const [isMenuOpen, setMenuOpen] = useState(false)
@@ -25,7 +25,7 @@ export default function Header({history}) {
                             navigate('/')
                             dispatch(setActive('account'))
                             setMenuOpen(false)
-                        }}>Bob</p>
+                        }}>{!network ? 'Bob' : 'My Account'}</p>
                         <p onClick={() => {
                             navigate('/store')
                             setMenuOpen(false)

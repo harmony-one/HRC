@@ -9,7 +9,7 @@ This example will help you deploy an HRC-20 (ERC-20 compatible) token on Harmony
 3. Run `./deploy.sh <target_network>` to deploy the contracts, where `<target_network>` can be:
     - `local`: for a local running instance of the Harmony blockchain
     - `testnet`: for our current long running testnet (current URL: `https://api.s0.b.hmny.io/`)
-    - `mainnet`: for our Mainnet (current URL: `https://api.s0.t.hmny.io/`)
+    - `mainnet0`: for our Mainnet (current URL: `https://api.s0.t.hmny.io/`)
 4. In the `.env` file located in the same directory as this Readme, set `ENV=<target_network>` where `<target_network>` is the network you deployed the smart contract to.
 5. Use `npm start` to run the dapp
 
