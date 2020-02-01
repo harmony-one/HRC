@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Router } from "@reach/router"
 
-import { crowdsaleInit, crowdsaleState } from './redux/crowdsale'
+import { crowdsaleState } from './redux/crowdsale'
 import { hrc721State } from './redux/hrc721'
 import { harmonyInit, harmonyState } from './redux/harmony'
 import Header from './components/Header/Header'
@@ -28,6 +28,7 @@ export default connect(
 	const {processing} = props.harmonyState
 
 	useEffect(() => {
+		if (window.location.pathname.length > 1) window.location = '/'
 		dispatch(harmonyInit())
 	}, [])
 	

@@ -41,6 +41,7 @@ export default function Inventory(props) {
         {
             items.sort((a, b) => a.isSoldOut - b.isSoldOut).map((item) => {
                 const {index, isSoldOut} = item
+
                 if (wallet && balance && balance[index] === undefined) return null
                 
                 return wallet ?
@@ -84,11 +85,10 @@ export default function Inventory(props) {
                         
                         <div className={button}>
                             <button onClick={() => {
-
                                 if (market) {
                                     dispatch(buyTokenOnSale(item))
                                 } else {
-                                    dispatch(purchase({ index }))
+                                    dispatch(purchase(item))
                                 }
 
                             }}>{market ? 'Buy from Seller' : 'Purchase'}</button>

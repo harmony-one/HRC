@@ -60,7 +60,7 @@ export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) =>
 }
 
 
-export const purchase = ({ index }) => async (dispatch, getState) => {
+export const purchase = ({ index, price }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     
     const { items } = getState().crowdsaleReducer
@@ -70,7 +70,7 @@ export const purchase = ({ index }) => async (dispatch, getState) => {
     console.log(index)
     const tx = contract.methods.purchase(active.address, index).send({
         from: active.address,
-        value: new hmy.utils.Unit(items[index].price).asEther().toWei(),
+        value: new hmy.utils.Unit(price).asEther().toWei(),
         gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }).on('transactionHash', function (hash) {
@@ -94,11 +94,9 @@ export const getRaised = () => async (dispatch, getState) => {
     // const one = new hmy.utils.Unit(raised).asWei().toEther()
     // dispatch({ type: UPDATE, raised: one, minted: one * 1000 })
 }
-        
-
 
 export const getInventory = () => async (dispatch, getState) => {
-    
+
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
@@ -116,6 +114,7 @@ export const getInventory = () => async (dispatch, getState) => {
         let price = (await contract.methods.getPrice(i).call(args)).toString()
         price = new hmy.utils.Unit(price).asWei().toEther().toString()
         const url = await contract.methods.getUrl(i).call(args)
+
         items.push({
             index: i, limit, minted, price, url, isSoldOut: minted == limit
         })
