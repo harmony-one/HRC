@@ -9,7 +9,7 @@ const { filterMyAddress } = config
 export default function Form(props) {
 
     const {
-        fields,
+        fields, lowerContent,
         active, addressType, addresses,
         submit, title, subtitle = '', amountLabel,
     } = props
@@ -20,7 +20,10 @@ export default function Form(props) {
     const [toAddress, setToAddress] = useState('')
     const [inputValues, setInputValues] = useState({})
     const [resetInput, setResetInput] = useState(null)
-    const handleInputChange = (name, val) => setInputValues({ ...inputValues, [name]: val })
+    const handleInputChange = (name, val, onChange) => {
+        setInputValues({ ...inputValues, [name]: val })
+        if (onChange) onChange(val)
+    }
 
     useEffect(() => {
         setResetInput(Math.random().toString())
@@ -41,7 +44,7 @@ export default function Form(props) {
                             type={f.type}
                             placeholder={f.label}
                             reset={resetInput}
-                            onChange={handleInputChange}
+                            onChange={(name, val) => handleInputChange(name, val, f.onChange)}
                         />)}
                     </div>
                 :
@@ -53,6 +56,9 @@ export default function Form(props) {
                         onChange={handleInputChange}
                     />
                 }
+
+
+
                 {addressType && addresses &&
                     <div>
                         <Input
@@ -79,6 +85,9 @@ export default function Form(props) {
                     </div>
                 }
             </div>
+
+                { lowerContent && lowerContent }
+
             <div className={center}>
                 <button onClick={() => setResetInput(Math.random().toString())}>Clear</button>
                 <button onClick={() => {

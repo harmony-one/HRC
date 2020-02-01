@@ -34,6 +34,11 @@ export default function Header({history, harmonyState: { network }}) {
                             setMenuOpen(false)
                         }}>My Account</p>
                         <p onClick={() => {
+                            navigate('/create')
+                            dispatch(setActive('account'))
+                            setMenuOpen(false)
+                        }}>Create</p>
+                        <p onClick={() => {
                             navigate('/store')
                             setMenuOpen(false)
                         }}>Store</p>

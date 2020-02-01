@@ -1,7 +1,7 @@
 import { UPDATE, reducer } from '../util/redux-util'
 import HRC721 from '../build/contracts/HRC721.json'
 import HRC721Crowdsale from '../build/contracts/HRC721Crowdsale.json'
-import {getBalances, updateProcessing, updateDialogState} from './harmony'
+import {getBalances, updateProcessing, updateDialogState,} from './harmony'
 import { getContract, oneToHexAddress } from '../util/hmy-util'
 
 
@@ -67,7 +67,7 @@ export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
         console.log('receipt', receipt)
     }).on('confirmation', async (confirmationNumber, receipt) => {
         console.log('confirmationNumber', confirmationNumber, receipt)
-        dispatch(getTokens())
+        dispatch(getBalances())
         dispatch(updateProcessing(false))
     }).on('error', console.error)
 }
@@ -90,6 +90,7 @@ export const buyTokenOnSale = ({ price, tokenId }) => async (dispatch, getState)
     }).on('confirmation', async (confirmationNumber, receipt) => {
         console.log('confirmationNumber', confirmationNumber, receipt)
         dispatch(getMarket())
+        dispatch(getBalances())
         dispatch(updateProcessing(false))
     }).on('error', console.error)
 }
@@ -100,6 +101,7 @@ export const getTokens = (account) => async (dispatch, getState) => {
     
     // const hrc721 = await getContractInstance(hmy, HRC721)
 
+    dispatch({type: UPDATE, balances: {} })
 
     const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
     if (!hmy) {

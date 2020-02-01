@@ -117,9 +117,10 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
     dispatch({ type: UPDATE, [account.name]: account })
 }
 export const getBalances = (account) => async (dispatch, getState) => {
-    dispatch(getBalanceONE(account))
-    dispatch(getTokens(account))
-    dispatch(getRaised(account))
+    const { active } = getState().harmonyReducer
+    dispatch(getBalanceONE(account || active))
+    dispatch(getTokens(account || active))
+    dispatch(getRaised(account || active))
 }
 
 export const harmonyInit = () => async (dispatch) => {

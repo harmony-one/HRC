@@ -6,15 +6,15 @@ import { purchase } from './../../redux/crowdsale'
 import { setSell, buyTokenOnSale } from './../../redux/hrc721'
 import Form from './../../components/Form/Form'
 
-import { inventory, image, stats, button } from './Inventory.module.scss'
+import { inventory, image, stats, button, soldOut } from './Inventory.module.scss'
 
 
-const RenderItem = ({item, id, byline}) => {
-    console.log(item, id)
+const RenderItem = ({item, hidePrice, id, byline, isSoldOut = false}) => {
     return <div>
-    <div className={image}>
+    <div className={[image, isSoldOut ? soldOut : ''].join(' ')}>
         <img src={item.url} alt="dog" />
-        <p>Price: {item.price}</p>
+        
+        {hidePrice ? <p style={{opacity: 0}}></p> : <p>Price: {item.price}</p> }
         <p>{id}</p>
     </div>
     <div className={stats}>
@@ -39,15 +39,17 @@ export default function Inventory(props) {
     return (
     <div className={inventory}>
         {
-            items.map((item, index) => {
+            items.sort((a, b) => a.isSoldOut - b.isSoldOut).map((item, index) => {
                 if (wallet && balance && balance[index] === undefined) return null
 
+                const {isSoldOut} = item
                 
                 return wallet ?
                         balance[index].map(({tokenId, salePrice}) => {
                         return <div key={tokenId}>
                             <RenderItem {...{ 
                                 item,
+                                hidePrice: true,
                                 id: 'Token ID: ' + tokenId,
                                 byline: salePrice !== '0' ? `Selling for: ${salePrice} ONE` : `Not for Sale`
                             }} />
@@ -76,8 +78,11 @@ export default function Inventory(props) {
 
                     <div key={index}>
                         <RenderItem {...{ item, id: market ? 'TokenId: ' + item.tokenId : 'Item # ' + (index+1),
-                            byline: market ? null : `${item.minted} / ${item.limit} sold`
+                            byline: market ? null : `${item.minted} / ${item.limit} sold`,
+                            isSoldOut
                         }} />
+                        {!isSoldOut &&
+                        
                         <div className={button}>
                             <button onClick={() => {
 
@@ -89,6 +94,7 @@ export default function Inventory(props) {
 
                             }}>{market ? 'Buy from Seller' : 'Purchase'}</button>
                         </div>
+                        }
                     </div>
             })
         }

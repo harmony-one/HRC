@@ -116,7 +116,7 @@ export const getInventory = () => async (dispatch, getState) => {
         price = new hmy.utils.Unit(price).asWei().toEther().toString()
         const url = await contract.methods.getUrl(i).call(args)
         items.push({
-            limit, minted, price, url
+            limit, minted, price, url, isSoldOut: minted == limit
         })
     }
     dispatch({type: UPDATE, items})

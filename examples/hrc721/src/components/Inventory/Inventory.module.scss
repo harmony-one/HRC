@@ -44,6 +44,10 @@
     }
 }
 
+.soldOut {
+    filter: grayscale(0.9);
+}
+
 .stats {
     box-shadow: $shadow;
     position: relative;
