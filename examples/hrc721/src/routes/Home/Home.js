@@ -24,7 +24,6 @@ export default function Home(props) {
 
 
             <section>
-                <h2>Balances</h2>
                 {active &&
                     <div className={bubble}>
                         <h3>{active.name}</h3>

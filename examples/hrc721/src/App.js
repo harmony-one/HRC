@@ -9,6 +9,7 @@ import Header from './components/Header/Header'
 import Dialog from './components/Dialog/Dialog'
 import Home from './routes/Home/Home'
 import Store from './routes/Store/Store'
+import Funds from './routes/Funds/Funds'
 import Create from './routes/Create/Create'
 import Market from './routes/Market/Market'
 import LoadingGIF from './img/loading.gif'
@@ -45,6 +46,7 @@ export default connect(
 			<Dialog {...props} />
 			<Router>
 				<Home {...props} path="/" />
+				<Funds {...props} path="/funds" />
 				<Create {...props} path="/create" />
 				<Store {...props} path="/store" />
 				<Market {...props} path="/market" />

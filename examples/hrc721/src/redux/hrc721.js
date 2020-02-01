@@ -45,7 +45,7 @@ export const getMarket = (account) => async(dispatch, getState) => {
             market.push({ price, url, tokenId })
         }
     }
-    console.log(market)
+    // console.log(market)
     dispatch({type: UPDATE, market })
 }
 

@@ -20,32 +20,35 @@ export default function Header({history, harmonyState: { network }}) {
                     <section>
                         { ENV === 'local' &&
 
-<p onClick={() => {
-    navigate('/')
-    dispatch(setActive('minter'))
-    setMenuOpen(false)
-}}>Alice</p>
-
-
+                            <p onClick={() => {
+                                navigate('/')
+                                dispatch(setActive('minter'))
+                                setMenuOpen(false)
+                            }}><i className="far fa-user-circle fa-lg"></i><span>Minter</span></p>
                         }
                         <p onClick={() => {
                             navigate('/')
                             dispatch(setActive('account'))
                             setMenuOpen(false)
-                        }}>My Account</p>
+                        }}><i className="far fa-user-circle fa-lg"></i><span>My Account</span></p>
+                        <p onClick={() => {
+                            navigate('/funds')
+                            dispatch(setActive('account'))
+                            setMenuOpen(false)
+                        }}><i className="fas fa-coins fa-lg"></i><span>Funds</span></p>
                         <p onClick={() => {
                             navigate('/create')
                             dispatch(setActive('account'))
                             setMenuOpen(false)
-                        }}>Create</p>
+                        }}><i className="fab fa-creative-commons fa-lg"></i><span>Create</span></p>
                         <p onClick={() => {
                             navigate('/store')
                             setMenuOpen(false)
-                        }}>Store</p>
+                        }}><i className="fas fa-store fa-lg"></i><span>Store</span></p>
                         <p onClick={() => {
                             navigate('/market')
                             setMenuOpen(false)
-                        }}>Market</p>
+                        }}><i className="fas fa-users"></i><span>Market</span></p>
                     </section>
                 </div>
             </div>

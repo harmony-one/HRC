@@ -26,7 +26,6 @@ export default function Store(props) {
 
 
             <section>
-                <h2>Current User</h2>
                 {active &&
                     <div className={bubble}>
                         <h3>{active.name}</h3>

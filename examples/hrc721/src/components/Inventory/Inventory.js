@@ -35,50 +35,56 @@ export default function Inventory(props) {
     const dispatch = useDispatch()
 
     if (market) items = market
+    if (!wallet) items.sort((a, b) => a.isSoldOut - b.isSoldOut)
+    else items = items
+        .map((item) => ({ item, balance: balance[item.index] || [] }))
+        .reduce((acc, {item, balance}) => {
+            acc.push(...balance.map((b) => ({...item, ...b})))
+            return acc
+        }, [])
+        .sort((a, b) => b.tokenId - a.tokenId)
+
+    if (items.length === 0) return null
 
     return (
     <div className={inventory}>
         {
-            items.sort((a, b) => a.isSoldOut - b.isSoldOut).map((item) => {
-                const {index, isSoldOut} = item
-
-                if (wallet && balance && balance[index] === undefined) return null
+            items.map((item) => {
+                const {index, isSoldOut, tokenId, salePrice} = item
                 
                 return wallet ?
-                        balance[index].map(({tokenId, salePrice}) => {
-                        return <div key={tokenId}>
-                            <RenderItem {...{ 
-                                item,
-                                hidePrice: true,
-                                id: 'Token ID: ' + tokenId,
-                                byline: salePrice !== '0' ? `Selling for: ${salePrice} ONE` : `Not for Sale`
-                            }} />
-                            <div className={button}>
-                                <button onClick={() => dispatch(updateDialogState({
-                                    open: true,
-                                    content: <Form
-                                        {...{
-                                            active,
-                                            title: 'Sell Your Token',
-                                            submit: ({amount}) => setSell({
-                                                amount,
-                                                tokenId
-                                            })
-                                        }}
-                                    />
-                                }))}>{
-                                    salePrice !== '0' ? 'Update Sale' : 'Sell Token'
-                                }</button>
-                            </div>
+                    <div key={tokenId + '' + index}>
+                        <RenderItem {...{ 
+                            item,
+                            hidePrice: true,
+                            id: 'Token ID: ' + tokenId,
+                            byline: salePrice !== '0' ? `Selling for: ${salePrice} ONE` : `Not for Sale`
+                        }} />
+                        <div className={button}>
+                            <button onClick={() => dispatch(updateDialogState({
+                                open: true,
+                                content: <Form
+                                    {...{
+                                        active,
+                                        title: 'Sell Your Token',
+                                        submit: ({amount}) => setSell({
+                                            amount,
+                                            tokenId
+                                        })
+                                    }}
+                                />
+                            }))}>{
+                                salePrice !== '0' ? 'Update Sale' : 'Sell Token'
+                            }</button>
                         </div>
-                        })
+                    </div>
                     :
 
                     //handles both store and market cases
 
-                    <div key={index}>
+                    <div key={item.tokenId + '' + index}>
                         <RenderItem {...{ item, id: market ? 'TokenId: ' + item.tokenId : 'Item # ' + (index+1),
-                            byline: market ? null : `${item.minted} / ${item.limit} sold`,
+                            byline: market ? null : isSoldOut ? 'Sold Out!' : `${item.minted} / ${item.limit} sold`,
                             isSoldOut
                         }} />
                         {!isSoldOut &&
