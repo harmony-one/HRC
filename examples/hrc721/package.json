@@ -22,7 +22,7 @@
     "sass": "^1.23.7"
   },
   "scripts": {
-    "start": "pkill node; parcel ./src/index.html --open > output.log &"
+    "start": "pkill node; rm -rf ./src/build; mkdir ./src/build; mkdir ./src/build/contracts; cp -r ./build/contracts/* ./src/build/contracts/; parcel ./src/index.html --open > output.log &"
   },
   "browserslist": [
     "last 2 Chrome versions"

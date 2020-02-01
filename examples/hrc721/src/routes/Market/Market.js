@@ -1,6 +1,7 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useDispatch } from 'react-redux'
 import { setActive } from '../../redux/harmony'
+import { getMarket } from '../../redux/hrc721'
 import Inventory from '../../components/Inventory/Inventory'
 
 import { route, gradient, bubble, processingCover, button } from './Market.module.scss'
@@ -14,6 +15,10 @@ export default function Market(props) {
     } = props
 
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(getMarket())
+    }, [active])
 
     return (
         <div className={route}>

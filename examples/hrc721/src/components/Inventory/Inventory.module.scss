@@ -3,7 +3,7 @@
 @import './../../theme/theme.module.scss';
 
 .inventory {
-    width: 100vw;
+    width: calc(100% + 32px);
     margin-left: -$margin;
     > div {
         margin-bottom: $margin;

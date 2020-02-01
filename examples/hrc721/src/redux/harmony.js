@@ -142,7 +142,6 @@ export const harmonyInit = () => async (dispatch) => {
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
-    console.log(minter)
     // 0xea877e7412c313cd177959600e655f8ba8c28b40
     let account
     if (!hmyExt) {
@@ -155,7 +154,7 @@ export const harmonyInit = () => async (dispatch) => {
 
     const bech32Addresses = [account.bech32Address, minter.bech32Address]
 
-    if (network) {
+    if (ENV !== 'local') {
         bech32Addresses.pop()
     }
     dispatch({ type: UPDATE,
@@ -170,7 +169,7 @@ export const harmonyInit = () => async (dispatch) => {
     }
 
     dispatch(crowdsaleInit())
-    dispatch(getMarket())
+
 }
 
 //reducer

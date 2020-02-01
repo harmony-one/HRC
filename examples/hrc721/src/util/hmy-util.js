@@ -8,6 +8,7 @@ const { net } = config
 export const getContract = (state, artifact) => {
 
     const { hmy, hmyExt, active } = state
+    
     if (!hmy) {
         console.trace('call loadContracts first')
         return {}
@@ -15,10 +16,15 @@ export const getContract = (state, artifact) => {
     const harmony = active && active.isExt ? hmyExt : hmy
     console.log(harmony)
     const contract = getContractInstance(harmony, artifact)
-    console.log(contract)
+    // console.log(contract)
     return { hmy, contract, active }
 }
 export const getContractInstance = (hmy, artifact) => {
+
+    console.log(artifact.contractName, config[artifact.contractName])
+    
+    console.log(artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName])
+
     const contract = hmy.contracts.createContract(
         artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
     )

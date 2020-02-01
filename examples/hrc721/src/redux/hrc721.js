@@ -1,5 +1,5 @@
 import { UPDATE, reducer } from '../util/redux-util'
-import HarmonyMintable from '../build/contracts/HRC721.json'
+import HRC721 from '../build/contracts/HRC721.json'
 import HRC721Crowdsale from '../build/contracts/HRC721Crowdsale.json'
 import {getBalances, updateProcessing, updateDialogState} from './harmony'
 import { getContract, oneToHexAddress } from '../util/hmy-util'
@@ -21,7 +21,7 @@ export const hrc721State = ({ hrc721Reducer: { ...keys } }) => {
 
 export const getMarket = (account) => async(dispatch, getState) => {
 
-    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
+    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
     const { contract: hrc721Crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     if (!hmy) {
         return
@@ -33,8 +33,9 @@ export const getMarket = (account) => async(dispatch, getState) => {
     }
 
     const market = []
-    const tokens = (await hrc721.methods.totalSupply().call({...args})).toNumber()
-    
+    let tokens = await hrc721.methods.totalSupply().call(args)
+    tokens = tokens ? tokens.toNumber() : 0
+
     for (let i = 0; i < tokens; i++) {
         const tokenId = i+1
         let price = (await hrc721.methods.getSalePrice(tokenId).call({...args})).toString()
@@ -54,7 +55,7 @@ export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
     dispatch(updateDialogState({ open: false }))
     // const { items } = getState().crowdsaleReducer
     //const { hmy, hmyExt, active } = getState().harmonyReducer
-    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const tx = contract.methods.setSale(tokenId, new hmy.utils.Unit(amount).asEther().toWei()).send({
         from: active.address,
@@ -75,7 +76,7 @@ export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
 export const buyTokenOnSale = ({ price, tokenId }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     //const { hmy, hmyExt, active } = getState().harmonyReducer
-    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const tx = contract.methods.buyTokenOnSale(tokenId).send({
         from: active.address,
@@ -97,18 +98,20 @@ export const getTokens = (account) => async (dispatch, getState) => {
     // const { hmy } = getState().harmonyReducer
     let { balances } = getState().hrc721Reducer
     
-    // const hrc721 = await getContractInstance(hmy, HarmonyMintable)
+    // const hrc721 = await getContractInstance(hmy, HRC721)
 
 
-    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HarmonyMintable)
+    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
     if (!hmy) {
         return
     }
-
-    const tokens = (await hrc721.methods.balanceOf(account.address).call({
-        gasLimit: '210000',
+    let tokens = await hrc721.methods.balanceOf(account.address).call({
+        gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
-    })).toNumber()
+    })
+    tokens = tokens ? tokens.toNumber() : 0
+
+
     const balance = {}
     for (let i = 0; i < tokens; i++) {
         const tokenId = (await hrc721.methods.tokenOfOwnerByIndex(account.address, i).call({

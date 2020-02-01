@@ -19,10 +19,6 @@ export default function Home(props) {
 
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        dispatch(getTokens(active))
-    }, [active])
-
     return (
         <div className={route}>
 

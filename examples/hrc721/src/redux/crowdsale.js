@@ -96,7 +96,7 @@ export const getRaised = () => async (dispatch, getState) => {
         
 
 
-const getInventory = () => async (dispatch, getState) => {
+export const getInventory = () => async (dispatch, getState) => {
     
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
@@ -105,7 +105,9 @@ const getInventory = () => async (dispatch, getState) => {
         gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
-    const totalItems = parseInt((await contract.methods.totalItems().call(args)).toNumber())
+    let totalItems = await contract.methods.totalItems().call(args)
+    totalItems = totalItems ? parseInt(totalItems.toNumber()) : 0
+    console.log(totalItems)
     const items = []
     for (let i = 0; i < totalItems; i++) {
         const limit = parseInt(await contract.methods.getLimit(i).call(args), 16)

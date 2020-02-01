@@ -1,21 +1,24 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useDispatch } from 'react-redux'
 import { setActive } from '../../redux/harmony'
+import { getInventory    } from '../../redux/crowdsale'
 import Inventory from '../../components/Inventory/Inventory'
 
 import { route, gradient, bubble, processingCover, button } from './Store.module.scss'
 import LoadingGIF from '../../img/loading.gif'
 
-export default function Sale(props) {
+export default function Store(props) {
 
     const {
         harmonyState: { processing, active,  },
         hrc721State: { balances  },
     } = props
 
-    console.log(balances)
-
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(getInventory())
+    }, [active])
 
     return (
         <div className={route}>

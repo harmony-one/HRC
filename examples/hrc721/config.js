@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 let network, net, url
-let HRC721Crowdsale, HarmonyMintable, Migrations 
+let HRC721Crowdsale, HRC721, Migrations 
 
 switch(process.env.ENV){
     case 'local': {
@@ -15,7 +15,7 @@ switch(process.env.ENV){
         net = 2;
         url = process.env.TESTNET_0_URL
         HRC721Crowdsale = process.env.TESTNET_HRC721CROWDSALE
-        HarmonyMintable = process.env.TESTNET_HARMONYMINTABLE
+        HRC721 = process.env.TESTNET_HRC721
         Migrations = process.env.TESTNET_MIGRATIONS
         break;
     }
@@ -24,7 +24,7 @@ switch(process.env.ENV){
         net = 1;
         url = process.env.MAINNET_0_URL
         HRC721Crowdsale = process.env.MAINNET_HRC721CROWDSALE
-        HarmonyMintable = process.env.MAINNET_HARMONYMINTABLE
+        HRC721 = process.env.MAINNET_HRC721
         Migrations = process.env.MAINNET_MIGRATIONS
         break;
     }
@@ -37,7 +37,5 @@ export default {
     url: url,   
     filterMyAddress: true,
     //use these if not deploying contract or targeting a different deployment on (same or ) different network
-    HRC721Crowdsale: HRC721Crowdsale,
-    HarmonyMintable: HarmonyMintable,
-    Migrations: Migrations
+    HRC721Crowdsale, HRC721, Migrations
 }
