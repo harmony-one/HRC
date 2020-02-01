@@ -150,7 +150,7 @@ export const harmonyInit = () => async (dispatch) => {
         account.name = 'Bob'
     } else {
         account = await getExtAccount(hmyExt)
-        account.name = 'Bob'
+        account.name = 'My Account'
     }
 
     const bech32Addresses = [account.bech32Address, minter.bech32Address]
