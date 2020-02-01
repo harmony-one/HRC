@@ -39,10 +39,9 @@ export default function Inventory(props) {
     return (
     <div className={inventory}>
         {
-            items.sort((a, b) => a.isSoldOut - b.isSoldOut).map((item, index) => {
+            items.sort((a, b) => a.isSoldOut - b.isSoldOut).map((item) => {
+                const {index, isSoldOut} = item
                 if (wallet && balance && balance[index] === undefined) return null
-
-                const {isSoldOut} = item
                 
                 return wallet ?
                         balance[index].map(({tokenId, salePrice}) => {
