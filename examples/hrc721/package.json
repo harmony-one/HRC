@@ -11,6 +11,7 @@
     "@openzeppelin/contracts": "^2.4.0",
     "@reach/router": "^1.2.1",
     "chartist": "^0.11.4",
+    "dotenv": "^8.2.0",
     "parcel": "^1.12.4",
     "parcel-bundler": "^1.12.4",
     "postcss-modules": "^1.4.1",
@@ -26,5 +27,8 @@
   },
   "browserslist": [
     "last 2 Chrome versions"
-  ]
+  ],
+  "devDependencies": {
+    "tslib": "^1.10.0"
+  }
 }
