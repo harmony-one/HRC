@@ -1,11 +1,12 @@
 var HarmonyERC20 = artifacts.require("HarmonyERC20");
+const { toHex, toBech32 } = require("./hmy-utils")
 
 //mint amount address
-const myAddress =   "0x3aea49553Ce2E478f1c0c5ACC304a84F5F4d1f98";
+const myAddress = "one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7";
 
 //test account address, keys under
 //https://github.com/harmony-one/harmony/blob/master/.hmy/keystore/one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7.key
-const testAccount = "0x7c41e0668b551f4f902cfaec05b5bdca68b124ce";
+let testAccount = "one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7";
 
 const transferAmount = 20000;
 
@@ -17,12 +18,11 @@ module.exports = function() {
         let decimals = await instance.decimals();
         
         console.log('calling transfer')
-        const tx = await instance.transfer(testAccount, transferAmount);
-        // console.log(tx)
-        let testAccBalance = await instance.balanceOf(testAccount);
-        let myAddrBalance = await instance.balanceOf(myAddress);
+        const tx = await instance.transfer(toHex(testAccount), transferAmount);
+        let testAccBalance = await instance.balanceOf(toHex(testAccount));
+        let myAddrBalance = await instance.balanceOf(toHex(myAddress));
 
-        console.log("HarmonyERC20 is deployed at address " + instance.address);
+        console.log("HarmonyERC20 is deployed at address " + toBech32(instance.address));
         console.log("Harmony ERC20 Information: Name    : " + name);
         console.log("Harmony ERC20 Information: Decimals: " + decimals);
         console.log("Harmony ERC20 Information: Total   : " + total.toString());
