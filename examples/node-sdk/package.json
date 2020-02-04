@@ -10,6 +10,6 @@
     "tslib": "^1.10.0"
   },
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/app.js"
   }
 }
