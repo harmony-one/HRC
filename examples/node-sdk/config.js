@@ -14,12 +14,14 @@ switch(process.env.ENV){
         network = 1;
         net = 2;
         url = process.env.TESTNET_0_URL
+        privateKey = process.env.TESTNET_PRIVATE_KEY
         break;
     }
     case 'mainnet': {
         network = 2;
         net = 1;
         url = process.env.MAINNET_0_URL
+        privateKey = process.env.MAINNET_PRIVATE_KEY
         break;
     }
 }
