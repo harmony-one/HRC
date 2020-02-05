@@ -50,34 +50,6 @@ module.exports = {
         return truffleProvider;
       },
     },
-    //    testnet0: {
-//      network_id: '2', 
-//      provider: () => {
-//        const truffleProvider = new TruffleProvider(
-//          testnet_0_url,
-//          { memonic: testnet_mnemonic },
-//          { shardID: 0, chainId: 2 },
-//          { gasLimit: gasLimit, gasPrice: gasPrice },
-//        );
-//        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
-//        truffleProvider.setSigner(newAcc);
-//        return truffleProvider;
-//      },
-//    },
-//    testnet1: {
-//      network_id: '2', 
-//      provider: () => {
-//        const truffleProvider = new TruffleProvider(
-//          testnet_1_url,
-//          { memonic: testnet_mnemonic },
-//          { shardID: 1, chainId: 2 },
-//          { gasLimit: gasLimit, gasPrice: gasPrice },
-//        );
-//        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
-//        truffleProvider.setSigner(newAcc);
-//        return truffleProvider;
-//      },
-//    },
     mainnet0: {
       network_id: '1', 
       provider: () => {

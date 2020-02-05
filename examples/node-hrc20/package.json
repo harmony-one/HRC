@@ -11,6 +11,7 @@
     "tslib": "^1.10.0"
   },
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "deploy": "truffle migrate --reset --network ${1}"
   }
 }

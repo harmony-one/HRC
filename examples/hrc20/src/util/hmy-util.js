@@ -6,8 +6,6 @@ const { net } = config
 
 //TODO: naming
 export const getContract = (state, artifact) => {
-
-
     const { hmy, hmyExt, active } = state
     if (!hmy) {
         console.log('call loadContracts first')

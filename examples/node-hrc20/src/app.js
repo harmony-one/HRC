@@ -5,12 +5,16 @@ const { Harmony } = require('@harmony-js/core')
 const { ChainType } = require('@harmony-js/utils')
 // import or require simutlated keystore (optional)
 const { importKey } = require('./simulated-keystore')
+const { getContractInstance } = require('./contract-api')
 /********************************
 Config
 ********************************/
 const config = require('../config')
 const { ENV, url, net, port, privateKey } = config
-
+/********************************
+Contracts
+********************************/
+const HRC20 = require('../build/contracts/HRC20.json')
 /********************************
 Harmony
 ********************************/
@@ -29,6 +33,13 @@ const bob = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider tas
 console.log('alice', alice.bech32Address)
 console.log('bob', bob.bech32Address)
 
+
+
+/********************************
+Get Contract Instances
+********************************/
+const hrc20 = getContractInstance(hmy, HRC20)
+console.log(hrc20)
 /********************************
 Express
 ********************************/
