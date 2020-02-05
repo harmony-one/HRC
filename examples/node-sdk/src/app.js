@@ -14,20 +14,33 @@ const { ENV, url, net, port, privateKey } = config
 /********************************
 Harmony
 ********************************/
-const hmy = new Harmony(url,
+const createHmy = (url) => new Harmony(url,
 	{
 		chainType: ChainType.Harmony,
 		chainId: net,
 	},
 )
+
+async function setSharding(hmy){
+	const res = await hmy.blockchain.getShardingStructure();
+	hmy.shardingStructures(res.result);
+}
+
+
+/********************************
+Wallet Setup
+********************************/
+function setDefaultWallets(hmy){
 // add privateKey to wallet
 // localnet: one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
 // testnet: one1w7lu05adqfhv8slx0aq8lgzglk5vrnwvf5f740
 const alice = hmy.wallet.addByPrivateKey(privateKey)
+	hmy.wallet.setSigner(alice.address)
 //one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65
 const bob = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
 console.log('alice', alice.bech32Address)
 console.log('bob', bob.bech32Address)
+}
 
 /********************************
 Express
@@ -46,10 +59,14 @@ let transfers = {
 // localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1&fromshard=0&toshard=1
 app.get('/transfer', async (req, res) => {
     const {to, from, toshard, fromshard, value} = req.query
+
 	if (!to || !value) {
 		res.send({success: false, message: 'missing to or value query params e.g. localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1'})
 		return
 	}
+	const hmy = createHmy(url)
+
+	await setSharding(hmy);
 	//defaults to shard 0
 	const toShard = !toshard ? 0x0 : '0x' + toshard
 	const fromShard = !fromshard ? 0x0 : '0x' + fromshard
@@ -67,8 +84,9 @@ app.get('/transfer', async (req, res) => {
 			return
 		}
 	} else {
-		//set signer to default if from isn't used
-		hmy.wallet.setSigner(alice.address)
+		//no from argument found:
+		//initialize default wallets and set signer to default if from argument isn't used
+		setDefaultWallets(hmy)
 	}
 	//prevent accidental re-entry if transaction is in flight
 	if (transfers[to]) return
@@ -89,9 +107,17 @@ app.get('/transfer', async (req, res) => {
 		// console.log('--- receipt ---', receipt)
 		transfers[to] = false //can send again
 		res.send({ success: true, receipt })
-    }).on('error', console.error)
+    }).on('error', (error) => {
+		console.error(error)
+		res.send({ success: false })
+	})
     const [sentTX, txHash] = await signedTX.sendTransaction()
-    const confirmedTX = await sentTX.confirm(txHash)
+    try {
+		await sentTX.confirm(txHash)
+	}
+	catch (error){
+		res.send({ success: false })
+	}
 })
 
 /********************************
@@ -99,18 +125,38 @@ Get balance
 ********************************/
 // localhost:3000/balance?address=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65
 app.get('/balance', async (req, res) => {
-	const {address, shard} = req.query
+	const {address} = req.query
 	if (!address) {
 		res.send({success: false, message: 'missing address query param e.g. localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1'})
 	}
-	const shardID = !shard ? 0 : parseInt(shard)
+
+	//create base harmony instance
+	let hmy = createHmy(url)
+	let balances = []
+	let err = false
+
+	//get shard information for the network
+	const shards = (await hmy.blockchain.getShardingStructure()).result
+
+	//get balance for each shard
+	for(let i = 0; i < shards.length; i++){
+		const shard = shards[i]
+
+		//create new harmony instance for each shard
+		hmy = createHmy(shard.http)
+
 	//rpc call
-	const result = (await hmy.blockchain.getBalance({ address, shardID }).catch((error) => {
+		const result = (await hmy.blockchain.getBalance({ address }).catch((error) => {
 		res.send({success: false, error })
+			err = true
 	})).result
+		if (err) break
 	if (result) {
-		res.send({success: true, balance: new hmy.utils.Unit(result).asWei().toEther()})
+			balances.push({ "shard": shard.shardID, balance: new hmy.utils.Unit(result).asWei().toEther()})
+		}
 	}
+	if(!err) res.send({success: true, balances: balances})
+	
 })
 
 /********************************
