@@ -5,14 +5,19 @@ const { Harmony } = require('@harmony-js/core')
 const { ChainType } = require('@harmony-js/utils')
 // import or require simutlated keystore (optional)
 const { importKey } = require('./simulated-keystore')
-const { getContractInstance } = require('./contract-api')
+const {
+	getContractInstance,
+	txContractMethod,
+	callContractMethod,
+	oneToHexAddress
+} = require('./contract-api')
 /********************************
 Config
 ********************************/
 const config = require('../config')
 const { ENV, url, net, port, privateKey } = config
 /********************************
-Contracts
+Contract Imports
 ********************************/
 const HRC20 = require('../build/contracts/HRC20.json')
 /********************************
@@ -32,18 +37,72 @@ const alice = hmy.wallet.addByPrivateKey(privateKey)
 const bob = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
 console.log('alice', alice.bech32Address)
 console.log('bob', bob.bech32Address)
-
-
-
-/********************************
-Get Contract Instances
-********************************/
-const hrc20 = getContractInstance(hmy, HRC20)
-console.log(hrc20)
 /********************************
 Express
 ********************************/
 const app = express()
+
+/********************************
+Contract methods
+********************************/
+
+/********************************
+Mint
+********************************/
+//example: localhost:3000/mint?to=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7&amount=1000
+app.get('/mint', async (req, res) => {
+	let {to, amount} = req.query
+	//check args
+	/********************************
+	@todo check make sure address works and amount is valid
+	********************************/
+	//prepare args
+	to = oneToHexAddress(hmy, to)
+	amount = new hmy.utils.Unit(amount).asEther().toWei()
+	//get instance
+	const hrc20 = getContractInstance(hmy, HRC20)
+	//call method
+	const { hash, receipt, error} = await txContractMethod(hrc20, 'mint', to, amount)
+	res.send({
+		success: !error,
+		hash,
+		receipt,
+	})
+})
+/********************************
+Get Balance
+********************************/
+//example: localhost:3000/tokenbalance?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
+app.get('/tokenbalance', async (req, res) => {
+	let {address} = req.query
+	//check args
+	/********************************
+	@todo check make sure address works
+	********************************/
+	//prepare args
+	address = oneToHexAddress(hmy, address)
+	//get instance
+	const hrc20 = getContractInstance(hmy, HRC20)
+	//call method
+	let balance = await callContractMethod(hrc20, 'balanceOf', address)
+	if (balance === null) {
+		res.send({
+			success: false,
+			message: 'balance is null',
+		})
+		return
+	}
+	balance = new hmy.utils.Unit(balance).asWei().toEther()
+	
+	res.send({
+		success: true,
+		balance,
+	})
+})
+
+/********************************
+ONE transfer and balance methods (also see examples/node-sdk for simple example of this)
+********************************/
 
 /********************************
 Transfer
