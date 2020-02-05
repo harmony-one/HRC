@@ -25,8 +25,6 @@ npm start
 /balance
 ```
 - `address`: ONE address to query balance of
-- `shard`(optional): shardID to target 
-    - (defaults to 0)
 
 ```
 /transfer
