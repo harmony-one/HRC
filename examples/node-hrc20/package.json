@@ -12,6 +12,6 @@
   },
   "scripts": {
     "start": "node src/app.js",
-    "deploy": "truffle migrate --reset --network ${1}"
+    "deploy": "truffle migrate --reset --network "
   }
 }
