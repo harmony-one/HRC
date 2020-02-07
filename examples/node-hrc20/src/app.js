@@ -58,6 +58,7 @@ app.get('/mint', async (req, res) => {
 	********************************/
 	//prepare args
 	to = oneToHexAddress(hmy, to)
+	//hex address of example above: 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
 	amount = new hmy.utils.Unit(amount).asEther().toWei()
 	//get instance
 	const hrc20 = getContractInstance(hmy, HRC20)

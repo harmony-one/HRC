@@ -21,7 +21,10 @@ exports.txContractMethod = (contract, method, ...args) => new Promise((resolve, 
     })
     console.log('getContractMethod args', ...args)
     const tx = contract.methods[method](...args)
-    .send({ gasLimit, gasPrice })
+    .send({
+        // gasLimit,
+        gasPrice
+    })
     .on('transactionHash', (_hash) => {
         hash = _hash
         console.log(hash)
