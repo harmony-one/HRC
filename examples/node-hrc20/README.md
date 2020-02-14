@@ -16,6 +16,10 @@ npm i
 ```
 In `.env` set `ENV=[local|testnet|mainnet]`
 ```
+## Deploy Smart Contract
+```
+truffle deploy --network=testnet
+```
 ## Run App
 ```
 npm start
