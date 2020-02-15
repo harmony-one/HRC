@@ -6,19 +6,37 @@ contract DAO {
     // be used for variables later.
     // It will represent a single voter.
     struct Voter {
-        uint weight; // weight is accumulated by delegation
-        bool voted;  // if true, that person already voted
-        address delegate; // person delegated to
-        uint vote;   // index of the voted proposal
+       mapping(byte32 => bool) voted; // map of the voted proposal
     }
+
+    enum proposalState { Open, Active, Close };
+
+    // a new proposal is created
+    event NewProposal (address from, byte32 name);
+
+    // a proposal is activated
+    event ActiveProposal (byte32 name, int voteCount);
+
+    // a proposal is closed
+    event CloseProposal (byte32 name);
+
+    // a proposal is voted
+    event VotedProposal (byte32 name, int voteCount);
 
     // This is a type for a single proposal.
     struct Proposal {
-        bytes32 name;   // short name (up to 32 bytes)
-        uint voteCount; // number of accumulated votes
+        bytes32 name;         // short name (up to 32 bytes)
+        uint voteCount;       // number of accumulated votes
+        uint256 donation;     // amount of donation to this proposal
+        proposalState state;  // state of the proposal
+        uint minimal;         // mimimal amount of donation
+        unit maximal;         // maximal amount of donation
     }
 
     address public chairperson;
+
+    uint public activeProposal;  // number of proposal will be active
+    uint public minimalVoter;    // number of minimal vote needed to make the proposal active
 
     // This declares a state variable that
     // stores a `Voter` struct for each possible address.
@@ -27,124 +45,127 @@ contract DAO {
     // A dynamically-sized array of `Proposal` structs.
     Proposal[] public proposals;
 
-    /// Create a new ballot to choose one of `proposalNames`.
-    constructor(bytes32[] memory proposalNames) public {
-        chairperson = msg.sender;
-        voters[chairperson].weight = 1;
-
-        // For each of the provided proposal names,
-        // create a new proposal object and add it
-        // to the end of the array.
-        for (uint i = 0; i < proposalNames.length; i++) {
-            // `Proposal({...})` creates a temporary
-            // Proposal object and `proposals.push(...)`
-            // appends it to the end of `proposals`.
-            proposals.push(Proposal({
-                name: proposalNames[i],
-                voteCount: 0
-            }));
-        }
+    /// Init the smart contract
+    constructor(uint numVoter) public {
+       requiree(numVoter > 2, "at least 2 voters needed to activate the proposal")
+       chairperson = msg.sender;
+       minimalVoter = numVoter;
     }
 
-    // Give `voter` the right to vote on this ballot.
+    // Open a new proposal
     // May only be called by `chairperson`.
-    function giveRightToVote(address voter) public {
-        // If the first argument of `require` evaluates
-        // to `false`, execution terminates and all
-        // changes to the state and to Ether balances
-        // are reverted.
-        // This used to consume all gas in old EVM versions, but
-        // not anymore.
-        // It is often a good idea to use `require` to check if
-        // functions are called correctly.
-        // As a second argument, you can also provide an
-        // explanation about what went wrong.
+    function openProposal(byte32 name, uint min, unit max) public {
         require(
             msg.sender == chairperson,
-            "Only chairperson can give right to vote."
+            "Only chairperson can open proposal."
         );
+        require(max > min,
+            "max donation has to be greater than min donation."
+        );
+        proposals.push(Proposal({
+            name: name,
+            voteCount: 0,
+            state: Open,
+            minimal: min,
+            maximal: max,
+        }));
+        emit NewProposal(name);
+    }
+
+    // Change the state of the proposal to Active
+    // if minimal number of vote met
+    function activateProposal(byte32 name) public (returns bool activated_) {
         require(
-            !voters[voter].voted,
-            "The voter already voted."
+            msg.sender == chairperson,
+            "Only chairperson can activate proposal."
         );
-        require(voters[voter].weight == 0);
-        voters[voter].weight = 1;
-    }
-
-    /// Delegate your vote to the voter `to`.
-    function delegate(address to) public {
-        // assigns reference
-        Voter storage sender = voters[msg.sender];
-        require(!sender.voted, "You already voted.");
-
-        require(to != msg.sender, "Self-delegation is disallowed.");
-
-        // Forward the delegation as long as
-        // `to` also delegated.
-        // In general, such loops are very dangerous,
-        // because if they run too long, they might
-        // need more gas than is available in a block.
-        // In this case, the delegation will not be executed,
-        // but in other situations, such loops might
-        // cause a contract to get "stuck" completely.
-        while (voters[to].delegate != address(0)) {
-            to = voters[to].delegate;
-
-            // We found a loop in the delegation, not allowed.
-            require(to != msg.sender, "Found loop in delegation.");
-        }
-
-        // Since `sender` is a reference, this
-        // modifies `voters[msg.sender].voted`
-        sender.voted = true;
-        sender.delegate = to;
-        Voter storage delegate_ = voters[to];
-        if (delegate_.voted) {
-            // If the delegate already voted,
-            // directly add to the number of votes
-            proposals[delegate_.vote].voteCount += sender.weight;
-        } else {
-            // If the delegate did not vote yet,
-            // add to her weight.
-            delegate_.weight += sender.weight;
+        for (uint i = 0; i < proposals.length; i++) {
+           if (proposals[i].name == name) {
+              if (proposals[i].voteCount > minimalVoter) {
+                 proposals[i].state = Active;
+                 activated_ = true;
+                 emit ActiveProposal(name, proposals[i].voteCount);
+                 returns;
+              } else {
+                 activated_ = false
+              }
+           }
         }
     }
 
-    /// Give your vote (including votes delegated to you)
-    /// to proposal `proposals[proposal].name`.
-    function vote(uint proposal) public {
-        Voter storage sender = voters[msg.sender];
-        require(sender.weight != 0, "Has no right to vote");
-        require(!sender.voted, "Already voted.");
-        sender.voted = true;
-        sender.vote = proposal;
-
-        // If `proposal` is out of the range of the array,
-        // this will throw automatically and revert all
-        // changes.
-        proposals[proposal].voteCount += sender.weight;
+    // Close the proposal
+    function closeProposal(byte32 name) public (returns bool closed_) {
+        require(
+            msg.sender == chairperson,
+            "Only chairperson can activate proposal."
+        );
+        for (uint i = 0; i < proposals.length; i++) {
+           if (proposals[i].name == name) {
+              proposals[i].state = Close;
+              closed_ = true;
+              emit CloseProposal(name);
+              returns;
+           }
+        }
     }
 
-    /// @dev Computes the winning proposal taking all
+    /// Vote to proposal `proposals[proposal].name`.
+    /// Voter can only vote to proposal once
+    function vote(byte32 name) public (returns bool voted_) {
+        Voter storage sender = voters[msg.sender];
+
+        for (uint i = 0; i < proposals.length; i++) {
+           if (proposals[i].name == name) {
+              if (voters[msg.sender].voted[name]) {
+                 voted_ = false;
+                 returns;
+              } else {
+                 voters[msg.sender].voted[name] = true;
+                 voted_ = true;
+                 proposals[i].voteCount ++;
+                 if (proposals[i].voteCount > minimalVoter) {
+                    proposals[i].state = Active;
+                 }
+                 emit VotedProposal(name, proposals[i].voteCount);
+                 emit ActiveProposal(name, proposals[i].voteCount);
+                 returns;
+              }
+           }
+        }
+    }
+
+    /// @dev Computes all the proposals that are Active
     /// previous votes into account.
-    function winningProposal() public view
-            returns (uint winningProposal_)
+    function allActiveProposal() public view
+            returns (byte32[] activeProposals_)
     {
-        uint winningVoteCount = 0;
         for (uint p = 0; p < proposals.length; p++) {
-            if (proposals[p].voteCount > winningVoteCount) {
-                winningVoteCount = proposals[p].voteCount;
-                winningProposal_ = p;
+            if (proposals[p].voteCount > minimalVoter) {
+               proposals[p].state = Active;
+               activeProposals_.push(proposals[p].name);
             }
         }
     }
 
-    // Calls winningProposal() function to get the index
-    // of the winner contained in the proposals array and then
-    // returns the name of the winner
-    function winnerName() public view
-            returns (bytes32 winnerName_)
+    // return the state of the proposal
+    function proposalState(byte32 name) public view
+            returns (proposal p)
     {
-        winnerName_ = proposals[winningProposal()].name;
+       for (uint p = 0; p < proposals.length; p++) {
+           if (proposals[i].name == name) {
+              p = proposals[i];
+              returns;
+            }
+       }
+    }
+            
+    // donate donates to proposal
+    function donate(byte32 name) {
+    }
+
+
+    // claim the donation, and maybe close the proposal
+    function claim(byte32 name) {
+
     }
 }
