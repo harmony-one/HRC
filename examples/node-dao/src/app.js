@@ -3,6 +3,8 @@ const express = require('express')
 const { Harmony } = require('@harmony-js/core')
 // import or require settings
 const { ChainType } = require('@harmony-js/utils')
+// import or require settings
+const { isHex } = require('@harmony-js/utils')
 // import or require simutlated keystore (optional)
 const { importKey } = require('./simulated-keystore')
 const {
@@ -43,6 +45,33 @@ console.log('bob', bob.bech32Address)
 Express
 ********************************/
 const app = express()
+
+/**
+ * Should be called to get ascii from it's hex representation
+ *
+ * @method hexToAscii
+ * @param {String} hex
+ * @returns {String} ascii string representation of hex value
+ */
+var hexToAscii = function(hex) {
+    if (!isHex(hex))
+        throw new Error('The parameter must be a valid HEX string.');
+
+    var str = "";
+    var i = 0, l = hex.length;
+    if (hex.substring(0, 2) === '0x') {
+        i = 2;
+    }
+    for (; i < l; i+=2) {
+        var code = parseInt(hex.substr(i, 2), 16);
+        if (code == 0) {
+           break
+        }
+        str += String.fromCharCode(code);
+    }
+
+    return str;
+};
 
 /********************************
 Contract methods
@@ -97,7 +126,7 @@ app.get('/winnerName', async (req, res) => {
 	//get instance
    const dao = getContractInstance(hmy, DAO)
 	//call method
-	let winner = await txContractMethod(dao, 'winnerName')
+	let winner = await callContractMethod(dao, 'winnerName')
 	if (winner === null) {
 		res.send({
 			success: false,
@@ -105,6 +134,7 @@ app.get('/winnerName', async (req, res) => {
 		})
 		return
 	}
+	winner = hexToAscii(winner)
 	res.send({
 		success: true,
 		winner,
@@ -119,7 +149,7 @@ app.get('/winningProposal', async (req, res) => {
 	//get instance
    const dao = getContractInstance(hmy, DAO)
 	//call method
-	let proposal = await txContractMethod(dao, 'winningProposal')
+	let proposal = await callContractMethod(dao, 'winningProposal')
 	if (proposal === null) {
 		res.send({
 			success: false,
