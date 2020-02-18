@@ -15,7 +15,7 @@ contract Faucet is Ownable {
     }
 
     //default payable, this contract can receive funds
-    function() public payable {}
+    function() external payable {}
 
     function fund(address to) public {
         uint256 currentBlock = block.number;

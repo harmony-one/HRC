@@ -9,16 +9,22 @@
     <h1>Faucet</h1>
     <input id="input" placeholder="ONE Address" type="text" />
     <button id="submit">Fund</button>
+    <p id="loading">Waiting for confirmation...</p>
     <p id="output"></p>
 
     <script>
         const qs = (x) => document.querySelector(x)
         const init = () => {
+            qs('#loading').style.display = 'none'
             qs('#submit').onclick = () => {
+                qs('#loading').style.display = 'block'
                 const value = qs('#input').value
                 fetch('/fund?address=' + value)
                 .then((res) => res.json())
-                .then((res) => qs('#output').innerHTML = 'Response: ' + JSON.stringify(res))
+                .then((res) => {
+                    qs('#loading').style.display = 'none'
+                    qs('#output').innerHTML = 'Response: ' + JSON.stringify(res)
+                })
             }
         }
         window.onload = init
