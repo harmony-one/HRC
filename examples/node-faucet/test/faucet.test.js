@@ -13,7 +13,7 @@ contract("Faucet", (accounts) => {
         faucet = await Faucet.deployed();
         assert.ok(faucet)
     })
-    it("should fund the contract", async () => {
+    it("contract should be funded with one ONE", async () => {
         const balance = (await faucet.getBalance.call()).toString()
         console.log(balance)
         assert.equal(balance, ONE)

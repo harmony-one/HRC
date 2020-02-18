@@ -8,9 +8,11 @@ Contract Helpers
 ********************************/
 const {
 	getContractInstance,
+	getContractAddress,
 	txContractMethod,
 	callContractMethod,
-	oneToHexAddress
+	oneToHexAddress,
+	hexToOneAddress
 } = require('./contract')
 const FaucetJSON = require('../build/contracts/Faucet.json')
 /********************************
@@ -59,6 +61,28 @@ app.get('/fund', async (req, res) => {
 	await balance(req, res)
 })
 
+app.get('/addfunds', async (req, res) => {
+	const initRes = await initHarmony(url)
+	const { success, hmy } = initRes
+	if (!success) {
+		res.send(initRes)
+		return
+	}
+	/********************************
+	@todo check make sure address works and amount is valid
+	********************************/
+	let {amount} = req.query
+	const faucet = hexToOneAddress(hmy, getContractAddress(FaucetJSON))
+	console.log('\n\nFunding Faucet:', faucet, amount)
+	await transfer({query: { to: faucet, value: amount}}, res)
+})
+
+//example:
+// localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
+// localhost:3000/transfer?from=one1w7lu05adqfhv8slx0aq8lgzglk5vrnwvf5f740&to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
+// localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1&fromshard=0&toshard=1
+app.get('/transfer', transfer)
+
 app.get('/balance', balance)
 
 app.get('/', (req, res) => {
@@ -71,10 +95,8 @@ app.listen(port, () => console.log(`App listening on port ${port}!`))
 /********************************
 Helpers
 ********************************/
-
-
 /********************************
-Get balance
+Get balances
 ********************************/
 // localhost:3000/balance?address=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65
 async function balance(req, res) {
@@ -121,8 +143,6 @@ async function balance(req, res) {
 	
 }
 
-
-
 /********************************
 ONE Transfers
 ********************************/
@@ -133,41 +153,25 @@ Transfer
 let transfers = {
 	address: true
 }
-//example:
-// localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
-// localhost:3000/transfer?from=one1w7lu05adqfhv8slx0aq8lgzglk5vrnwvf5f740&to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
-// localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1&fromshard=0&toshard=1
-app.get('/transfer', async (req, res) => {
+async function transfer(req, res) {
     const {to, from, toshard, fromshard, value} = req.query
 
 	if (!to || !value) {
 		res.send({success: false, message: 'missing to or value query params e.g. localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1'})
 		return
 	}
-	const hmy = createHmy(url)
+	
+	const initRes = await initHarmony(url)
+	const { success, hmy } = initRes
+	if (!success) {
+		res.send(initRes)
+		return
+	}
 
-	await setSharding(hmy);
-	//defaults to shard 0
 	const toShard = !toshard ? 0x0 : '0x' + toshard
 	const fromShard = !fromshard ? 0x0 : '0x' + fromshard
 	console.log(to, value)
-	//checks for from argument and attempts to set address as signer
-	//will fail if key isn't in keystore
-	if (from) {
-		const pkey = importKey(from)
-		if(pkey) {
-			hmy.wallet.addByPrivateKey(pkey)
-			hmy.wallet.setSigner(hmy.crypto.getAddress(from).basicHex)
-		}
-		else {
-			res.send({success: false, message: `account ${from} not in keystore`})
-			return
-		}
-	} else {
-		//no from argument found:
-		//initialize default wallets and set signer to default if from argument isn't used
-		setDefaultWallets(hmy)
-	}
+	
 	//prevent accidental re-entry if transaction is in flight
 	if (transfers[to]) return
 	transfers[to] = true
@@ -175,7 +179,7 @@ app.get('/transfer', async (req, res) => {
 	const tx = hmy.transactions.newTx({
         to,
         value: new hmy.utils.Unit(value).asEther().toWei(),
-        gasLimit: '21000',
+        gasLimit: '1000000',
         shardID: fromShard,
         toShardID: toShard,
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
@@ -184,7 +188,7 @@ app.get('/transfer', async (req, res) => {
     signedTX.observed().on('transactionHash', (txHash) => {
         console.log('--- txHash ---', txHash)
     }).on('receipt', (receipt) => {
-		// console.log('--- receipt ---', receipt)
+		console.log('--- receipt ---', receipt)
 		transfers[to] = false //can send again
 		res.send({ success: true, receipt })
     }).on('error', (error) => {
@@ -198,4 +202,4 @@ app.get('/transfer', async (req, res) => {
 	catch (error){
 		res.send({ success: false })
 	}
-})
+}
