@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Harmony Test Faucet</title>
+</head>
+
+<body>
+    <h1>Faucet</h1>
+    <input id="input" placeholder="ONE Address" type="text" />
+    <button id="submit">Fund</button>
+    <p id="output"></p>
+
+    <script>
+        const qs = (x) => document.querySelector(x)
+        const init = () => {
+            qs('#submit').onclick = () => {
+                const value = qs('#input').value
+                fetch('/fund?address=' + value)
+                .then((res) => res.json())
+                .then((res) => qs('#output').innerHTML = 'Response: ' + JSON.stringify(res))
+            }
+        }
+        window.onload = init
+    </script>
+</body>
+</html>

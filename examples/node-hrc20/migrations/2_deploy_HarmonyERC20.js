@@ -12,7 +12,7 @@ module.exports = function (deployer, network, accounts) {
 
 	deployer.then(function () {
 		return deployer.deploy(HarmonyERC20, name, symbol, decimals, minterTokens).then(function (token) {
-			console.log(token)
+			// console.log(token)
 			return deployer.deploy(HRC20Crowdsale, rate, accounts[0], token.address, saleAmount).then(function (sale) {
 				return token.addMinter(sale.address).then((res) => {
 					// console.log(res.logs)
