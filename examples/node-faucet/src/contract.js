@@ -1,11 +1,11 @@
 
 const config = require('../config')
 const { ENV, url, net, port, privateKey, GAS_LIMIT, GAS_PRICE } = config
-// const gasLimit = GAS_LIMIT
-// const gasPrice = GAS_PRICE
+const gasLimit = GAS_LIMIT
+const gasPrice = GAS_PRICE
 
-const gasLimit = '1000000'
-const gasPrice = '1000000000'
+// const gasLimit = '1000000'
+// const gasPrice = '1000000000'
 
 exports.oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
 exports.getContractInstance = (hmy, artifact) => {

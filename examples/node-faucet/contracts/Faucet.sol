@@ -11,12 +11,14 @@ contract Faucet is Ownable {
     
     constructor() public payable {
         rate = 100000000000000000; //fund with 0.1 ONE
-        freq = 3; //will fund address every 4th block
+        freq = 4; //will fund address every 4th block
     }
+
+    function addFunds() public payable {}
 
     function fund(address to) public {
         uint256 currentBlock = block.number;
-        require(currentBlock - lastBlock[to] > freq);
+        require(currentBlock - lastBlock[to] >= freq);
         lastBlock[to] = currentBlock;
         address payable receiver = address(uint160(to));
 		receiver.transfer(rate);

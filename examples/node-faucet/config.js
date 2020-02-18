@@ -32,5 +32,7 @@ module.exports = {
     ENV: process.env.ENV,
     network, // 0 local, 1 testnet, 2 mainnet
     net, //TODO: change name
-    url,   
+    url,
+    GAS_LIMIT: process.env.GAS_LIMIT,
+    GAS_PRICE: process.env.GAS_PRICE,
 }
