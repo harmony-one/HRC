@@ -14,7 +14,8 @@ contract Faucet is Ownable {
         freq = 4; //will fund address every 4th block
     }
 
-    function addFunds() public payable {}
+    //default payable, this contract can receive funds
+    function() public payable {}
 
     function fund(address to) public {
         uint256 currentBlock = block.number;

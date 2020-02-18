@@ -8,14 +8,14 @@ const gasPrice = GAS_PRICE
 // const gasPrice = '1000000000'
 
 exports.oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
+exports.getContractAddress = (artifact) =>
+    artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
 exports.getContractInstance = (hmy, artifact) => {
-    console.log('Contract Address:', artifact.networks[net].address)
-    const contract = hmy.contracts.createContract(
-        artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
-    )
+    const address = getContractAddress(artifact)
+    console.log('Contract Address:', address)
+    const contract = hmy.contracts.createContract(address)
     return contract
 }
-
 exports.callContractMethod = (contract, method, ...args) => args ?
     contract.methods[method](...args).call() :
     contract.methods[method]().call()
