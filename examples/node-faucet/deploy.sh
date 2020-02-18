@@ -1,0 +1,1 @@
+truffle migrate --reset --network ${1}

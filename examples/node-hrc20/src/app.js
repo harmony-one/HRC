@@ -31,7 +31,7 @@ const hmy = new Harmony(url,
 )
 // add privateKey to wallet
 // localnet: one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
-// testnet: one1w7lu05adqfhv8slx0aq8lgzglk5vrnwvf5f740
+// testnet: one18t4yj4fuutj83uwqckkvxp9gfa0568uc48ggj7
 const alice = hmy.wallet.addByPrivateKey(privateKey)
 //one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65
 const bob = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
@@ -41,7 +41,6 @@ console.log('bob', bob.bech32Address)
 Express
 ********************************/
 const app = express()
-
 /********************************
 Contract methods
 ********************************/
@@ -49,7 +48,7 @@ Contract methods
 /********************************
 Mint
 ********************************/
-//example: localhost:3000/mint?to=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7&amount=1000
+//example (local): localhost:3000/mint?to=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7&amount=1000
 app.get('/mint', async (req, res) => {
 	let {to, amount} = req.query
 	//check args
@@ -73,7 +72,7 @@ app.get('/mint', async (req, res) => {
 /********************************
 Get Balance
 ********************************/
-//example: localhost:3000/tokenbalance?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
+//example (local): localhost:3000/tokenbalance?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
 app.get('/tokenbalance', async (req, res) => {
 	let {address} = req.query
 	//check args
