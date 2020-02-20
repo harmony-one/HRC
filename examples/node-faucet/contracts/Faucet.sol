@@ -10,9 +10,13 @@ contract Faucet is Ownable {
 	mapping(address => uint256) private lastBlock;
     
     constructor() public payable {
-        rate = 100000000000000000; //fund with 0.1 ONE
-        freq = 4; //will fund address every 4th block
+        rate = 10000000000000000000; //fund with 10 ONE
+        freq = 450; //will fund address every ~1 hour based on block time
     }
+
+    // function exposeAddress() public view returns (address) {
+    //     return (address(this));
+    // }
 
     //default payable, this contract can receive funds
     function() external payable {}

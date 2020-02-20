@@ -27,6 +27,27 @@ Express
 const app = express()
 
 
+
+/********************************
+Expose Contract Address
+********************************/
+app.get('/exposeAddress', async (req, res) => {
+	const initRes = await initHarmony(url)
+	const { success, hmy } = initRes
+	if (!success) {
+		res.send(initRes)
+		return
+	}
+	const faucetAddress = hexToOneAddress(hmy, getContractAddress(FaucetJSON))
+	res.send({
+		success: faucetAddress ? "true" : "false",
+		faucetAddress
+	})
+})
+
+/********************************
+Fund Account
+********************************/
 //e.g.
 // http://localhost:3000/fund?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7// -> 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
 app.get('/fund', async (req, res) => {
@@ -61,27 +82,33 @@ app.get('/fund', async (req, res) => {
 	await balance(req, res)
 })
 
-app.get('/addfunds', async (req, res) => {
-	const initRes = await initHarmony(url)
-	const { success, hmy } = initRes
-	if (!success) {
-		res.send(initRes)
-		return
-	}
-	/********************************
-	@todo check make sure address works and amount is valid
-	********************************/
-	let {amount} = req.query
-	const faucet = hexToOneAddress(hmy, getContractAddress(FaucetJSON))
-	console.log('\n\nFunding Faucet:', faucet, amount)
-	await transfer({query: { to: faucet, value: amount}}, res)
-})
+
+/********************************
+Add funds using endpoint
+********************************/
+// app.get('/addfunds', async (req, res) => {
+// 	const initRes = await initHarmony(url)
+// 	const { success, hmy } = initRes
+// 	if (!success) {
+// 		res.send(initRes)
+// 		return
+// 	}
+// 	/********************************
+// 	@todo check make sure address works and amount is valid
+// 	********************************/
+// 	let {amount} = req.query
+// 	const faucet = hexToOneAddress(hmy, getContractAddress(FaucetJSON))
+// 	console.log('\n\nFunding Faucet:', faucet, amount)
+// 	await transfer({query: { to: faucet, value: amount}}, res)
+// })
 
 //example:
 // localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
 // localhost:3000/transfer?from=one1w7lu05adqfhv8slx0aq8lgzglk5vrnwvf5f740&to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
 // localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1&fromshard=0&toshard=1
-app.get('/transfer', transfer)
+
+
+// app.get('/transfer', transfer)
 
 app.get('/balance', balance)
 
