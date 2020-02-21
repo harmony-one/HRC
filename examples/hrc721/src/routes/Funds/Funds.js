@@ -1,14 +1,13 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import { useDispatch } from 'react-redux'
+import { setActive } from '../../redux/harmony'
 
 import { transferONE,  } from '../../redux/harmony'
-import { getTokens } from '../../redux/hrc721'
-import { addItem } from '../../redux/crowdsale'
 import Form from '../../components/Form/Form'
-import Inventory from '../../components/Inventory/Inventory'
 
-import { route, gradient, bubble, marginTop,  } from './Funds.module.scss'
-import LoadingGIF from '../../img/loading.gif'
+import { route, bubble, button } from './Funds.module.scss'
+import config from '../../../config'
+const {ENV} = config
 
 export default function Home(props) {
 
@@ -30,6 +29,12 @@ export default function Home(props) {
                     <div className={bubble}>
                         <h3>{active.name}</h3>
                         <p>ONE: {active.balanceONE}</p>
+                        { ENV === 'local' &&
+                            <button 
+                                onClick={() => dispatch(setActive(active.name === 'Alice' ? 'account' : 'minter'))}
+                                className={button}
+                            >Toggle User</button>
+                        }
                     </div>
                 }
             </section>

@@ -6,7 +6,7 @@ import { purchase } from './../../redux/crowdsale'
 import { setSell, buyTokenOnSale } from './../../redux/hrc721'
 import Form from './../../components/Form/Form'
 
-import { inventory, image, stats, button, soldOut } from './Inventory.module.scss'
+import { inventory, image, stats, purchaseButton, soldOut } from './Inventory.module.scss'
 
 
 const RenderItem = ({item, hidePrice, id, byline, isSoldOut = false}) => {
@@ -60,7 +60,7 @@ export default function Inventory(props) {
                             id: 'Token ID: ' + tokenId,
                             byline: salePrice !== '0' ? `Selling for: ${salePrice} ONE` : `Not for Sale`
                         }} />
-                        <div className={button}>
+                        <div className={purchaseButton}>
                             <button onClick={() => dispatch(updateDialogState({
                                 open: true,
                                 content: <Form
@@ -89,7 +89,7 @@ export default function Inventory(props) {
                         }} />
                         {!isSoldOut &&
                         
-                        <div className={button}>
+                        <div className={purchaseButton}>
                             <button onClick={() => {
                                 if (market) {
                                     dispatch(buyTokenOnSale(item))
