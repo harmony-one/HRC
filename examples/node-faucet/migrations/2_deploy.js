@@ -6,7 +6,7 @@ module.exports = function (deployer, network, accounts) {
 
 	deployer.then(function () {
 		return deployer.deploy(Faucet, {
-			value: ONE
+			value: ONE,
 		}).then(function (faucet) {
 			// console.log(faucet)
 		});
