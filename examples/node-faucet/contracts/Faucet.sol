@@ -10,7 +10,7 @@ contract Faucet is Ownable {
 	mapping(address => uint256) private lastBlock;
     
     constructor() public payable {
-        rate = 10000000000000000000; //fund with 10 ONE
+        rate = 1000000000000000000000; //fund with 1000 ONE
         freq = 450; //will fund address every ~1 hour based on block time
     }
 
@@ -23,7 +23,8 @@ contract Faucet is Ownable {
 
     function fund(address to) public {
         uint256 currentBlock = block.number;
-        require(currentBlock - lastBlock[to] >= freq);
+        require(currentBlock - lastBlock[to] >= freq, "Address has been funded within the last hour");
+        require(getBalance() > rate, "Not enough funds in faucet");
         lastBlock[to] = currentBlock;
         address payable receiver = address(uint160(to));
 		receiver.transfer(rate);
