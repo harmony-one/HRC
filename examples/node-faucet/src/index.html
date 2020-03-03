@@ -27,6 +27,7 @@
         const init = () => {
             qs('#loading').style.display = 'none'
             qs('#submit').onclick = () => {
+                qs('#output').innerHTML = ''
                 qs('#loading').style.display = 'block'
                 const value = qs('#input').value
                 fetch('/fund?address=' + value)

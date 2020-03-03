@@ -23,7 +23,7 @@ contract Faucet is Ownable {
 
     function fund(address to) public {
         uint256 currentBlock = block.number;
-        require(currentBlock - lastBlock[to] >= freq, "Address has been funded within the last hour");
+        require(lastBlock[to] == 0 || currentBlock - lastBlock[to] >= freq, "Address has been funded within the last hour");
         require(getBalance() > rate, "Not enough funds in faucet");
         lastBlock[to] = currentBlock;
         address payable receiver = address(uint160(to));
