@@ -1,11 +1,11 @@
 // require('dotenv').config()
 
-let network, net, url, privateKey, faucet
+let network, net, url, privateKey, Faucet
 
 switch(process.env.ENV){
     case 'local': {
-        network = 0;
-        net = 2;
+        network = 0
+        net = 2
         url = process.env.LOCAL_0_URL
         privateKey = process.env.LOCAL_PRIVATE_KEY
         break;
@@ -27,6 +27,7 @@ switch(process.env.ENV){
         break;
     }
 }
+
 
 module.exports = {
     port: 3000,
