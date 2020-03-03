@@ -1,6 +1,6 @@
-require('dotenv').config()
+// require('dotenv').config()
 
-let network, net, url, privateKey
+let network, net, url, privateKey, faucet
 
 switch(process.env.ENV){
     case 'local': {
@@ -14,6 +14,7 @@ switch(process.env.ENV){
         network = 1;
         net = 2;
         url = process.env.TESTNET_0_URL
+        Faucet = process.env.TESTNET_FAUCET
         privateKey = process.env.TESTNET_PRIVATE_KEY
         break;
     }
@@ -21,6 +22,7 @@ switch(process.env.ENV){
         network = 2;
         net = 1;
         url = process.env.MAINNET_0_URL
+        Faucet = process.env.MAINNET_FAUCET
         privateKey = process.env.MAINNET_PRIVATE_KEY
         break;
     }
@@ -35,4 +37,5 @@ module.exports = {
     url,
     GAS_LIMIT: process.env.GAS_LIMIT,
     GAS_PRICE: process.env.GAS_PRICE,
+    Faucet
 }

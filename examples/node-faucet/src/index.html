@@ -3,15 +3,47 @@
 <head>
   <meta charset="utf-8">
   <title>Harmony Test Faucet</title>
+  <style>
+    body {
+        font-family: Geneva, Tahoma, sans-serif;
+    }
+    #faucet {
+        margin-top: 10vh;
+        margin-left: auto;
+        margin-right: auto;
+        width: 85vw;
+        text-align: center;
+        font-size: 2vw;
+    }
+    h1 {
+        height: 12vh;
+        max-height: 75px;
+    }
+    #input {
+        width: 40vw;
+        max-width: 400px;
+        height: 5vw;
+        max-height: 40px;
+    }
+    #submit {
+        width: 30vw;
+        max-width: 300px;
+        height: 3vw;
+        max-height: 30px;
+    }
+  </style>
+
 </head>
 
 <body>
-    <h1>Faucet</h1>
-    <input id="input" placeholder="ONE Address" type="text" />
-    <button id="submit">Fund</button>
-    <p id="loading">Waiting for confirmation...</p>
-    <p id="output"></p>
-
+    <div id="faucet">
+        <h1>ONE Faucet</h1>
+        <input id="input" placeholder="ONE Address" type="text" />
+        <br>
+        <button id="submit">Fund</button>
+        <p id="loading">Waiting for confirmation...</p>
+        <p id="output"></p>
+    </div>
     <script>
         const qs = (x) => document.querySelector(x)
         const init = () => {
@@ -30,4 +62,5 @@
         window.onload = init
     </script>
 </body>
+
 </html>
