@@ -1,43 +1,21 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Harmony Test Faucet</title>
-  <style>
-    body {
-        font-family: Geneva, Tahoma, sans-serif;
-    }
-    #faucet {
-        margin-top: 10vh;
-        margin-left: auto;
-        margin-right: auto;
-        width: 85vw;
-        text-align: center;
-        font-size: 2vw;
-    }
-    h1 {
-        height: 12vh;
-        max-height: 75px;
-    }
-    #input {
-        width: 40vw;
-        max-width: 400px;
-        height: 5vw;
-        max-height: 40px;
-    }
-    #submit {
-        width: 30vw;
-        max-width: 300px;
-        height: 3vw;
-        max-height: 30px;
-    }
-  </style>
+    <meta charset="utf-8">
+    <title>Harmony Test Faucet</title>
+    <link rel="stylesheet" href="app.css" />
 
 </head>
 
 <body>
-    <div id="faucet">
+    <header>
+        <img src="logo.svg" />
         <h1>ONE Faucet</h1>
+    </header>
+    <div id="faucet">
+        <p>Enter your ONE address and click fund.<br />We'll send a transaction to the Harmony blockchain and let you
+            know when it's confirmed.</p>
         <input id="input" placeholder="ONE Address" type="text" />
         <br>
         <button id="submit">Fund</button>
@@ -52,11 +30,16 @@
                 qs('#loading').style.display = 'block'
                 const value = qs('#input').value
                 fetch('/fund?address=' + value)
-                .then((res) => res.json())
-                .then((res) => {
-                    qs('#loading').style.display = 'none'
-                    qs('#output').innerHTML = 'Response: ' + JSON.stringify(res)
-                })
+                    .then((res) => res.json())
+                    .then((res) => {
+                        qs('#loading').style.display = 'none'
+                        if (res.success === true) {
+                            qs('#output').innerHTML = '<h4>Balances</h4>' +
+                                res.balances.map((b) => `<p>Shard ${b.shard}: ${b.balance}</p>`).join('')
+                        } else {
+                            qs('#output').innerHTML = '<p>An error occurred. Please try again!</p>'
+                        }
+                    })
             }
         }
         window.onload = init

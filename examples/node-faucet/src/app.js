@@ -25,7 +25,7 @@ const { url, port } = config
 Express
 ********************************/
 const app = express()
-
+app.use(express.static('public'))
 
 
 /********************************
