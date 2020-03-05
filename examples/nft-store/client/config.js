@@ -34,10 +34,8 @@ export default {
     ENV: process.env.ENV,
     network: network, // 0 local, 1 testnet, 2 mainnet
     net: net, //TODO: change name
-    url: url,
-    port: 3000,
+    url: url,   
     filterMyAddress: true,
     //use these if not deploying contract or targeting a different deployment on (same or ) different network
     HRC721Crowdsale, HRC721, Migrations
 }
-

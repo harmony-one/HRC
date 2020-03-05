@@ -7,9 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "truffle migrate --reset --network ${1}",
+    "test": "truffle test"
   },
-  "author": "",
+  "author": "@mattdlockyer matt@harmony.one",
   "license": "ISC",
   "dependencies": {
     "@harmony-js/core": "^0.1.36",
