@@ -10,7 +10,7 @@ contract Faucet is Ownable {
 	mapping(address => uint256) private lastBlock;
     
     constructor() public payable {
-        rate = 1000000000000000000000; //fund with 1000 ONE
+        rate = 10000000000000000000000; //fund with 10000 ONE
         freq = 450; //will fund address every ~1 hour based on block time
     }
 
@@ -39,6 +39,6 @@ contract Faucet is Ownable {
 		rate = _rate;
 	}
     function setFreq(uint256 _freq) public onlyOwner {
-		rate = _freq;
+		freq = _freq;
 	}
 }
