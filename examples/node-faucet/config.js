@@ -12,15 +12,15 @@ switch(process.env.ENV){
     }
     case 'testnet': {
         network = 1;
-        net = 2;
+        net = parseInt(process.env.TESTNET_CHAIN_ID, 10)
         url = process.env.TESTNET_0_URL
         Faucet = process.env.TESTNET_FAUCET
         privateKey = process.env.TESTNET_PRIVATE_KEY
         break;
     }
     case 'mainnet': {
-        network = 2;
-        net = 1;
+        network = 2
+        net = 1
         url = process.env.MAINNET_0_URL
         Faucet = process.env.MAINNET_FAUCET
         privateKey = process.env.MAINNET_PRIVATE_KEY

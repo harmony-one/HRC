@@ -8,6 +8,7 @@ const local_url = process.env.LOCAL_0_URL;
 const testnet_mnemonic = process.env.TESTNET_MNEMONIC
 const testnet_private_key = process.env.TESTNET_PRIVATE_KEY
 const testnet_url = process.env.TESTNET_0_URL
+const testnet_chain_id = process.env.TESTNET_CHAIN_ID
 //const testnet_0_url = process.env.TESTNET_0_URL
 //const testnet_1_url = process.env.TESTNET_1_URL
 //Mainnet
@@ -37,18 +38,19 @@ module.exports = {
       },
     },
     testnet: {
-      network_id: '2', 
+      network_id: '*', 
       provider: () => {
         const truffleProvider = new TruffleProvider(
           testnet_url,
           { memonic: testnet_mnemonic },
-          { shardID: 0, chainId: 2 },
+          { shardID: 0, chainId: parseInt(testnet_chain_id, 10)},
           { gasLimit: gasLimit, gasPrice: gasPrice},
         );
         const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
+      skipDryRun: true,
     },
     mainnet0: {
       network_id: '1', 
