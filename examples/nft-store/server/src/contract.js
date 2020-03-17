@@ -1,12 +1,7 @@
 
 
 const config = require('./../config')
-const { ENV, url, net, port, privateKey, GAS_LIMIT, GAS_PRICE } = config
-const gasLimit = GAS_LIMIT
-const gasPrice = GAS_PRICE
-
-// const gasLimit = '1000000'
-// const gasPrice = '1000000000'
+const { net, gasLimit, gasPrice } = config
 
 exports.oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
 exports.hexToOneAddress = (hmy, address) => hmy.crypto.toBech32(address)
@@ -14,7 +9,6 @@ const getContractAddress = (artifact) =>
     artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
 exports.getContractAddress = getContractAddress
 exports.getContractInstance = (hmy, artifact) => {
-    console.log(hmy.crypto)
     const address = getContractAddress(artifact)
     console.log('Contract Address:', address)
     const contract = hmy.contracts.createContract(artifact.abi, address)
@@ -29,7 +23,7 @@ exports.txContractMethod = (contract, method, ...args) => new Promise((resolve, 
     const done = () => resolve({
         hash, receipt, error
     })
-    console.log('getContractMethod args', ...args)
+    console.log('txContractMethod args', ...args)
     const tx = contract.methods[method](...args)
     .send({
         gasLimit,
@@ -40,10 +34,9 @@ exports.txContractMethod = (contract, method, ...args) => new Promise((resolve, 
         console.log('transactionHash', hash)
     }).on('receipt', (_receipt) => {
         receipt = _receipt
-        console.log('receipt\n\n', receipt)
-        console.log('\n\n')
-    }).on('confirmation', (confirmationNumber, receipt) => {
-        console.log('confirmed')
+        console.log('receipt blockHash', receipt.blockHash)
+    }).on('confirmation', (confirmation) => {
+        console.log('\nconfirmed', confirmation, '\n')
         done()
     }).on('error', (_error) => {
         error = _error

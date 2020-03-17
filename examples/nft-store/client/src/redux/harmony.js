@@ -5,6 +5,8 @@ import { ChainID, ChainType } from '@harmony-js/utils'
 import { getTokens, getMarket } from './hrc721'
 import { crowdsaleInit, getRaised } from './crowdsale'
 
+import Fortmatic from 'fortmatic';
+
 import config from '../../config'
 const { ENV, network, net, url } = config
 
@@ -47,7 +49,6 @@ export const updateProcessing = (processing) => async (dispatch) => {
 /********************************
 This is only enabled for localnet hmy e.g. Alice's account
 ********************************/
-
 export const transferONE = ({ amount, address }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     const { hmy, hmyExt, active } = getState().harmonyReducer
@@ -123,7 +124,26 @@ export const getBalances = (account) => async (dispatch, getState) => {
     dispatch(getRaised(account || active))
 }
 
+
+
+
+
+/********************************
+Formatic Login
+********************************/
+export const handleLoginWithMagicLink = (email) => async (dispatch) => {
+    const fmPhantom = new Fortmatic.Phantom('pk_test_1C24F45217D39E66'); // ✨
+    if (fmPhantom.user && fmPhantom.user.isLoggedIn()) {
+        await fmPhantom.user.logout()
+    }
+    console.log('handleLoginWithMagicLink', email)
+    const user = await fmPhantom.loginWithMagicLink({ email });
+    console.log(await user.isLoggedIn()); // => true
+    console.log((await user.getMetadata()).publicAddress); // You should use this as a unique user Id.
+}
+
 export const harmonyInit = () => async (dispatch) => {
+
     console.log(url)
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,

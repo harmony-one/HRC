@@ -1,9 +1,6 @@
 import config from '../../config'
 const { net } = config
 
-
-
-
 //TODO: naming
 export const getContract = (state, artifact) => {
 
@@ -20,7 +17,6 @@ export const getContract = (state, artifact) => {
     return { hmy, contract, active }
 }
 export const getContractInstance = (hmy, artifact) => {
-
     const contract = hmy.contracts.createContract(
         artifact.abi, artifact.networks[net] ? artifact.networks[net].address : config[artifact.contractName]
     )

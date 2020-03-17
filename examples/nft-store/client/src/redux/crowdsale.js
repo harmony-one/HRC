@@ -99,9 +99,10 @@ export const getInventory = () => async (dispatch, getState) => {
 
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    // console.log(HRC721Crowdsale)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const args = {
-        gasLimit: '5000000',
+        gasLimit: '4000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
     let totalItems = await contract.methods.totalItems().call(args)
@@ -119,6 +120,11 @@ export const getInventory = () => async (dispatch, getState) => {
             index: i, limit, minted, price, url, isSoldOut: minted == limit
         })
     }
+
+
+    console.log(items)
+
+    
     dispatch({type: UPDATE, items})
 }
 

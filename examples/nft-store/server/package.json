@@ -4,10 +4,11 @@
   "description": "Harmony sample ERC20 deploy",
   "main": "truffle.js",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "express": "^4.17.1"
   },
   "scripts": {
-    "start": "node src/app.js"
+    "start": "cp ./../.env ./.env; node src/app.js"
   }
 }

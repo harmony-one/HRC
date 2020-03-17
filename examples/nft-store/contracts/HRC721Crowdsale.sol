@@ -6,7 +6,8 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/roles/MinterRole.sol";
 
 contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
-
+    using SafeMath for uint64;
+    using SafeMath for uint128;
     using SafeMath for uint256;
 	//721 tokens
 	HRC721 token;
@@ -16,8 +17,8 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 	//inventory
 	struct Item {
 		//tight pack 256bits
-        uint8 minted;
-		uint8 limit;
+        uint64 minted;
+		uint64 limit;
 		uint128 price;
 		//end tight pack
 		address payable owner;
@@ -25,12 +26,13 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
     }
 	Item[] private items;
 	uint256 public totalItems;
-
+	//constructor
 	constructor(HRC721 _token) public {
 		token = _token;
 	}
-
-	//sales
+	/********************************
+	Primary Sales
+	********************************/
     function purchase(address to, uint256 index) public nonReentrant payable {
         uint256 weiAmount = msg.value;
 		require(to != address(0), "Crowdsale: beneficiary is the zero address");
@@ -42,28 +44,35 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 		//transfer funds to owner
         items[index].owner.transfer(msg.value);
     }
+	/********************************
+	Only the Minter
+	********************************/
 	function mint(address to, uint256 index) public onlyMinter {
 		_mint(to, index);
 	}
-	function _mint(address to, uint256 index) internal {
-		uint8 minted = items[index].minted;
-		uint8 limit = items[index].limit;
+	function _mint(address to, uint256 index) internal onlyMinter {
+		uint64 minted = items[index].minted;
+		uint64 limit = items[index].limit;
 		require(minted < limit, "Crowdsale: item limit reached");
         items[index].minted++;
 		token.mintWithIndex(to, index);
 	}
-
 	//inventory management
-	function addItem(uint8 limit, uint128 price, string memory url) public {
+	function addItem(uint64 limit, uint128 price, string memory url) public onlyMinter {
 		items.push(Item(0, limit, price, msg.sender, url));
 		totalItems++;
 	}
+	//add item and mint
+	function addItemAndMint(uint64 limit, uint128 price, string memory url, address to) public onlyMinter {
+		addItem(limit, price, url);
+		_mint(to, totalItems - 1);
+	}
 
 	//getting data
-	function getMinted(uint256 index) public view returns (uint8) {
+	function getMinted(uint256 index) public view returns (uint64) {
 		return items[index].minted;
 	}
-	function getLimit(uint256 index) public view returns (uint8) {
+	function getLimit(uint256 index) public view returns (uint64) {
 		return items[index].limit;
 	}
 	function getPrice(uint256 index) public view returns (uint128) {

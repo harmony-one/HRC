@@ -1,20 +1,21 @@
 pragma solidity >=0.4.21 <0.6.0;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
 
 contract HRC721 is ERC721Full, ERC721Mintable {
 	//maps tokenIds to item indexes
 	mapping(uint256 => uint256) private itemIndex;
-	//sales
-	// struct Sale {
-	// 	//tight pack 256bits
-	// 	uint128 price;
-	// 	//end tight pack
-    // }
+	//maps tokenIds to salePrice, sale means price of > 0
 	mapping(uint256 => uint256) private salePrice;
+
+	// Stablecoin placeholder
+	ERC20 public token;
 	
-	constructor(string memory _name, string memory _symbol) ERC721Full(_name, _symbol) public {}
+	constructor(string memory _name, string memory _symbol, ERC20 _token) ERC721Full(_name, _symbol) public {
+		token = _token;
+	}
 
 	function setSale(uint256 tokenId, uint256 price) public {
 		address owner = ownerOf(tokenId);
