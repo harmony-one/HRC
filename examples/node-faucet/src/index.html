@@ -14,12 +14,11 @@
         <h1>ONE Faucet</h1>
     </header>
     <div id="faucet">
-        <p>Enter your ONE address and click fund.<br />We'll send a transaction to the Harmony blockchain and let you
-            know when it's confirmed.</p>
+        <p>Enter your ONE address and click fund.<br />We'll send a transaction to the Harmony blockchain</p>
         <input id="input" placeholder="ONE Address" type="text" />
         <br>
         <button id="submit">Fund</button>
-        <p id="loading">Waiting for confirmation...</p>
+        <p id="loading">Queuing...</p>
         <p id="output"></p>
     </div>
     <script>
@@ -35,10 +34,9 @@
                     .then((res) => {
                         qs('#loading').style.display = 'none'
                         if (res.success === true) {
-                            qs('#output').innerHTML = '<h4>Balances</h4>' +
-                                res.balances.map((b) => `<p>Shard ${b.shard}: ${b.balance}</p>`).join('')
+                            qs('#output').innerHTML = '<h4>Queued!</h4>' + res.message
                         } else {
-                            qs('#output').innerHTML = '<p>An error occurred. Please try again!</p>'
+                            qs('#output').innerHTML = '<h4>An error occurred!</h4>' + res.message
                         }
                     })
             }

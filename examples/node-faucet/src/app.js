@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path');
+const shajs = require('sha.js')
 // import or require simutlated keystore (optional)
 const { importKey } = require('./simulated-keystore')
 const { initHarmony } = require('./harmony')
@@ -15,6 +16,15 @@ const {
 	hexToOneAddress
 } = require('./contract')
 const FaucetJSON = require('../build/contracts/Faucet.json')
+
+/********************************
+Initialization
+********************************/
+let addressMap = new Map()
+let queue = []
+const timeLimit = 3600000 // 1 hour in ms
+const txFrequency = 15000 // 15 seconds in ms
+
 /********************************
 Config
 ********************************/
@@ -57,30 +67,73 @@ app.get('/fund', async (req, res) => {
 		res.send(initRes)
 		return
 	}
-	/********************************
-	@todo check make sure address works and amount is valid
-	********************************/
+
 	let {address} = req.query
+
 	//prepare args for contract call
+	console.log('bech32 address:', address)
 	address = oneToHexAddress(hmy, address)
 	console.log('hex address:', address)
-	const faucet = getContractInstance(hmy, FaucetJSON)
-	//get faucet balance
-	const faucetBalance = await callContractMethod(faucet, 'getBalance')
-	console.log('faucet balance:', faucetBalance.toString())
-	//call method
-	const { hash, receipt, error} = await txContractMethod(faucet, 'fund', address)
-	
-	if (error) {
+
+	if(queue.find((pending)=> pending.key === shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'))){
 		res.send({
-			success: !error,
-			hash,
-			receipt,
+			success: false,
+			message: 'Too many requests from your ip, please try again later'
 		})
 		return
 	}
-	await balance(req, res)
+	if(addressMap.has(address) && addressMap.get(address) > (Date.now() - timeLimit)){
+		res.send({
+			success: false,
+			message: `This address has already been funded at ${new Date(addressMap.get(address)).toLocaleString()}`
+		})
+		return
+	}
+
+	queue.push({
+		key: shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'),
+		address: address,
+		created: Date.now()
+	})
+	res.send({
+		success: true,
+		message: `Your faucet request has been queued, ETA: ~${queue.length*15} seconds`
+	})
 })
+
+setInterval(async () => {
+	let front
+	//throw out addresses that have already been funded
+	do {
+		front = queue.sort((a, b) => a.created - b.created).pop()
+	} while (front && addressMap.has(front.address) && addressMap.get(front.address) > (Date.now() - timeLimit));
+
+	if(!front) {
+		console.log(new Date().toISOString(), "  queue is empty.")
+		return
+	}
+
+	const initRes = await initHarmony(url)
+	const { success, hmy } = initRes
+	if (!success) {
+		res.send(initRes)
+		return
+	}
+
+	const faucet = getContractInstance(hmy, FaucetJSON)
+	const faucetBalance = await callContractMethod(faucet, 'getBalance')
+	console.log('faucet balance:', faucetBalance.toString())
+	try {
+		const { hash, receipt, error} = await txContractMethod(faucet, 'fund', front.address)
+		if (error) {
+			console.error(error)
+			return
+		}
+		addressMap.set(front.address, Date.now())
+	} catch(err) {
+		console.error(err)
+	}
+}, txFrequency)
 
 
 /********************************
