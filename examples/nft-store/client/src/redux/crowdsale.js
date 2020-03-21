@@ -66,6 +66,7 @@ export const purchase = ({ index, price }) => async (dispatch, getState) => {
     const { items } = getState().crowdsaleReducer
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     console.log(index)
     const tx = contract.methods.purchase(active.address, index).send({
@@ -100,6 +101,8 @@ export const getInventory = () => async (dispatch, getState) => {
     //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
     // console.log(HRC721Crowdsale)
+    // console.log(contract)
+    console.log(hmy)
     //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
     const args = {
         gasLimit: '4000000',
@@ -110,8 +113,8 @@ export const getInventory = () => async (dispatch, getState) => {
     console.log(totalItems)
     const items = []
     for (let i = 0; i < totalItems; i++) {
-        const limit = parseInt(await contract.methods.getLimit(i).call(args), 16)
-        const minted = parseInt(await contract.methods.getMinted(i).call(args), 16)
+        const limit = parseInt(await contract.methods.getLimit(i).call(args), 10)
+        const minted = parseInt(await contract.methods.getMinted(i).call(args), 10)
         let price = (await contract.methods.getPrice(i).call(args)).toString()
         price = new hmy.utils.Unit(price).asWei().toEther().toString()
         const url = await contract.methods.getUrl(i).call(args)
