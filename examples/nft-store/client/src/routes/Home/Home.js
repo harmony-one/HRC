@@ -5,7 +5,7 @@ import { balanceOf } from '../../redux/hrc20'
 
 import Inventory from './../../components/Inventory/Inventory'
 import config from './../../../config'
-console.log(config)
+// console.log(config)
 const { ENV } = config
 
 import { route, bubble, button } from './Home.module.scss'
@@ -15,9 +15,12 @@ export default function Home(props) {
     const {
         harmonyState: { active, },
         hrc721State: { balances },
+        hrc20State: { hrc20balances },
     } = props
 
     const dispatch = useDispatch()
+
+    const hrc20balance = active && hrc20balances[active.name] || 0
 
     return (
         <div className={route}>
@@ -27,6 +30,7 @@ export default function Home(props) {
                     <div className={bubble}>
                         <h3>{active.name}</h3>
                         <p>ONE: {active.balanceONE}</p>
+                        <p>USD: {hrc20balance}</p>
                         {ENV === 'local' &&
                             <button
                                 onClick={() => dispatch(setActive(active.name === 'Alice' ? 'account' : 'minter'))}

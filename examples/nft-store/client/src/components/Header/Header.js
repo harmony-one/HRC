@@ -5,11 +5,14 @@ import { setActive } from './../../redux/harmony'
 import { root, menu, menuOpen } from './Header.module.scss'
 import config from '../../../config'
 const { ENV, } = config
+console.log(ENV)
 
 export default function Header({history, harmonyState: { network }}) {
 	const dispatch = useDispatch()
 
     const [isMenuOpen, setMenuOpen] = useState(false)
+
+    const defaultAccount = ENV === 'local' ? 'minter' : 'account'
 
     return (
         <div>
@@ -18,27 +21,27 @@ export default function Header({history, harmonyState: { network }}) {
                 <div>
                     <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
                     <section>
-                        { ENV === 'local' &&
+                        {/* { ENV === 'local' &&
 
                             <p onClick={() => {
                                 navigate('/')
-                                dispatch(setActive('minter'))
+                                dispatch(setActive(defaultAccount))
                                 setMenuOpen(false)
                             }}><i className="far fa-user-circle fa-lg"></i><span>Minter</span></p>
-                        }
+                        } */}
                         <p onClick={() => {
                             navigate('/')
-                            dispatch(setActive('account'))
+                            dispatch(setActive(defaultAccount))
                             setMenuOpen(false)
                         }}><i className="far fa-user-circle fa-lg"></i><span>My Account</span></p>
                         <p onClick={() => {
                             navigate('/funds')
-                            dispatch(setActive('account'))
+                            dispatch(setActive(defaultAccount))
                             setMenuOpen(false)
                         }}><i className="fas fa-coins fa-lg"></i><span>Funds</span></p>
                         <p onClick={() => {
                             navigate('/create')
-                            dispatch(setActive('account'))
+                            dispatch(setActive(defaultAccount))
                             setMenuOpen(false)
                         }}><i className="fab fa-creative-commons fa-lg"></i><span>Create</span></p>
                         <p onClick={() => {

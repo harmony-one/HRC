@@ -2,8 +2,8 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { updateDialogState } from './../../redux/harmony'
-import { purchase } from './../../redux/crowdsale'
-import { setSell, buyTokenOnSale } from './../../redux/hrc721'
+import { purchase, buyTokenOnSale } from './../../redux/crowdsale'
+import { setSell } from './../../redux/hrc721'
 import Form from './../../components/Form/Form'
 
 import { inventory, image, stats, purchaseButton, soldOut } from './Inventory.module.scss'
@@ -51,7 +51,7 @@ export default function Inventory(props) {
         {
             items.map((item) => {
                 const {index, isSoldOut, tokenId, salePrice} = item
-                
+
                 return wallet ?
                     <div key={tokenId + '' + index}>
                         <RenderItem {...{ 

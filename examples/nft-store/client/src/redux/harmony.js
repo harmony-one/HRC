@@ -2,6 +2,7 @@ import { UPDATE, reducer } from '../util/redux-util'
 import { waitForInjected, getExtAccount } from '../util/hmy-util'
 import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
+import { balanceOf } from './hrc20'
 import { getTokens, getMarket } from './hrc721'
 import { crowdsaleInit, getRaised } from './crowdsale'
 
@@ -120,8 +121,8 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
 export const getBalances = (account) => async (dispatch, getState) => {
     const { active } = getState().harmonyReducer
     dispatch(getBalanceONE(account || active))
+    dispatch(balanceOf(account || active))
     dispatch(getTokens(account || active))
-    dispatch(getRaised(account || active))
 }
 
 
@@ -143,8 +144,7 @@ export const handleLoginWithMagicLink = (email) => async (dispatch) => {
 }
 
 export const harmonyInit = () => async (dispatch) => {
-
-    console.log(url)
+    // console.log(url)
     const hmy = new Harmony(url, {
         chainType: ChainType.Harmony,
         chainId: net,

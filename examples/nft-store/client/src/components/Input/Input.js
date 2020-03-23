@@ -31,7 +31,6 @@ export default function Input(props) {
     return (
         <div className={root}>
             <input
-                id="input"
                 value={val}
                 type={type}
                 placeholder={placeholder}

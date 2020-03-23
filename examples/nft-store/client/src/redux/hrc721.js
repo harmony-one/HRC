@@ -53,11 +53,11 @@ export const getMarket = (account) => async(dispatch, getState) => {
 export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
     dispatch(updateProcessing(true))
     dispatch(updateDialogState({ open: false }))
-    // const { items } = getState().crowdsaleReducer
-    //const { hmy, hmyExt, active } = getState().harmonyReducer
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
-    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
-    const tx = contract.methods.setSale(tokenId, new hmy.utils.Unit(amount).asEther().toWei()).send({
+    const { contract: crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+    // clean args
+    amount = new hmy.utils.Unit(amount).asEther().toWei()
+    const tx = contract.methods.setSale(tokenId, amount, crowdsale.address).send({
         from: active.address,
         gasLimit: '5000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
@@ -72,28 +72,6 @@ export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
     }).on('error', console.error)
 }
 
-
-export const buyTokenOnSale = ({ price, tokenId }) => async (dispatch, getState) => {
-    dispatch(updateProcessing(true))
-    //const { hmy, hmyExt, active } = getState().harmonyReducer
-    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
-    //console.log(hmy, hmyExt, HRC20Crowdsale, contract)
-    const tx = contract.methods.buyTokenOnSale(tokenId).send({
-        from: active.address,
-        value: new hmy.utils.Unit(price).asEther().toWei(),
-        gasLimit: '5000000',
-        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
-    }).on('transactionHash', function (hash) {
-        console.log('hash', hash)
-    }).on('receipt', function (receipt) {
-        console.log('receipt', receipt)
-    }).on('confirmation', async (confirmationNumber, receipt) => {
-        console.log('confirmationNumber', confirmationNumber, receipt)
-        dispatch(getMarket())
-        dispatch(getBalances())
-        dispatch(updateProcessing(false))
-    }).on('error', console.error)
-}
 
 export const getTokens = (account) => async (dispatch, getState) => {
     // const { hmy } = getState().harmonyReducer

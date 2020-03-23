@@ -13,9 +13,12 @@ export default function Market(props) {
     const {
         harmonyState: { active,  },
         hrc721State: { balances, market  },
+        hrc20State: { hrc20balances },
     } = props
 
     const dispatch = useDispatch()
+
+    const hrc20balance = hrc20balances[active.name] || 0
 
     useEffect(() => {
         dispatch(getMarket())
@@ -30,6 +33,7 @@ export default function Market(props) {
                     <div className={bubble}>
                         <h3>{active.name}</h3>
                         <p>ONE: {active.balanceONE}</p>
+                        <p>USD: {hrc20balance}</p>
                         { ENV === 'local' &&
                             <button 
                                 onClick={() => dispatch(setActive(active.name === 'Alice' ? 'account' : 'minter'))}

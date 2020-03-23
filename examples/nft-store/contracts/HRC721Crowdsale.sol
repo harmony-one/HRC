@@ -1,6 +1,7 @@
 pragma solidity >=0.4.24 <0.6.0;
 
 import "./HRC721.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/roles/MinterRole.sol";
@@ -9,11 +10,15 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
     using SafeMath for uint64;
     using SafeMath for uint128;
     using SafeMath for uint256;
-	//721 tokens
-	HRC721 token;
+	// owner to benefit from primary sales
+	address owner;
+	// Stablecoin placeholder
+	ERC20 public hrc20;
+	// 721 tokens
+	HRC721 hrc721;
 	//sales
 	mapping(address => uint256) public contributions;
-	uint256 public raised;
+	// uint256 public raised;
 	//inventory
 	struct Item {
 		//tight pack 256bits
@@ -27,35 +32,74 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 	Item[] private items;
 	uint256 public totalItems;
 	//constructor
-	constructor(HRC721 _token) public {
-		token = _token;
+	constructor(address _owner, ERC20 _hrc20, HRC721 _hrc721) public {
+		owner = _owner;
+		hrc20 = _hrc20;
+		hrc721 = _hrc721;
 	}
 	/********************************
 	Primary Sales
 	********************************/
-    function purchase(address to, uint256 index) public nonReentrant payable {
+    function purchaseWithONE(address to, uint256 index) public nonReentrant payable {
         uint256 weiAmount = msg.value;
 		require(to != address(0), "Crowdsale: beneficiary is the zero address");
         require(weiAmount != 0, "Crowdsale: weiAmount is 0");
 		uint128 price = items[index].price;
         require(weiAmount == price, "Crowdsale: weiAmount does not equal price");
-		_mint(to, index);
-        raised = raised.add(weiAmount);
 		//transfer funds to owner
         items[index].owner.transfer(msg.value);
+		//mint and send the token
+		_mint(to, index);
+    }
+	function purchaseWithHRC20(uint256 amount, uint256 index) public {
+		address to = msg.sender;
+		require(to != address(0), "Crowdsale: beneficiary is the zero address");
+        require(amount != 0, "Crowdsale: amount is 0");
+		uint128 price = items[index].price;
+        require(amount == price, "Crowdsale: amount does not equal price");
+		uint256 balance = hrc20.balanceOf(to);
+        require(balance >= amount, "Crowdsale: receiver doesn't have enough tokens");
+		//transfer funds to owner
+        hrc20.transferFrom(to, owner, amount);
+		//mint and send the token
+		_mint(to, index);
     }
 	/********************************
-	Only the Minter
+	Only safe minting that passes purchase conditions
 	********************************/
-	function mint(address to, uint256 index) public onlyMinter {
-		_mint(to, index);
-	}
-	function _mint(address to, uint256 index) internal onlyMinter {
+	function _mint(address to, uint256 index) internal {
 		uint64 minted = items[index].minted;
 		uint64 limit = items[index].limit;
 		require(minted < limit, "Crowdsale: item limit reached");
         items[index].minted++;
-		token.mintWithIndex(to, index);
+		hrc721.mintWithIndex(to, index);
+	}
+
+	/********************************
+	Secondary Sales
+	********************************/
+	function buyTokenOnSale(uint256 tokenId, uint256 amount) public payable {
+		address to = msg.sender;
+		uint256 price = hrc721.getSalePrice(tokenId);
+        require(price != 0, "Crowdsale: cannot buy token with price 0");
+        require(amount == price, "Crowdsale: price doesn't equal hrc721.getSalePrice(tokenId)");
+		uint256 balance = hrc20.balanceOf(to);
+        require(balance >= amount, "Crowdsale: receiver doesn't have enough tokens");
+		address owner = hrc721.ownerOf(tokenId);
+		//pay for token
+        hrc20.transferFrom(to, owner, amount);
+		//remove the sale
+		hrc721.minterSetSale(tokenId, 0);
+		//transfer the token
+		hrc721.transferFrom(owner, to, tokenId);
+	}
+
+
+	/********************************
+	Inventory management, Only the Minter
+	********************************/
+	function mint(address to, uint256 index) public onlyMinter {
+		_mint(to, index);
 	}
 	//inventory management
 	function addItem(uint64 limit, uint128 price, string memory url) public onlyMinter {
@@ -68,7 +112,9 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 		_mint(to, totalItems - 1);
 	}
 
-	//getting data
+	/********************************
+	Public Getters
+	********************************/
 	function getMinted(uint256 index) public view returns (uint64) {
 		return items[index].minted;
 	}
@@ -82,7 +128,7 @@ contract HRC721Crowdsale is MinterRole, ReentrancyGuard {
 		return items[index].url;
 	}
 	function getTokenData(uint256 tokenId) public view returns (string memory) {
-		return items[token.getItemIndex(tokenId)].url;
+		return items[hrc721.getItemIndex(tokenId)].url;
 	}
 
 }
