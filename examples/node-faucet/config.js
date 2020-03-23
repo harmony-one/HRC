@@ -1,6 +1,7 @@
-// require('dotenv').config()
+require('dotenv').config()
 
 let network, net, url, privateKey, Faucet
+const ONE = 1000000000000000000 // 1 ONE in atto
 
 switch(process.env.ENV){
     case 'local': {
@@ -38,5 +39,7 @@ module.exports = {
     url,
     GAS_LIMIT: process.env.GAS_LIMIT,
     GAS_PRICE: process.env.GAS_PRICE,
+    timeLimit: process.env.TIME_LIMIT ? parseInt(process.env.TIME_LIMIT) : 3600000, // 1 Hour
+    txRate: process.env.TX_RATE ? parseInt(process.env.TX_RATE) : 11000 * ONE, //11000 ONE
     Faucet
 }
