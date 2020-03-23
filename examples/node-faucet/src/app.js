@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path');
 const shajs = require('sha.js')
+const { Mutex } = require('async-mutex')
 // import or require simutlated keystore (optional)
 const { importKey } = require('./simulated-keystore')
 const { initHarmony } = require('./harmony')
@@ -20,16 +21,17 @@ const FaucetJSON = require('../build/contracts/Faucet.json')
 /********************************
 Initialization
 ********************************/
+const ONE = 1000000000000000000 // 1 ONE in atto
+const mutex = new Mutex()
 let addressMap = new Map()
 let queue = []
-const timeLimit = 3600000 // 1 hour in ms
 const txFrequency = 15000 // 15 seconds in ms
 
 /********************************
 Config
 ********************************/
 const config = require('../config')
-const { url, port } = config
+const { url, port, timeLimit, txRate } = config
 
 /********************************
 Express
@@ -75,13 +77,7 @@ app.get('/fund', async (req, res) => {
 	address = oneToHexAddress(hmy, address)
 	console.log('hex address:', address)
 
-	if(queue.find((pending)=> pending.key === shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'))){
-		res.send({
-			success: false,
-			message: 'Too many requests from your ip, please try again later'
-		})
-		return
-	}
+	//Check if address has already been funded
 	if(addressMap.has(address) && addressMap.get(address) > (Date.now() - timeLimit)){
 		res.send({
 			success: false,
@@ -89,12 +85,41 @@ app.get('/fund', async (req, res) => {
 		})
 		return
 	}
+	//Check if faucet has enough funds to complete transaction
+	const faucetAddress = hexToOneAddress(hmy, getContractAddress(FaucetJSON))
+	let faucetBalance = (await hmy.blockchain.getBalance({ address:faucetAddress }).catch((error) => {
+		res.send({success: false, message: "Could not connect to Harmony"})
+		err = true
+	})).result
+	faucetBalance = new hmy.utils.Unit(faucetBalance).asWei().toEther()
+	console.log('balance', faucetBalance)
+	if(faucetBalance < (queue.length+1)*(txRate/ONE)) {
+		res.send({
+			success: false,
+			message: `The faucet does not have enough funds`
+		})
+		return
+	}
 
+	//mutex needed for critical section involving queue
+	const release = await mutex.acquire()
+	//Check if this ip + user agent is already in queue
+	if(queue.find((pending)=> pending.key === shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'))){
+		res.send({
+			success: false,
+			message: 'Too many requests from your ip, please try again later'
+		})
+		release()
+		return
+	}
+	//add address to queue
 	queue.push({
 		key: shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'),
 		address: address,
 		created: Date.now()
 	})
+	//end of critical section
+	release()
 	res.send({
 		success: true,
 		message: `Your faucet request has been queued, ETA: ~${queue.length*15} seconds`
@@ -120,6 +145,12 @@ setInterval(async () => {
 		return
 	}
 
+	//Get account balance before faucet call
+	let accountBalance1 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
+		res.send({success: false, message: "Could not connect to Harmony"})
+	})).result
+	accountBalance1 = new hmy.utils.Unit(accountBalance1).asWei().toEther()
+
 	const faucet = getContractInstance(hmy, FaucetJSON)
 	const faucetBalance = await callContractMethod(faucet, 'getBalance')
 	console.log('faucet balance:', faucetBalance.toString())
@@ -129,7 +160,14 @@ setInterval(async () => {
 			console.error(error)
 			return
 		}
-		addressMap.set(front.address, Date.now())
+		//Get account balance after faucet call
+		let accountBalance2 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
+			res.send({success: false, message: "Could not connect to Harmony"})
+		})).result
+		accountBalance2 = new hmy.utils.Unit(accountBalance2).asWei().toEther()
+		//If account balance changed, funding was successful
+		if(accountBalance1 < accountBalance2) addressMap.set(front.address, Date.now())
+		else console.error('Account has not been funded')
 	} catch(err) {
 		console.error(err)
 	}
@@ -209,13 +247,13 @@ async function balance(req, res) {
 			return
 		}
 
-	//rpc call
+		//rpc call
 		const result = (await hmy.blockchain.getBalance({ address }).catch((error) => {
-		res.send({success: false, error })
+			res.send({success: false, error })
 			err = true
-	})).result
+		})).result
 		if (err) break
-	if (result) {
+		if (result) {
 			balances.push({ "shard": shard.shardID, balance: new hmy.utils.Unit(result).asWei().toEther()})
 		}
 	}
