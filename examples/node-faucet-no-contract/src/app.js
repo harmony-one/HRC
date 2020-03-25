@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path');
 const shajs = require('sha.js')
+const db = require('diskdb')
 const { Mutex } = require('async-mutex')
 const { initHarmony, transfer } = require('./harmony')
 
@@ -12,6 +13,12 @@ const mutex = new Mutex()
 let addressMap = new Map()
 let queue = []
 const txFrequency = 15000 // 15 seconds in ms
+
+
+/********************************
+Database Initialization
+********************************/
+db.connect('./', ['funded'])
 
 /********************************
 Config
@@ -70,10 +77,11 @@ app.get('/fund', async (req, res) => {
 	console.log('bech32 address:', address)
 
 	//Check if address has already been funded
-	if(addressMap.has(address) && addressMap.get(address) > (Date.now() - timeLimit)){
+	if( db.funded.findOne({address}) && 
+		db.funded.findOne({address}).time > (Date.now() - timeLimit)){
 		res.send({
 			success: false,
-			message: `This address has already been funded at ${new Date(addressMap.get(address)).toLocaleString()}`
+			message: `This address has already been funded at ${new Date(db.funded.findOne({address}).time).toLocaleString()}`
 		})
 		return
 	}
@@ -118,10 +126,13 @@ app.get('/fund', async (req, res) => {
 //Logic to consume the queue. Runs every txFrequency ms, which should be larger than block time.
 setInterval(async () => {
 	let front
+	let fundedAddress
 	//throw out addresses that have already been funded
 	do {
 		front = queue.sort((a, b) => a.created - b.created).pop()
-	} while (front && addressMap.has(front.address) && addressMap.get(front.address) > (Date.now() - timeLimit));
+	} while (front && 
+		db.funded.findOne({address: front.address}) && 
+		db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit));
 
 	if(!front) {
 		console.log(new Date().toISOString(), "  queue is empty.")
@@ -149,7 +160,10 @@ setInterval(async () => {
 		})).result
 		accountBalance2 = new hmy.utils.Unit(accountBalance2).asWei().toEther()
 		//If account balance changed, funding was successful
-		if(accountBalance1 < accountBalance2) addressMap.set(front.address, Date.now())
+		if(accountBalance1 < accountBalance2){ 
+			addressMap.set(front.address, Date.now())
+			db.funded.update({address: front.address}, {address: front.address, time: Date.now()}, {upsert: true})
+		}
 		else console.error('Account has not been funded')
 	} catch(err) {
 		console.error(err)
