@@ -26,10 +26,10 @@ module.exports = function (deployer, network, accounts) {
 		return deployer.deploy(HRC20, hrc20Name, hrc20Symbol, hrc20Decimals, hrc20MinterSupply).then(function (hrc20) {
 			return deployer.deploy(HRC721, name, symbol).then(function (hrc721) {
 				return deployer.deploy(HRC721Crowdsale, owner, hrc20.address, hrc721.address).then(async function (sale) {
-					for (let i = 0; i < 2; i++) {
-						console.log(urls[i])
-						await sale.addItem(10, price, urls[i])
-					}
+					// for (let i = 0; i < 2; i++) {
+					// 	console.log(urls[i])
+					// 	await sale.addItem(10, price, urls[i])
+					// }
 					return hrc721.addMinter(sale.address)
 				})
 			})

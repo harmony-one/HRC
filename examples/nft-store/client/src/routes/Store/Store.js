@@ -10,6 +10,7 @@ export default function Store(props) {
 
     const {
         harmonyState: { active, allowToggle },
+        crowdsaleState: { items  },
         hrc721State: { balances  },
         hrc20State: { hrc20balances },
     } = props
@@ -27,8 +28,13 @@ export default function Store(props) {
     return (
         <div className={route}>
 
+            <section>
+                <div className={bubble}>
+                    <h2>{items.length === 0 ? 'No NFTs for Sale' : 'NFTs for Sale'}</h2>
+                </div>
+            </section>
+
             <section className={gradient}>
-                <h2>Items</h2>
                 <Inventory {...props} balance={active && balances && balances[active.name]} />
             </section>
         </div>
