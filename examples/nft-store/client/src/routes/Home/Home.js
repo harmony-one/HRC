@@ -17,7 +17,6 @@ export default function Home(props) {
     const dispatch = useDispatch()
 
     if (!active) return null
-
     const hrc20balance = hrc20balances[active.name] || 0
 
     return (

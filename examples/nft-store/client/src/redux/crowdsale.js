@@ -46,9 +46,9 @@ export const buyTokenOnSale = ({ price, tokenId }) => async (dispatch, getState)
                 console.log('receipt', receipt)
             }).on('confirmation', async (confirmation) => {
                 console.log('confirmation', confirmation)
-                dispatch(getMarket())
-                dispatch(getBalances())
-                dispatch(updateProcessing(false))
+                await dispatch(getMarket())
+                await dispatch(getBalances())
+                await dispatch(updateProcessing(false))
             }).on('error', console.error)
         }
     }))
@@ -76,8 +76,9 @@ export const purchase = ({ index, price }) => async (dispatch, getState) => {
                 console.log('receipt', receipt)
             }).on('confirmation', async (confirmation) => {
                 console.log('confirmation', confirmation)
-                dispatch(getInventory())
-                dispatch(updateProcessing(false))
+                await dispatch(getInventory())
+                await dispatch(getBalances())
+                await dispatch(updateProcessing(false))
             }).on('error', console.error)
         }
     }))

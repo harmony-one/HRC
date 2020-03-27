@@ -28,10 +28,14 @@ export default function Market(props) {
     return (
         <div className={route}>
 
-            {<section className={gradient}>
+            <section>
                 <div className={bubble}>
                     <h2>{market.length > 0 ? 'NFTs for Sale by Owner' : 'No NFTs for Sale'}</h2>
                 </div>
+            </section>
+
+            {<section className={gradient}>
+                
                 <Inventory {...props} market={market} balance={active && balances && balances[active.name]} />
             </section>}
         </div>
