@@ -6,20 +6,20 @@ import { addItem } from '../../redux/crowdsale'
 import Form from '../../components/Form/Form'
 
 import { route, bubble, button } from './Create.module.scss'
-import config from '../../../config'
-const {ENV} = config
 
 
 export default function Home(props) {
 
     const {
-        harmonyState: { active, bech32Addresses },
+        harmonyState: { active, allowToggle },
         hrc721State: { balances },
     } = props
 
     const [link, setLink] = useState(null)
 
     const dispatch = useDispatch()
+    
+    if (!active) return null
 
     return (
         <div className={route}>
@@ -30,7 +30,7 @@ export default function Home(props) {
                     <div className={bubble}>
                         <h3>{active.name}</h3>
                         <p>ONE: {active.balanceONE}</p>
-                        { ENV === 'local' &&
+                        { allowToggle &&
                             <button 
                                 onClick={() => dispatch(setActive(active.name === 'Alice' ? 'account' : 'minter'))}
                                 className={button}

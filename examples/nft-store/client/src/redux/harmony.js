@@ -6,8 +6,6 @@ import { balanceOf } from './hrc20'
 import { getTokens, getMarket } from './hrc721'
 import { crowdsaleInit, getRaised } from './crowdsale'
 
-import Fortmatic from 'fortmatic';
-
 import config from '../../config'
 const { ENV, network, net, url } = config
 
@@ -21,8 +19,9 @@ const defaultState = {
     account: null,
     bech32Addresses: [],
     addresses: [],
+    allowToggle: false,
     //app ui state, should be in app.js reducer (TBD)
-    processing: false,
+    processing: true,
     dialogState: {
         open: false,
         title: '',
@@ -114,10 +113,13 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
             console.log(err);
         })).result
     }
-    account.balanceONE = new hmy.utils.Unit(result).asWei().toEther()
+    account.balanceONE = weiToOne(hmy, result)
 
     dispatch({ type: UPDATE, [account.name]: account })
 }
+
+const weiToOne = (hmy, v) => Math.floor(new hmy.utils.Unit(v).asWei().toEther() * 10000) / 10000
+
 export const getBalances = (account) => async (dispatch, getState) => {
     const { active } = getState().harmonyReducer
     dispatch(getBalanceONE(account || active))
@@ -125,40 +127,17 @@ export const getBalances = (account) => async (dispatch, getState) => {
     dispatch(getTokens(account || active))
 }
 
-
-
-
-
-/********************************
-Formatic Login
-********************************/
-export const handleLoginWithMagicLink = (email) => async (dispatch) => {
-    const fmPhantom = new Fortmatic.Phantom('pk_test_1C24F45217D39E66'); // ✨
-    if (fmPhantom.user && fmPhantom.user.isLoggedIn()) {
-        await fmPhantom.user.logout()
-    }
-    console.log('handleLoginWithMagicLink', email)
-    const user = await fmPhantom.loginWithMagicLink({ email });
-    console.log(await user.isLoggedIn()); // => true
-    console.log((await user.getMetadata()).publicAddress); // You should use this as a unique user Id.
+export const signOut = () => async (dispatch, getState) => {
+    dispatch({ type: UPDATE, ...defaultState, processing: false })
 }
 
-export const harmonyInit = () => async (dispatch) => {
-    // console.log(url)
-    const hmy = new Harmony(url, {
-        chainType: ChainType.Harmony,
-        chainId: net,
-    })
-    dispatch({ type: UPDATE, hmy })
-
-    const harmony = await waitForInjected(1)
-    let hmyExt
-    if (harmony) {
-        hmyExt = new HarmonyExtension(harmony, {
-            chainId: net
-        });
-        dispatch({ type: UPDATE, hmyExt })
+export const signIn = (authedAccount) => async (dispatch, getState) => {
+    let { hmy, hmyExt } = getState().harmonyReducer
+    if (!hmy && !hmyExt) {
+        await dispatch(harmonyInit());
+        ({ hmy, hmyExt } = getState().harmonyReducer)
     }
+    
 
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
@@ -183,14 +162,39 @@ export const harmonyInit = () => async (dispatch) => {
         bech32Addresses
     })
 
-    dispatch(setActive('account'))
-    if (ENV === 'local') {
-        console.log("setting minter")
-        dispatch(setActive('minter'))
+    if (authedAccount) {
+        minter.name = 'mattdlockyer@gmail.com'
+        account.name = 'matt@harmony.one'
+        dispatch(setActive(authedAccount))
+    } else {
+        allowToggle = true
+        dispatch(setActive('account'))
+        if (ENV === 'local') {
+            console.log("setting minter")
+            dispatch(setActive('minter'))
+        }
     }
 
     dispatch(crowdsaleInit())
+}
 
+export const harmonyInit = () => async (dispatch) => {
+    // console.log(url)
+    const hmy = new Harmony(url, {
+        chainType: ChainType.Harmony,
+        chainId: net,
+    })
+    dispatch({ type: UPDATE, hmy })
+
+    const harmony = await waitForInjected(1)
+    let hmyExt
+    if (harmony) {
+        hmyExt = new HarmonyExtension(harmony, {
+            chainId: net
+        });
+        dispatch({ type: UPDATE, hmyExt })
+    }
+    return { hmy, hmyExt }
 }
 
 //reducer

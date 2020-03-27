@@ -25,7 +25,6 @@
 }
 
 .menu {
-
     p {
         display: flex;
         align-items: center;
@@ -58,13 +57,19 @@
         width: 300px;
         height: 100vh;
         transform: translateX(350px);
+        
+        > h3 {
+            text-align: left;
+            line-height: 48px;
+            font-size: 1rem;
+            margin-left: $margin;
+        }
         > i {
             position: absolute;
             padding: $margin;
             right: 0; top: 0;
         }
         > section {
-            margin-top: $header-height;
             padding: 0;
             > p {
                 cursor: pointer;
@@ -77,6 +82,7 @@
         }
     }
 }
+
 .menuOpen {
     width: 100vw;
     > div:nth-child(1) {
@@ -84,5 +90,19 @@
     }
     > div:nth-child(2) {
         transform: translateX(0);
+    }
+}
+
+.avatar {
+    margin: $margin auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    display:flex;
+    justify-content: center;
+    > img {
+        height: 100%;
+        object-fit: contain;
     }
 }
