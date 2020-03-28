@@ -36,7 +36,7 @@ export default function Home(props) {
                         <br />
                         <button 
                             className={button}
-                            onClick={() => navigate('/store')}
+                            onClick={() => navigate('/market')}
                         >Market</button>
                     </div>
                 </section>

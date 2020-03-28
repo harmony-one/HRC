@@ -166,6 +166,7 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
         minter.name = 'mattdlockyer@gmail.com'
         account.name = 'matt@harmony.one'
         dispatch(setActive(authedAccount))
+        console.log(account)
     } else {
         allowToggle = true
         dispatch(setActive('account'))

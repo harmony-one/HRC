@@ -43,9 +43,16 @@ app.get('/create', async (req, res) => {
 		return
 	}
 	let { limit, price, media, owner } = req.query
-	price = toWei(hmy, price)
 	/********************************
-	@todo validate args
+	 @todo validate args
+	 ********************************/
+	price = toWei(hmy, price)
+	if (owner.indexOf('one') > -1) {
+		owner = oneToHexAddress(hmy, owner)
+	}
+	console.log('owner', owner)
+	/********************************
+	Get store contract
 	********************************/
 	let store = getContractInstance(hmy, HRC721Crowdsale)
 	let hash, receipt, error
