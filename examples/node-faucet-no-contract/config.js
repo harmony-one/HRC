@@ -39,4 +39,5 @@ module.exports = {
     GAS_PRICE: process.env.GAS_PRICE,
     timeLimit: process.env.TIME_LIMIT ? parseInt(process.env.TIME_LIMIT) : 3600000, // 1 Hour
     txRate: process.env.TX_RATE ? parseInt(process.env.TX_RATE) : 11000 * ONE, //11000 ONE
+    recaptchaSecretKey: process.env.RECAPTCHA_SECRET
 }

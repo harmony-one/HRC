@@ -3,5 +3,5 @@ const fs = require('fs')
 try {
     fs.unlinkSync('./funded.json')
 } catch (err) {
-    console.error(error)
+    console.error(err)
 }
