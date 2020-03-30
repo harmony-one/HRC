@@ -1,55 +1,66 @@
 # HRC
-Harmony NodeJS SDK Demo
+Harmony Faucet (No Contract)
 
 ## Overview
-This sample project can be cloned to interact with the Harmony Blockchain on Local, Test and Main networks
+This is an example of a faucet used to distribute Harmony ONE tokens. If you would like to see an example of this faucet with a smart contract, please see the `node-faucet` example instead.
 
 ## Pre-requisites
 NodeJS and JavaScript knowledge
-Check out the .env and config.js files first
 
 ## Install
 ```
 npm i
 ```
 ## Configure
-```
-In `.env` set `ENV=[local|testnet|mainnet]`
-```
+Check out the config.js file first
+
+These are the environmental variables that need to be set to run the faucet. They can be set from the command line or in a .env file in the same directory as this README
+
+* `ENV`: the network you're deploying to, `local`, `testnet`, or `mainnet`. This readme assumes `ENV` is set to `testnet`.
+* `TESTNET_CHAIN_ID`: the chain id of the network you're connecting to (3 for OSTN, 4 for PTN) (Not applicable to `local` or `mainnet` networks).
+* `TESTNET_0_URL`: the URL endpoint of the network you are connecting to. Replace `TESTNET` with `LOCAL` or `MAINNET` if you are targeting those networks.
+* `TESTNET_PRIVATE_KEY`: the private key of the faucet account. This account pays for both the transactions and the funded account. Replace `TESTNET` with `LOCAL` or `MAINNET` if you are targeting those networks.
+* `GAS_LIMIT`: amount of gas allotted to transactions. defaults to `2000000` gas
+* `GAS_PRICE`: amount of ONE to pay for each unit of gas. defaults to `1000000000` atto, (0.000000001 ONE)
+* `TIME_LIMIT`: amount of time in ms before an address is allowed to fund again, defaults to `3600000` ms (1 hour)
+* `TX_RATE`: amount in ONE to pay out from the faucet, defaults to `11000` ONE
+* `RECAPTCHA_SECRET`: the secret recaptcha token provided by google's reCAPTCHA
+
+**The corresponding recaptcha public token must replace the `data-sitekey` attribute value of the recaptcha div in `/src/index.html` line 22**
+
 ## Run App
 ```
 npm start
 ```
 ## Endpoints
+### GET
 ```
 /balance
 ```
+returns the balance of a ONE address
+#### Parameters:
 - `address`: ONE address to query balance of
 
 ```
-/transfer
+/exposeAddress
 ```
-- `to`: ONE address to send tokens to
-- `from`(optional): ONE address to send tokens from
-    - For this demo, the private keys are stored in `simulated-keystore.js`
-    - (defaults to account in `.env` corresponding to network)
-- `toshard`(optional): shard to send tokens to
-    - (defaults to 0)
-- `fromshard`(optional): shard to send tokens from 
-    - (defaults to 0)
-- `value`: amounts of tokens to send
+returns the ONE address of the faucet
+#### Parameters:
+- none
+
+### POST
+```
+/fund
+```
+Is used to fund an account, requires recaptcha token
 
 ## Examples on Local Network
 
-### Test "Alice's" Balance 
+### Check "Alice's" Balance 
 ```
 localhost:3000/balance?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7
 ```
-### Send "Bob" ONE tokens
+### Check faucet's address
 ```
-localhost:3000/transfer?to=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65&value=1
-```
-### Check "Bob's" Balance
-```
-localhost:3000/balance?address=one1a2rhuaqjcvfu69met9sque2l3w5v9z6qcdcz65
+localhost:3000/exposeAddress
 ```
