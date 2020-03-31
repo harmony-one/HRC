@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path');
 const shajs = require('sha.js')
 const db = require('diskdb')
+const fetch = require('node-fetch')
 const { Mutex } = require('async-mutex')
 const { initHarmony, transfer } = require('./harmony')
 
@@ -24,7 +25,7 @@ db.connect('./', ['funded'])
 Config
 ********************************/
 const config = require('../config')
-const { url, port, timeLimit, txRate } = config
+const { url, port, timeLimit, txRate, recaptchaSecretKey } = config
 
 /********************************
 Express
@@ -55,7 +56,7 @@ Fund Account
 ********************************/
 //e.g.
 // http://localhost:3000/fund?address=one103q7qe5t2505lypvltkqtddaef5tzfxwsse4z7// -> 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
-app.get('/fund', async (req, res) => {
+app.post('/fund', express.json(), async (req, res) => {
 	const initRes = await initHarmony(url)
 	const { success, hmy } = initRes
 	if (!success) {
@@ -63,7 +64,27 @@ app.get('/fund', async (req, res) => {
 		return
 	}
 
-	let {address} = req.query
+	let {address, token} = req.body
+
+	//Verify reCaptcha response token
+	const recaptchaUrl = `https://www.google.com/recaptcha/api/siteverify`
+	let recaptchaResponse = await fetch(recaptchaUrl, {
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/x-www-form-urlencoded'
+		},
+		body: `secret=${recaptchaSecretKey}&response=${token}`
+	})
+	recaptchaResponse = await recaptchaResponse.json()
+	console.log(recaptchaResponse)
+	if(!recaptchaResponse.success){
+		res.send({
+			success: false,
+			message: `reCAPTCHA verification failed`
+		})
+		console.log(recaptchaResponse["error-codes"])
+		return
+	}
 
 	//prepare args for contract call
 	if(! hmy.utils.isValidAddress(address)){

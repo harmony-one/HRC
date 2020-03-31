@@ -35,8 +35,9 @@ module.exports = {
     network, // 0 local, 1 testnet, 2 mainnet
     net, //TODO: change name
     url,
-    GAS_LIMIT: process.env.GAS_LIMIT,
-    GAS_PRICE: process.env.GAS_PRICE,
+    GAS_LIMIT: process.env.GAS_LIMIT ? process.env.GAS_LIMIT : 2000000,
+    GAS_PRICE: process.env.GAS_PRICE ? process.env.GAS_PRICE : 1000000000,
     timeLimit: process.env.TIME_LIMIT ? parseInt(process.env.TIME_LIMIT) : 3600000, // 1 Hour
-    txRate: process.env.TX_RATE ? parseInt(process.env.TX_RATE) : 11000 * ONE, //11000 ONE
+    txRate: process.env.TX_RATE ? parseInt(process.env.TX_RATE) * ONE : 11000 * ONE, //11000 ONE
+    recaptchaSecretKey: process.env.RECAPTCHA_SECRET
 }
