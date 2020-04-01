@@ -4,13 +4,14 @@ const shajs = require('sha.js')
 const db = require('diskdb')
 const fetch = require('node-fetch')
 const { Mutex } = require('async-mutex')
-const { initHarmony, transfer } = require('./harmony')
+const { initHarmony, transfer, toOneAddress } = require('./harmony')
 
 /********************************
 Initialization
 ********************************/
 const ONE = 1000000000000000000 // 1 ONE in atto
-const mutex = new Mutex()
+const queueMutex = new Mutex()
+const fundMutex = new Mutex()
 let addressMap = new Map()
 let queue = []
 const txFrequency = 15000 // 15 seconds in ms
@@ -25,13 +26,14 @@ db.connect('./', ['funded'])
 Config
 ********************************/
 const config = require('../config')
-const { url, port, timeLimit, txRate, recaptchaSecretKey } = config
+const { url, port, timeLimit, txRate, recaptchaSecretKey, proxy } = config
 
 /********************************
 Express
 ********************************/
 const app = express()
 app.use(express.static('public'))
+app.set('trust proxy', proxy)
 
 
 /********************************
@@ -87,12 +89,14 @@ app.post('/fund', express.json(), async (req, res) => {
 	}
 
 	//prepare args for contract call
-	if(! hmy.utils.isValidAddress(address)){
+	try {
+		address = toOneAddress(hmy, address)
+	} catch (error) {
 		res.send({
 			success: false,
 			message: `Invalid ONE address ${address}`
 		})
-		console.error(`Invalid ONE address ${address}`)
+		console.error(error)
 		return
 	}
 	console.log('bech32 address:', address)
@@ -120,60 +124,76 @@ app.post('/fund', express.json(), async (req, res) => {
 	
 
 	//mutex needed for critical section involving queue
-	const release = await mutex.acquire()
+	const release = await queueMutex.acquire()
 	//Check if this ip + user agent is already in queue
-	if(queue.find((pending)=> pending.key === shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'))){
+	try {
+		if(queue.find((pending)=> pending.key === req.ip) ||
+			db.funded.findOne({key: req.ip})
+		){
+			res.send({
+				success: false,
+				message: 'Too many requests from your ip, please only use this faucet once'
+			})
+			return
+		}
+		//add address to queue
+		queue.push({
+			key: req.ip,
+			address: address,
+			created: Date.now()
+		})
+		//end of critical section
+		res.send({
+			success: true,
+			message: `Your faucet request has been queued, ETA: ~${parseInt(queue.length*(txFrequency/1000))} seconds`
+		})
+	} catch (error) {
+		console.error(error)
 		res.send({
 			success: false,
-			message: 'Too many requests from your ip, please try again later'
+			message: 'An unexpected error has occurred!'
 		})
-		release()
 		return
+	} finally {
+		release()
 	}
-	//add address to queue
-	queue.push({
-		key: shajs('sha256').update(req.ip + req.get('user-agent')).digest('hex'),
-		address: address,
-		created: Date.now()
-	})
-	//end of critical section
-	release()
-	res.send({
-		success: true,
-		message: `Your faucet request has been queued, ETA: ~${queue.length*15} seconds`
-	})
 })
 
 //Logic to consume the queue. Runs every txFrequency ms, which should be larger than block time.
 setInterval(async () => {
 	let front
-	let fundedAddress
-	//throw out addresses that have already been funded
-	do {
-		front = queue.sort((a, b) => a.created - b.created).pop()
-	} while (front && 
-		db.funded.findOne({address: front.address}) && 
-		db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit));
 
-	if(!front) {
-		console.log(new Date().toISOString(), "  queue is empty.")
-		return
-	}
-
-	const initRes = await initHarmony(url)
-	const { success, hmy } = initRes
-	if (!success) {
-		console.error(`Could not initialize Harmony instance`)
-		return
-	}
-
-	//Get account balance before faucet call
-	let accountBalance1 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
-		console.error(error)
-	})).result
-	accountBalance1 = new hmy.utils.Unit(accountBalance1).asWei().toEther()
-
+	//critical section, only allow one thread at a time to pop queue and perform transaction
+	//prevents case where 2 transactions can be fired off at once
+	const release = await fundMutex.acquire()
 	try {
+		do {
+			front = queue.sort((a, b) => a.created - b.created).pop()
+		//throw out addresses that have already been funded
+		} while (front && ((
+			db.funded.findOne({address: front.address}) && 
+			db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit)) || 
+			db.funded.findOne({key: front.key}) 
+		));
+
+		if(!front) {
+			console.log(new Date().toISOString(), "  queue is empty.")
+			return
+		}
+
+		const initRes = await initHarmony(url)
+		const { success, hmy } = initRes
+		if (!success) {
+			console.error(`Could not initialize Harmony instance`)
+			return
+		}
+
+		//Get account balance before faucet call
+		let accountBalance1 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
+			console.error(error)
+		})).result
+		accountBalance1 = new hmy.utils.Unit(accountBalance1).asWei().toEther()
+
 		await transfer(front.address, txRate)
 		//Get account balance after faucet call
 		let accountBalance2 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
@@ -183,11 +203,17 @@ setInterval(async () => {
 		//If account balance changed, funding was successful
 		if(accountBalance1 < accountBalance2){ 
 			addressMap.set(front.address, Date.now())
-			db.funded.update({address: front.address}, {address: front.address, time: Date.now()}, {upsert: true})
+			db.funded.update({address: front.address}, {address: front.address, time: Date.now(), key: front.key}, {upsert: true})
 		}
-		else console.error('Account has not been funded')
+		else {
+			console.error(`Account has not been funded, readding ${front.address} to queue`)
+			queue.push(front)
+		}
 	} catch(err) {
 		console.error(err)
+	} finally {
+		//end of critical section
+		release()
 	}
 }, txFrequency)
 

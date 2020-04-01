@@ -31,13 +31,14 @@ const txFrequency = 15000 // 15 seconds in ms
 Config
 ********************************/
 const config = require('../config')
-const { url, port, timeLimit, txRate } = config
+const { url, port, timeLimit, txRate, proxy } = config
 
 /********************************
 Express
 ********************************/
 const app = express()
 app.use(express.static('public'))
+app.set('trust proxy', proxy)
 
 
 /********************************
