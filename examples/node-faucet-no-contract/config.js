@@ -38,6 +38,7 @@ module.exports = {
     GAS_LIMIT: process.env.GAS_LIMIT ? process.env.GAS_LIMIT : 2000000,
     GAS_PRICE: process.env.GAS_PRICE ? process.env.GAS_PRICE : 1000000000,
     timeLimit: process.env.TIME_LIMIT ? parseInt(process.env.TIME_LIMIT) : 3600000, // 1 Hour
-    txRate: process.env.TX_RATE ? parseInt(process.env.TX_RATE) * ONE : 11000 * ONE, //11000 ONE
-    recaptchaSecretKey: process.env.RECAPTCHA_SECRET
+    txRate: process.env.TX_RATE ? parseFloat(process.env.TX_RATE) * ONE : 11000 * ONE, //11000 ONE
+    recaptchaSecretKey: process.env.RECAPTCHA_SECRET,
+    proxy: process.env.PROXY && process.env.PROXY === 'true' ? true : false
 }

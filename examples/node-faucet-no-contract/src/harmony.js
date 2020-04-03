@@ -117,3 +117,10 @@ const transfer = async (to, value, toshard, fromshard) => {
 }
 
 exports.transfer = transfer
+
+/********************************
+Utilities
+********************************/
+
+exports.toHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
+exports.toOneAddress = (hmy, address) => hmy.crypto.getAddress(address).bech32
