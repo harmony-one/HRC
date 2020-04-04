@@ -114,7 +114,7 @@ app.post('/fund', express.json(), async (req, res) => {
 	let faucetBalance = await hmy.wallet.signer.getBalance()
 	faucetBalance = faucetBalance.balance
 	console.log('balance', faucetBalance)
-	if(faucetBalance < (queue.length+1)*(txRate)) {
+	if(faucetBalance < (queue.length+1)*(parseInt(txRate) * ONE)) {
 		res.send({
 			success: false,
 			message: `The faucet does not have enough funds`

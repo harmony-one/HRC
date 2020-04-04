@@ -97,7 +97,7 @@ const transfer = async (to, value, toshard, fromshard) => {
 	//prepare transaction
 	const tx = hmy.transactions.newTx({
         to,
-        value: new hmy.utils.Unit(value).asWei().toWei(),
+        value: new hmy.utils.Unit(value).asEther().toWei(),
         gasLimit: '1000000',
         shardID: fromShard,
         toShardID: toShard,
