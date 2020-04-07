@@ -67,7 +67,14 @@ app.post('/fund', express.json(), async (req, res) => {
 		return
 	}
 
-	let {address, token} = req.body
+	let {address, token} = req.body || {}
+	if (!(address && token)) {
+		res.send({
+			success: false,
+			message: "Missing address or reCAPTCHA token"
+		})
+		return
+	}
 
 	//Verify reCaptcha response token
 	const recaptchaUrl = `https://www.google.com/recaptcha/api/siteverify`
