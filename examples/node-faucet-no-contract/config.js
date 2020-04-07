@@ -40,5 +40,6 @@ module.exports = {
     timeLimit: process.env.TIME_LIMIT ? parseInt(process.env.TIME_LIMIT) : 3600000, // 1 Hour
     txRate: process.env.TX_RATE ? process.env.TX_RATE : '11000', //11000 ONE
     recaptchaSecretKey: process.env.RECAPTCHA_SECRET,
-    proxy: process.env.PROXY && process.env.PROXY === 'true' ? true : false
+    proxy: process.env.PROXY && process.env.PROXY === 'true' ? true : false,
+    usageLimit: process.env.USAGE_LIMIT ? parseInt(process.env.USAGE_LIMIT) : 10
 }

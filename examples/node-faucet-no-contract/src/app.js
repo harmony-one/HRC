@@ -21,12 +21,13 @@ const txFrequency = 15000 // 15 seconds in ms
 Database Initialization
 ********************************/
 db.connect('./', ['funded'])
+db.connect('./', ['ips'])
 
 /********************************
 Config
 ********************************/
 const config = require('../config')
-const { url, port, timeLimit, txRate, recaptchaSecretKey, proxy } = config
+const { url, port, timeLimit, txRate, recaptchaSecretKey, proxy, usageLimit } = config
 
 /********************************
 Express
@@ -127,12 +128,13 @@ app.post('/fund', express.json(), async (req, res) => {
 	const release = await queueMutex.acquire()
 	//Check if this ip + user agent is already in queue
 	try {
-		if(queue.find((pending)=> pending.key === req.ip) ||
-			db.funded.findOne({key: req.ip})
+		if(queue.find((pending)=> pending.key === req.ip) || (
+			db.ips.findOne({ip: req.ip}) &&
+			db.ips.findOne({ip: req.ip}).useCount > usageLimit)
 		){
 			res.send({
 				success: false,
-				message: 'Too many requests from your ip, please only use this faucet once'
+				message: `Too many requests from your ip: current limit: ${usageLimit} use(s)`
 			})
 			return
 		}
@@ -169,11 +171,12 @@ setInterval(async () => {
 	try {
 		do {
 			front = queue.sort((a, b) => a.created - b.created).pop()
-		//throw out addresses that have already been funded
+		//throw out addresses that have already been funded and ips that violate usage limit
 		} while (front && ((
 			db.funded.findOne({address: front.address}) && 
-			db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit)) || 
-			db.funded.findOne({key: front.key}) 
+			db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit)) || (
+			db.ips.findOne({ip: front.key}) &&
+			db.ips.findOne({ip: front.key}).useCount > usageLimit)
 		));
 
 		if(!front) {
@@ -187,6 +190,8 @@ setInterval(async () => {
 			console.error(`Could not initialize Harmony instance`)
 			return
 		}
+
+		const useCount = db.ips.findOne({ip: front.key}) ? db.ips.findOne({ip: front.key}).useCount : 0
 
 		//Get account balance before faucet call
 		let accountBalance1 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
@@ -203,7 +208,8 @@ setInterval(async () => {
 		//If account balance changed, funding was successful
 		if(accountBalance1 < accountBalance2){ 
 			addressMap.set(front.address, Date.now())
-			db.funded.update({address: front.address}, {address: front.address, time: Date.now(), key: front.key}, {upsert: true})
+			db.funded.update({address: front.address}, {address: front.address, time: Date.now()}, {upsert: true})
+			db.ips.update({ip: front.key}, {ip: front.key, useCount: useCount+1}, {upsert: true})
 		}
 		else {
 			console.error(`Account has not been funded, readding ${front.address} to queue`)
