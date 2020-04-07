@@ -1,0 +1,20 @@
+version: "3"
+services:
+    faucet:
+        container_name: faucet
+        restart: always
+        build: .
+        ports:
+            - "3000:3000"
+        environment:
+            ENV: ${ENV}
+            TESTNET_CHAIN_ID: ${TESTNET_CHAIN_ID}
+            TESTNET_0_URL: ${TESTNET_0_URL}
+            TESTNET_PRIVATE_KEY: ${TESTNET_PRIVATE_KEY}
+            GAS_LIMIT: ${GAS_LIMIT}
+            GAS_PRICE: ${GAS_PRICE}
+            TIME_LIMIT: ${TIME_LIMIT}
+            TX_RATE: ${TX_RATE}
+            RECAPTCHA_SECRET: ${RECAPTCHA_SECRET}
+            PROXY: ${PROXY}
+            USAGE_LIMIT: ${USAGE_LIMIT}
