@@ -5,6 +5,7 @@ const db = require('diskdb')
 const fetch = require('node-fetch')
 const { Mutex } = require('async-mutex')
 const { initHarmony, transfer, toOneAddress } = require('./harmony')
+const htmlPage = require('./index')
 
 /********************************
 Initialization
@@ -20,8 +21,7 @@ const txFrequency = 15000 // 15 seconds in ms
 /********************************
 Database Initialization
 ********************************/
-db.connect('./', ['funded'])
-db.connect('./', ['ips'])
+db.connect('./', ['funded', 'ips'])
 
 /********************************
 Config
@@ -233,7 +233,8 @@ setInterval(async () => {
 app.get('/balance', balance)
 
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname + '/index.html'));
+	res.setHeader('Content-type','text/html')
+	res.send(htmlPage);
 })
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
