@@ -16,5 +16,6 @@ services:
             TIME_LIMIT: ${TIME_LIMIT}
             TX_RATE: ${TX_RATE}
             RECAPTCHA_SECRET: ${RECAPTCHA_SECRET}
+            RECAPTCHA_PUBLIC: ${RECAPTCHA_PUBLIC}
             PROXY: ${PROXY}
             USAGE_LIMIT: ${USAGE_LIMIT}

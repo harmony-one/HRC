@@ -24,8 +24,10 @@ These are the environmental variables that need to be set to run the faucet. The
 * `GAS_PRICE`: amount of ONE to pay for each unit of gas. defaults to `1000000000` atto, (0.000000001 ONE).
 * `TIME_LIMIT`: amount of time in ms before an address is allowed to fund again, defaults to `3600000` ms (1 hour).
 * `TX_RATE`: amount in ONE to pay out from the faucet, defaults to `11000` ONE.
-* `RECAPTCHA_SECRET`: the secret recaptcha token provided by google's reCAPTCHA.
+* `RECAPTCHA_SECRET`: the secret recaptcha key provided by google's reCAPTCHA. Defaults to a testing key.
+* `RECAPTCHA_PUBLIC`: the public recaptcha key provided by google's reCAPTCHA. Defaults to a testing key.
 * `PROXY`: whether the faucet is behind a reverse proxy such as nginx. Make sure to also adjust proxy settings. Default value is `false`.
+* `USAGE_LIMIT`: amount of times the faucet can be used per IP. Default value is `10`
 
 **The corresponding recaptcha public token must replace the `data-sitekey` attribute value of the recaptcha div in `/src/index.html` line 22**
 
