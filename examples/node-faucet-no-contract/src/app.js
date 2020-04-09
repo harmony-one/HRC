@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path');
 const shajs = require('sha.js')
-const db = require('diskdb')
+const low = require('lowdb')
 const fetch = require('node-fetch')
 const { Mutex } = require('async-mutex')
 const { initHarmony, transfer, toOneAddress } = require('./harmony')
@@ -21,7 +21,9 @@ const txFrequency = 15000 // 15 seconds in ms
 /********************************
 Database Initialization
 ********************************/
-db.connect('./', ['funded', 'ips'])
+const FileSync = require('lowdb/adapters/FileAsync')
+const adapter = new FileSync('db.json')
+let db
 
 /********************************
 Config
@@ -110,11 +112,10 @@ app.post('/fund', express.json(), async (req, res) => {
 	console.log('bech32 address:', address)
 
 	//Check if address has already been funded
-	if( db.funded.findOne({address}) && 
-		db.funded.findOne({address}).time > (Date.now() - timeLimit)){
+	if( db.get('funded').find(x => x.address==address).get('time').value() > (Date.now() - timeLimit)){
 		res.send({
 			success: false,
-			message: `This address has already been funded at ${new Date(db.funded.findOne({address}).time).toLocaleString()}`
+			message: `This address has already been funded at ${new Date(db.get('funded').find(x => x.address==address).get('time').value()).toLocaleString()}`
 		})
 		return
 	}
@@ -135,9 +136,8 @@ app.post('/fund', express.json(), async (req, res) => {
 	const release = await queueMutex.acquire()
 	//Check if this ip + user agent is already in queue
 	try {
-		if(queue.find((pending)=> pending.key === req.ip) || (
-			db.ips.findOne({ip: req.ip}) &&
-			db.ips.findOne({ip: req.ip}).useCount > usageLimit)
+		if(queue.find((pending) => pending.key === req.ip) || (
+			(db.get('ips').find({ip:req.ip}).get('useCount').value() || 0) >= usageLimit)
 		){
 			res.send({
 				success: false,
@@ -179,11 +179,9 @@ setInterval(async () => {
 		do {
 			front = queue.sort((a, b) => a.created - b.created).pop()
 		//throw out addresses that have already been funded and ips that violate usage limit
-		} while (front && ((
-			db.funded.findOne({address: front.address}) && 
-			db.funded.findOne({address: front.address}).time > (Date.now() - timeLimit)) || (
-			db.ips.findOne({ip: front.key}) &&
-			db.ips.findOne({ip: front.key}).useCount > usageLimit)
+		} while (front && (
+			db.get('funded').find({address:front.address}).get('time') > (Date.now() - timeLimit) ||
+			db.get('ips').find({ip:front.key}).get('useCount').value() > usageLimit
 		));
 
 		if(!front) {
@@ -198,7 +196,7 @@ setInterval(async () => {
 			return
 		}
 
-		const useCount = db.ips.findOne({ip: front.key}) ? db.ips.findOne({ip: front.key}).useCount : 0
+		const useCount = db.get('ips').find({ip:front.key}).get('useCount').value() || 0
 
 		//Get account balance before faucet call
 		let accountBalance1 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
@@ -215,8 +213,10 @@ setInterval(async () => {
 		//If account balance changed, funding was successful
 		if(accountBalance1 < accountBalance2){ 
 			addressMap.set(front.address, Date.now())
-			db.funded.update({address: front.address}, {address: front.address, time: Date.now()}, {upsert: true})
-			db.ips.update({ip: front.key}, {ip: front.key, useCount: useCount+1}, {upsert: true})
+			await db.get('funded').remove({address:front.address}).write()
+				.then(()=>db.get('funded').push({address: front.address, time: Date.now()}).write())
+				.then(()=>db.get('ips').remove({ip:front.key}).write())
+				.then(()=>db.get('ips').push({ip: front.key, useCount: useCount+1}).write())
 		}
 		else {
 			console.error(`Account has not been funded, readding ${front.address} to queue`)
@@ -237,7 +237,15 @@ app.get('/', (req, res) => {
 	res.send(htmlPage);
 })
 
-app.listen(port, () => console.log(`App listening on port ${port}!`))
+
+/********************************
+Server Init
+********************************/
+
+low(adapter).then(database =>{
+	db = database
+	app.listen(port, () => console.log(`App listening on port ${port}!`))
+})
 
 
 /********************************

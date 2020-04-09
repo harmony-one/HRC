@@ -1,8 +1,16 @@
-const fs = require('fs')
+const low = require('lowdb')
+const FileAsync = require('lowdb/adapters/FileAsync')
 
-try {
-    fs.unlinkSync('./funded.json')
-    fs.unlinkSync('./ips.json')
-} catch (err) {
-    console.error(err)
-}
+const adapter = new FileAsync('db.json')
+
+low(adapter).then(db => {
+    try {
+        db.setState({
+            funded: [],
+            ips: []
+        })
+        .write()
+    } catch (err) {
+        console.error(err)
+    }
+})
