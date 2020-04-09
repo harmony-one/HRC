@@ -1,11 +1,14 @@
-const express = require('express')
-const path = require('path');
-const shajs = require('sha.js')
-const low = require('lowdb')
-const fetch = require('node-fetch')
-const { Mutex } = require('async-mutex')
+const express 		= require('express')
+const path 			= require('path');
+const shajs 		= require('sha.js')
+const low 			= require('lowdb')
+const fetch 		= require('node-fetch')
+const randomNumber 	= require('random-number-csprng')
+const { Mutex } 	= require('async-mutex')
+const CronJob 		= require('cron').CronJob
 const { initHarmony, transfer, toOneAddress } = require('./harmony')
-const htmlPage = require('./index')
+const htmlPage 		= require('./index')
+const { resetDB } 	= require('./util/resetDB')
 
 /********************************
 Initialization
@@ -24,6 +27,12 @@ Database Initialization
 const FileSync = require('lowdb/adapters/FileAsync')
 const adapter = new FileSync('db.json')
 let db
+
+/********************************
+Cron Initialization
+********************************/
+const job = new CronJob('00 00 00 * * *', ()=>resetDB(db), null, true, 'America/Los_Angeles')
+
 
 /********************************
 Config
@@ -145,16 +154,46 @@ app.post('/fund', express.json(), async (req, res) => {
 			})
 			return
 		}
+		//Grab value from distribution
+		//Get total slots left in lottery
+		const total = db.get('distribution').reduce((sum,n)=>sum+n.numLeft, 0).value()
+		console.log('Total: ', total)
+		//Return without funding if lottery is empty
+		if(total == 0) {
+			res.send({
+				success: false,
+				message: `Faucet is empty, please wait for reset`
+			})
+			return
+		}
+		//Pick random number used for non-uniform distribution, only if total > 1
+		let index = total > 1 ? await randomNumber(0,total-1) : 0
+		//Get up to date distribution from db
+		const dist = db.get('distribution').value()
+		//Find the corresponding value for the rolled index
+		let i
+		for(i = 0; i < dist.length; i++){
+			index -= dist[i].numLeft
+			if(index < 0) break
+		}
+		const amount = dist[i].value
+		//Decrement number of rolled value left
+		await db.update(['distribution', i, 'numLeft'], n=>n-1).write()
+		console.log(amount)
+
+
 		//add address to queue
 		queue.push({
 			key: req.ip,
 			address: address,
-			created: Date.now()
+			created: Date.now(),
+			amount
 		})
 		//end of critical section
 		res.send({
 			success: true,
-			message: `Your faucet request has been queued, ETA: ~${parseInt(queue.length*(txFrequency/1000))} seconds`
+			message: `You will receive ${amount} ONE!
+				Your faucet request has been queued, ETA: ~${parseInt(queue.length*(txFrequency/1000))} seconds`
 		})
 	} catch (error) {
 		console.error(error)
@@ -204,7 +243,7 @@ setInterval(async () => {
 		})).result
 		accountBalance1 = new hmy.utils.Unit(accountBalance1).asWei().toEther()
 
-		await transfer(front.address, txRate)
+		await transfer(front.address, front.amount)
 		//Get account balance after faucet call
 		let accountBalance2 = (await hmy.blockchain.getBalance({ address:front.address }).catch((error) => {
 			console.error(error)

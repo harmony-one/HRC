@@ -1,15 +1,12 @@
 const low = require('lowdb')
 const FileAsync = require('lowdb/adapters/FileAsync')
+const {resetDB} = require('./src/util/resetDB')
 
 const adapter = new FileAsync('db.json')
 
 low(adapter).then(db => {
     try {
-        db.setState({
-            funded: [],
-            ips: []
-        })
-        .write()
+        resetDB(db)
     } catch (err) {
         console.error(err)
     }
