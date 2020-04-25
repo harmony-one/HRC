@@ -1,0 +1,57 @@
+
+@import './../../theme/theme.module.scss';
+
+
+.dialog {
+    z-index: 3000;
+    position: fixed;
+    top: 0; right: 0;
+    width: 0;
+    transition: 0s;
+    > div {
+        transition: cubic-bezier(0.215, 0.610, 0.355, 1) .32s;
+    }
+    > div:nth-child(1) {
+        opacity: 0;
+        height: 100vh;
+        background: #000;
+    }
+    > div:nth-child(2) {
+        width: 100%;
+        position: absolute;
+        top: $margin; left: 0;
+        transform: translateY(-100vw);
+        display: flex;
+        justify-content: center;
+        > section {
+            min-width: 300px;
+            max-width: 600px;
+            background: #FFF;
+            box-shadow: $shadow;
+            button {
+                background: $blue;
+                color: white;
+            }
+            > div {
+                > div {
+                    padding: 0;
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+}
+
+.dialogOpen {
+    width: 100%;
+    > div {
+
+    }
+    > div:nth-child(1) {
+        opacity: 0.5;
+    }
+    > div:nth-child(2) {
+        margin: auto;
+        transform: translateY(0);
+    }
+}

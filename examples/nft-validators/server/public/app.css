@@ -1,0 +1,58 @@
+
+
+/* 
+$teal: #4de6c8;
+$blue: #03b0e8;
+*/
+
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+}
+header {
+    height: 56px;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);
+}
+header img {
+    height: 56px;
+    vertical-align: middle;
+}
+
+header h1 {
+    font-weight: 100;
+    margin: 0;
+    display: inline-block;
+    color: white;
+    vertical-align: middle;
+}
+
+#faucet {
+    margin: auto;
+    margin-top: 96px;
+    text-align: center;
+}
+input, button { 
+    border: 1px solid #ddd;
+    border-radius: 8px;;
+    padding: 8px;
+    margin-bottom: 16px;
+    outline: none;
+}
+input {
+    display: block;
+    margin: 16px auto;
+    min-width: 325px;
+}
+button {
+    border: 1px solid #ddd;
+    background: white;
+}
+button:hover, button:active {
+    background: #ddd;
+    cursor: pointer;
+}

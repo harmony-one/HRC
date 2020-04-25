@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NFT Dashboard</title>
+    <link rel="stylesheet" href="app.css" />
+
+</head>
+
+<body>
+    <header>
+        <img src="logo.svg" />
+        <h1>NFT Dashboard</h1>
+    </header>
+    <div id="faucet">
+        <p>Fill out this form to create a new NFT for your Dapp.</p>
+        <input id="limit" placeholder="Limit" type="number" />
+        <input id="price" placeholder="Price" type="number" />
+        <input id="media" placeholder="Media (url)" type="text" />
+        <input id="owner" placeholder="Owner (optional)" type="text" />
+        <br>
+        <button id="submit">Create</button>
+        <p id="loading" style="display:none">Waiting for confirmation...</p>
+        <p id="output"></p>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

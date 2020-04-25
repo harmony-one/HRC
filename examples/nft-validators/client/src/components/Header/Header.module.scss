@@ -1,0 +1,111 @@
+
+@import './../../theme/theme.module.scss';
+
+.root {
+    z-index:1000;
+    background: white;
+    width: 100vw;
+    height: $header-height;
+    position: fixed;
+    top: 0; left: 0;
+    box-shadow: $shadow;
+    color: $dark;
+    > p {
+        position: absolute;
+        padding: $margin;
+        left: 0; top: 0;
+        font-size: $margin;
+        line-height: $margin;
+    }
+    > i {
+        position: absolute;
+        padding: $margin;
+        right: 0; top: 0;
+    }
+}
+
+.menu {
+    p {
+        display: flex;
+        align-items: center;
+        i {
+            flex: 48px 0 0;
+        }
+        span {
+            flex: 1;
+        }
+    }
+    button {
+        margin-left: $margin;
+    }
+    z-index: 2000;
+    position: fixed;
+    top: 0; right: 0;
+    width: 0;
+    transition: 0s;
+    > div {
+        transition: cubic-bezier(0.215, 0.610, 0.355, 1) .32s;
+    }
+    > div:nth-child(1) {
+        opacity: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+    }
+    > div:nth-child(2) {
+        position: absolute;
+        top: 0; right: 0;
+        background: #FFF;
+        box-shadow: $shadow;
+        width: 300px;
+        height: 100vh;
+        transform: translateX(350px);
+        
+        > h3 {
+            text-align: left;
+            line-height: 48px;
+            font-size: 1rem;
+            margin-left: $margin;
+        }
+        > i {
+            position: absolute;
+            padding: $margin;
+            right: 0; top: 0;
+        }
+        > section {
+            padding: 0;
+            > p {
+                cursor: pointer;
+                padding: $margin;
+                margin: 0;
+                &:hover {
+                    background: #DDD;
+                }
+            }
+        }
+    }
+}
+
+.menuOpen {
+    width: 100vw;
+    > div:nth-child(1) {
+        opacity: 0.5;
+    }
+    > div:nth-child(2) {
+        transform: translateX(0);
+    }
+}
+
+.avatar {
+    margin: $margin auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    display:flex;
+    justify-content: center;
+    > img {
+        height: 100%;
+        object-fit: contain;
+    }
+}
