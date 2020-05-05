@@ -3,30 +3,38 @@ import { navigate, useLocation } from "@reach/router"
 import { useDispatch } from 'react-redux'
 import { fortmaticSignOut } from '../../redux/fortmatic'
 import { setActive } from '../../redux/harmony'
+import { toggleAuction } from '../../redux/auction'
 import AvatarImage from '../../img/avatar.png'
 
 import { root, menu, menuOpen, avatar, button } from './Header.module.scss'
 
+const admins = [
+    '0x7c41e0668b551f4f902cfaec05b5bdca68b124ce',
+    '0xdfdd951ed9d9eee1ced6bcf5b398b56db1723cfa'
+]
+    
 
 const titles = {
-    home: 'My NFTs 🥰',
+    home: 'Validator NFT Auction',
     // '/signin': 'Please Sign In',
     '/funds': 'Manage Funds 🤑',
-    '/create': 'Make Your Own NFT',
-    '/store': 'Purchase NFTs 😍',
-    '/market': 'P2P Market 🤗',
+    '/create': 'Make Your Own NFT 🤗',
+    '/auction': 'Validator NFT Auction',
+    // '/store': 'Purchase NFTs 😍',
+    // '/market': 'P2P Market 🤗',
 }
 
 export default function Header({
     history,
     harmonyState: { network, active, allowToggle },
-    hrc20State: { hrc20balances },
+    auctionState: { activeName },
+    // hrc20State: { hrc20balances },
 }) {
 
 	const dispatch = useDispatch()
 
     const [isMenuOpen, setMenuOpen] = useState(false)
-    const [location, setLocation] = useState('/')
+    const [location, setLocation] = useState(window.location.pathname)
 
     useEffect(() => {
         setLocation(window.location.pathname)
@@ -39,16 +47,15 @@ export default function Header({
 
     if (!active) return null
 
-    const hrc20balance = hrc20balances[active.name] || 0
+    // const hrc20balance = hrc20balances[active.name] || 0
 
     return (
         <div>
             <div className={[menu, isMenuOpen ? menuOpen : ''].join(' ')}>
                 <div onClick={() => setMenuOpen(false)}></div>
                 <div>
-                    { active && <h3>{active.name}</h3>}
+                    <h3>{ activeName.length > 0 ? activeName : 'anonymous' }</h3>
                     <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
-
 
                     {
                         active && 
@@ -67,7 +74,7 @@ export default function Header({
                             }
                             
                             <p><b>ONE:</b>&nbsp;{active.balanceONE}</p>
-                            <p><b>USD:</b>&nbsp;{hrc20balance}</p>
+                            {/* <p><b>USD:</b>&nbsp;{hrc20balance}</p> */}
                             
                         </section>
                     }
@@ -87,23 +94,31 @@ export default function Header({
                             setMenuOpen(false)
                         }}><i className="fab fa-creative-commons fa-lg"></i><span>Create</span></p> */}
                         <p onClick={() => {
-                            goTo('/store')
+                            goTo('/auction')
                             setMenuOpen(false)
-                        }}><i className="fas fa-store fa-lg"></i><span>Store</span></p>
-                        <p onClick={() => {
-                            goTo('/market')
-                            setMenuOpen(false)
-                        }}><i className="fas fa-users"></i><span>Market</span></p>
+                        }}><i className="fas fa-store fa-lg"></i><span>Auction</span></p>
                         <p onClick={async () => {
                             await dispatch(fortmaticSignOut())
                             setMenuOpen(false)
                             goTo('/signin')
                         }}><i className="fas fa-sign-out-alt"></i><span>SignOut</span></p>
+                        {
+                            admins.includes(active.address) && <>
+                                <p>Admin Only</p>
+                                <p onClick={async () => {
+                                    await dispatch(toggleAuction({ value: true }))
+                                }}><i className="fas fa-check"></i><span>Open Auction</span></p>
+                                <p onClick={async () => {
+                                    await dispatch(toggleAuction({ value: true }))
+                                }}><i className="fas fa-times"></i><span>Close Auction</span></p>
+                            </>
+                        }
                     </section>
                 </div>
             </div>
             <div className={root}>
                 <p>{titles[location] || titles.home}</p>
+                {/* <p><b>ONE:</b>&nbsp;{active.balanceONE}</p> */}
                 <i className={"fas fa-bars"} onClick={() => setMenuOpen(true)}></i>
             </div>
         </div>

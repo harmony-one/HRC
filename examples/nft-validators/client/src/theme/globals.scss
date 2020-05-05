@@ -1,5 +1,6 @@
 
 
+$max-width: 100%;
 $header-height: 48px;
 $margin: 16px;
 $double: 32px;
@@ -8,6 +9,8 @@ $dark: #222;
 $mid: #777;
 $light: #EFEFEF;
 $shadow: 0 0 $margin rgba(0, 0, 0, 0.25);
-$teal: #4de6c8;
-$blue: #03b0e8;
+$teal: #69fabd;
+$blue: #00aee9;
+$dark-blue: #1b29fe;
+$cool-gray: #758796;
 $gradient: linear-gradient(77deg, #03b0e8, #26cad9,#37d6d2,#4de6c8,#4de6c8,#4de6c8);

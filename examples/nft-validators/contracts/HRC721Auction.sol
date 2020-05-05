@@ -41,6 +41,7 @@ contract HRC721Auction is MinterRole, ReentrancyGuard {
 		uint256 amount;
 		address payable owner;
     }
+	mapping(address => string) private names; //when address makes bid they can set / update their name
 	mapping(uint256 => Bid[]) private bids; // item index to bids array
 
 	/********************************
@@ -69,6 +70,12 @@ contract HRC721Auction is MinterRole, ReentrancyGuard {
 			}
         }
 	}
+	// withdraw the funds
+	function withdraw() public onlyMinter {
+		require(isOpen == false); // auction must be closed
+		address payable payableOwner = address(uint160(owner));
+		payableOwner.transfer(address(this).balance);
+	}
 	/********************************
 	Bidding Process
 	********************************/
@@ -84,6 +91,9 @@ contract HRC721Auction is MinterRole, ReentrancyGuard {
 			previousOwner.transfer(previous.amount);
 		}
 		bids[index].push(Bid(msg.value, msg.sender));
+	}
+	function setName(string memory name) public {
+		names[msg.sender] = name;
 	}
 	/********************************
 	Only safe minting that passes auction conditions
@@ -114,11 +124,17 @@ contract HRC721Auction is MinterRole, ReentrancyGuard {
 	/********************************
 	Public Getters for Auction and Bids
 	********************************/
+	function getName(address who) public view returns (string memory) {
+		return names[who];
+	}
 	function getBidAmount(uint256 itemIndex, uint256 bidIndex) public view returns (uint256) {
 		return bids[itemIndex][bidIndex].amount;
 	}
 	function getBidOwner(uint256 itemIndex, uint256 bidIndex) public view returns (address) {
 		return bids[itemIndex][bidIndex].owner;
+	}
+	function getBidOwnerName(uint256 itemIndex, uint256 bidIndex) public view returns (string memory) {
+		return names[bids[itemIndex][bidIndex].owner];
 	}
 	/********************************
 	Public Getters for Inventory

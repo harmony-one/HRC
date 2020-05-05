@@ -1,4 +1,4 @@
-import { getReducer, getState, UPDATE } from '../util/redux-util'
+import { getReducer, getState } from '../util/redux-util-v2'
 import { signIn, updateProcessing, signOut } from './harmony'
 import { navigate } from "@reach/router"
 import Fortmatic from 'fortmatic';
@@ -7,13 +7,14 @@ const defaultState = {
     isLoggedIn: true,
     account: null,
 }
-export const fortmaticReducer = getReducer(defaultState)
-export const fortmaticState = getState('fortmaticReducer', defaultState)
+//reducer
+const type = 'fortmaticReducer'
+export const fortmaticReducer = getReducer(type, defaultState)
+export const fortmaticState = getState(type)
 //functions
 /********************************
 Formatic Login
 ********************************/
-
 
 export const fortmaticSignOut = () => async (dispatch) => {
     const fmPhantom = new Fortmatic.Phantom('pk_test_1C24F45217D39E66'); // ✨
@@ -29,7 +30,7 @@ export const checkFortmaticLogin = () => async (dispatch) => {
     /********************************
     Skipping for debug / local testing
     ********************************/
-    await dispatch({ type: UPDATE, isLoggedIn: true })
+    await dispatch({ type, isLoggedIn: true })
     await dispatch(signIn())
     dispatch(updateProcessing(false))
     return true
@@ -39,7 +40,7 @@ export const checkFortmaticLogin = () => async (dispatch) => {
     //     const account = accounts[(await fmPhantom.user.getMetadata()).publicAddress]
     //     console.log(account)
     //     if (account) {
-    //         await dispatch({ type: UPDATE, isLoggedIn: true, account })
+    //         await dispatch({ type, isLoggedIn: true, account })
     //         await dispatch(signIn(account))
     //         dispatch(updateProcessing(false))
     //         return true
@@ -59,7 +60,7 @@ export const handleLoginWithMagicLink = (email) => async (dispatch) => {
     console.log(await user.isLoggedIn()); // => true
     const account = accounts[(await user.getMetadata()).publicAddress]
     if (account) {
-        await dispatch({ type: UPDATE, isLoggedIn: true, account })
+        await dispatch({ type, isLoggedIn: true, account })
         await dispatch(signIn(account))
         setTimeout(() => navigate('/'), 250)
     }

@@ -2,7 +2,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { updateDialogState } from './../../redux/harmony'
-import { purchase, buyTokenOnSale } from './../../redux/crowdsale'
+import { purchase, buyTokenOnSale } from './../../redux/auction'
 import { setSell } from './../../redux/hrc721'
 import Form from './../../components/Form/Form'
 
@@ -28,9 +28,9 @@ export default function Inventory(props) {
     const {
         wallet, balance, market,
         harmonyState: { active },
-        crowdsaleState,
+        auctionState,
     } = props
-    let { items } = crowdsaleState
+    let { items } = auctionState
 
     const dispatch = useDispatch()
 

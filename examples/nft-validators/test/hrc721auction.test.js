@@ -12,7 +12,7 @@ contract("HRC721", (accounts) => {
 	let hrc721, auction
 	const one = 	bn('1000000000000000000');
 	const oneTenth = 	bn('100000000000000000');
-	const price = 	bn('100000000000000000');
+	const price = 	bn('100000000000000000'); // one tenth of ONE
 	const alice = accounts[0], bob = accounts[1]
 	
 	it("should be deployed", async () => {
@@ -21,9 +21,9 @@ contract("HRC721", (accounts) => {
 		assert.ok(hrc721 && auction)
 	})
 
-	it("should have 2 items deployed", async () => {
+	it("should have 18 items deployed", async () => {
 		const totalItems = await auction.totalItems()
-		assert.equal(totalItems.toString(), '2')
+		assert.equal(totalItems.toString(), '18')
 	})
 
 	/********************************
@@ -43,7 +43,19 @@ contract("HRC721", (accounts) => {
 		assert.equal(totalBids.toString(), '0') //bid wasn't accepted
 	})
 
-	it("should allow the minter / owner to open the action", async () => {
+	it("should not let bob open the auction", async () => {
+		await auction.toggleIsOpen(true, {
+			from: bob,
+			gasLimit,
+			gasPrice
+		}).catch((e) => {
+			// console.log(e) //capture the exception here
+		})
+		const isOpen = await auction.isOpen()
+		assert.equal(isOpen, false)
+	})
+
+	it("should allow the minter / owner to open the auction", async () => {
 		await auction.toggleIsOpen(true, {
 			from: alice,
 			gasLimit,
@@ -57,6 +69,13 @@ contract("HRC721", (accounts) => {
 	Open Auction
 	********************************/
 
+	it("should allow someone to name their address", async () => {
+		await auction.setName("Alice")
+		const aliceName = await auction.getName(alice)
+		// const bobName = await auction.getName(bob)
+		assert.equal(aliceName, 'Alice')
+	})
+
 	it("should accept a bid", async () => {
 		await auction.makeBid(1, {
 			from: alice,
@@ -65,6 +84,7 @@ contract("HRC721", (accounts) => {
 			gasPrice
 		})
 		const totalBids = await auction.totalBids(1)
+		const bidName = await auction.getBidOwnerName(1, 0)
 		assert.equal(totalBids.toString(), '1')
 	})
 
@@ -138,5 +158,18 @@ contract("HRC721", (accounts) => {
 			console.log(tokenId, tokenData)
 		}
 		assert.equal(tokens, 1)
+	})
+
+	it("should allow the minter / owner to withdraw the balance", async () => {
+		const balanceBefore = bn(await web3.eth.getBalance(alice))
+		//distribute
+		await auction.withdraw({
+			from: alice,
+			gasLimit,
+			gasPrice
+		})
+		const balanceAfter = bn(await web3.eth.getBalance(alice))
+		console.log(balanceBefore.toString(), balanceAfter.toString())
+		assert.ok(balanceBefore.lt(balanceAfter))
 	})
 });

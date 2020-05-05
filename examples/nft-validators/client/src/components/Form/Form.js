@@ -9,6 +9,7 @@ const { filterMyAddress } = config
 export default function Form(props) {
 
     const {
+        inline,
         fields, lowerContent,
         active, addressType, addresses,
         submit, title, subtitle = '', amountLabel,
@@ -32,7 +33,7 @@ export default function Form(props) {
     return (
         <div className={root}>
             <h2 className={marginTop}>{title}</h2>
-            <div className={bubble}>
+            <div className={!inline ? bubble : ''}>
                 {subtitle && <p>{subtitle}</p>}
                 
 

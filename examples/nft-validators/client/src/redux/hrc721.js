@@ -1,9 +1,7 @@
-import { UPDATE, reducer } from '../util/redux-util'
-import HRC721 from '../build/contracts/HRC721.json'
-import HRC721Crowdsale from '../build/contracts/HRC721Crowdsale.json'
-import {getBalances, updateProcessing, updateDialogState,} from './harmony'
-import { getContract, oneToHexAddress } from '../util/hmy-util'
 
+import { getReducer, getState } from '../util/redux-util-v2'
+import HRC721 from '../build/contracts/HRC721.json'
+import { getContract } from '../util/hmy-util'
 
 //state
 const defaultState = {
@@ -11,66 +9,10 @@ const defaultState = {
     market: [],
     balances: {}
 }
-const hrc721Keys = Object.keys(defaultState)
-export const hrc721State = ({ hrc721Reducer: { ...keys } }) => {
-    Object.keys(keys).forEach((k) => {
-        if (!hrc721Keys.includes(k)) delete keys[k]
-    })
-    return keys
-}
-
-export const getMarket = (account) => async(dispatch, getState) => {
-
-    const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
-    const { contract: hrc721Crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
-    if (!hmy) {
-        return
-    }
-
-    const args = {
-        gasLimit: '5000000',
-        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
-    }
-
-    const market = []
-    let tokens = await hrc721.methods.totalSupply().call(args)
-    tokens = tokens ? tokens.toNumber() : 0
-
-    for (let i = 0; i < tokens; i++) {
-        const tokenId = i+1
-        let price = (await hrc721.methods.getSalePrice(tokenId).call({...args})).toString()
-        if (price !== '0') {
-            price = new hmy.utils.Unit(price).asWei().toEther().toString()
-            const url = (await hrc721Crowdsale.methods.getTokenData(tokenId).call({...args}))
-            market.push({ price, url, tokenId })
-        }
-    }
-    // console.log(market)
-    dispatch({type: UPDATE, market })
-}
-
-
-export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
-    dispatch(updateProcessing(true))
-    dispatch(updateDialogState({ open: false }))
-    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
-    const { contract: crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
-    // clean args
-    amount = new hmy.utils.Unit(amount).asEther().toWei()
-    const tx = contract.methods.setSale(tokenId, amount, crowdsale.address).send({
-        from: active.address,
-        gasLimit: '5000000',
-        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
-    }).on('transactionHash', function (hash) {
-        console.log('hash', hash)
-    }).on('receipt', function (receipt) {
-        console.log('receipt', receipt)
-    }).on('confirmation', async (confirmationNumber, receipt) => {
-        console.log('confirmationNumber', confirmationNumber, receipt)
-        dispatch(getBalances())
-        dispatch(updateProcessing(false))
-    }).on('error', console.error)
-}
+//reducer
+const type = 'hrc721Reducer'
+export const hrc721Reducer = getReducer(type, defaultState)
+export const hrc721State = getState(type)
 
 
 export const getTokens = (account) => async (dispatch, getState) => {
@@ -79,7 +21,7 @@ export const getTokens = (account) => async (dispatch, getState) => {
     
     // const hrc721 = await getContractInstance(hmy, HRC721)
 
-    dispatch({type: UPDATE, balances: {} })
+    dispatch({type, balances: {} })
 
     const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
     if (!hmy) {
@@ -115,11 +57,65 @@ export const getTokens = (account) => async (dispatch, getState) => {
         }
     }
     balances = { ...balances, [account.name]: balance }
-    dispatch({type: UPDATE, balances })
+    dispatch({type, balances })
 }
 
 
-//reducer
-export const hrc721Reducer = (state = {
-    ...defaultState
-}, action) => reducer(state, action)
+
+/********************************
+Not used in this app
+********************************/
+
+
+// export const getMarket = (account) => async(dispatch, getState) => {
+
+//     const { hmy, contract: hrc721, active } = await getContract(getState().harmonyReducer, HRC721)
+//     const { contract: hrc721Crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+//     if (!hmy) {
+//         return
+//     }
+
+//     const args = {
+//         gasLimit: '5000000',
+//         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+//     }
+
+//     const market = []
+//     let tokens = await hrc721.methods.totalSupply().call(args)
+//     tokens = tokens ? tokens.toNumber() : 0
+
+//     for (let i = 0; i < tokens; i++) {
+//         const tokenId = i+1
+//         let price = (await hrc721.methods.getSalePrice(tokenId).call({...args})).toString()
+//         if (price !== '0') {
+//             price = new hmy.utils.Unit(price).asWei().toEther().toString()
+//             const url = (await hrc721Crowdsale.methods.getTokenData(tokenId).call({...args}))
+//             market.push({ price, url, tokenId })
+//         }
+//     }
+//     // console.log(market)
+//     dispatch({type, market })
+// }
+
+
+// export const setSell = ({ tokenId, amount }) => async (dispatch, getState) => {
+//     dispatch(updateProcessing(true))
+//     dispatch(updateDialogState({ open: false }))
+//     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721)
+//     const { contract: crowdsale } = await getContract(getState().harmonyReducer, HRC721Crowdsale)
+//     // clean args
+//     amount = new hmy.utils.Unit(amount).asEther().toWei()
+//     const tx = contract.methods.setSale(tokenId, amount, crowdsale.address).send({
+//         from: active.address,
+//         gasLimit: '5000000',
+//         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+//     }).on('transactionHash', function (hash) {
+//         console.log('hash', hash)
+//     }).on('receipt', function (receipt) {
+//         console.log('receipt', receipt)
+//     }).on('confirmation', async (confirmationNumber, receipt) => {
+//         console.log('confirmationNumber', confirmationNumber, receipt)
+//         dispatch(getBalances())
+//         dispatch(updateProcessing(false))
+//     }).on('error', console.error)
+// }

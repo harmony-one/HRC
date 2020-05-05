@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import { useDispatch } from 'react-redux'
 import { setActive } from '../../redux/harmony'
 
-import { addItem } from '../../redux/crowdsale'
+import { addItem } from '../../redux/auction'
 import Form from '../../components/Form/Form'
 
 import { route, bubble, button } from './Create.module.scss'

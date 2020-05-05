@@ -11,7 +11,6 @@ export default function Market(props) {
     const {
         harmonyState: { active, allowToggle },
         hrc721State: { balances, market  },
-        hrc20State: { hrc20balances },
     } = props
 
     const dispatch = useDispatch()
@@ -23,7 +22,6 @@ export default function Market(props) {
 
     if (!active) return null
     
-    const hrc20balance = hrc20balances[active.name] || 0
 
     return (
         <div className={route}>

@@ -9,7 +9,7 @@ body, html {
     font-family: 'IBM Plex Mono', monospace;
     text-align:center;
     margin: 0;
-    background: $light;
+    background: $cool-gray;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5, h6, p {
 .route {
     background: white;
     padding-top: $header-height;
-    max-width: 600px;
+    max-width: $max-width;
     min-height: calc(100vh - #{$header-height});
     margin:auto;
     background: $gradient;

@@ -17,6 +17,9 @@
         font-size: $margin;
         line-height: $margin;
     }
+    > p:nth-child(2) {
+        right: 0;
+    }
     > i {
         position: absolute;
         padding: $margin;

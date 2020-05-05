@@ -1,10 +1,10 @@
-import { UPDATE, reducer } from '../util/redux-util'
+import { getReducer, getState } from '../util/redux-util-v2'
 import { waitForInjected, getExtAccount } from '../util/hmy-util'
 import { Harmony, HarmonyExtension } from '@harmony-js/core'
 import { ChainID, ChainType } from '@harmony-js/utils'
-import { balanceOf } from './hrc20'
+// import { balanceOf } from './hrc20'
 import { getTokens, getMarket } from './hrc721'
-import { crowdsaleInit, getRaised } from './crowdsale'
+import { auctionInit } from './auction'
 
 import config from '../../config'
 const { ENV, network, net, url } = config
@@ -28,22 +28,19 @@ const defaultState = {
         content: null,
     },
 }
-const harmonyKeys = Object.keys(defaultState)
-export const harmonyState = ({ harmonyReducer: { ...keys } }) => {
-    Object.keys(keys).forEach((k) => {
-        if (!harmonyKeys.includes(k)) delete keys[k]
-    })
-    return keys
-}
+//reducer
+const type = 'harmonyReducer'
+export const harmonyReducer = getReducer(type, defaultState)
+export const harmonyState = getState(type)
 /********************************
 Functions / Actions
 ********************************/
 
 export const updateDialogState = (dialogState) => async (dispatch) => {
-    dispatch({ type: UPDATE, dialogState })
+    dispatch({ type, dialogState })
 }
 export const updateProcessing = (processing) => async (dispatch) => {
-    dispatch({ type: UPDATE, processing })
+    dispatch({ type, processing })
 }
 
 /********************************
@@ -94,7 +91,7 @@ export const setActive = (which) => async (dispatch, getState) => {
     if (!active.isExt) {
         hmy.wallet.setSigner(active.address)
     }
-    dispatch({ type: UPDATE, active })
+    dispatch({ type, active })
     dispatch(getBalances(active))
 }
 export const getBalanceONE = (account) => async (dispatch, getState) => {
@@ -115,7 +112,7 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
     }
     account.balanceONE = weiToOne(hmy, result)
 
-    dispatch({ type: UPDATE, [account.name]: account })
+    dispatch({ type, [account.name]: account })
 }
 
 const weiToOne = (hmy, v) => Math.floor(new hmy.utils.Unit(v).asWei().toEther() * 10000) / 10000
@@ -123,12 +120,12 @@ const weiToOne = (hmy, v) => Math.floor(new hmy.utils.Unit(v).asWei().toEther() 
 export const getBalances = (account) => async (dispatch, getState) => {
     const { active } = getState().harmonyReducer
     dispatch(getBalanceONE(account || active))
-    dispatch(balanceOf(account || active))
+    // dispatch(balanceOf(account || active))
     dispatch(getTokens(account || active))
 }
 
 export const signOut = () => async (dispatch, getState) => {
-    dispatch({ type: UPDATE, ...defaultState, processing: false })
+    dispatch({ type, ...defaultState, processing: false })
 }
 
 export const signIn = (authedAccount) => async (dispatch, getState) => {
@@ -150,6 +147,7 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
     } else {
         account = await getExtAccount(hmyExt)
         account.name = 'My Account'
+        console.log(account)
     }
 
     const bech32Addresses = [account.bech32Address, minter.bech32Address]
@@ -157,27 +155,23 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
     if (ENV !== 'local') {
         bech32Addresses.pop()
     }
-    dispatch({ type: UPDATE,
+    dispatch({ type,
         minter, account,
         bech32Addresses
     })
 
     if (authedAccount) {
-
-        
-
         dispatch(setActive(authedAccount))
-        console.log(account)
     } else {
-        dispatch({ type: UPDATE, allowToggle: true })
         dispatch(setActive('account'))
         if (ENV === 'local') {
+            dispatch({ type, allowToggle: true })
             console.log("setting minter")
             dispatch(setActive('minter'))
         }
     }
 
-    dispatch(crowdsaleInit())
+    dispatch(auctionInit())
 }
 
 export const harmonyInit = () => async (dispatch) => {
@@ -186,7 +180,7 @@ export const harmonyInit = () => async (dispatch) => {
         chainType: ChainType.Harmony,
         chainId: net,
     })
-    dispatch({ type: UPDATE, hmy })
+    dispatch({ type, hmy })
 
     const harmony = await waitForInjected(1)
     let hmyExt
@@ -194,12 +188,7 @@ export const harmonyInit = () => async (dispatch) => {
         hmyExt = new HarmonyExtension(harmony, {
             chainId: net
         });
-        dispatch({ type: UPDATE, hmyExt })
+        dispatch({ type, hmyExt })
     }
     return { hmy, hmyExt }
 }
-
-//reducer
-export const harmonyReducer = (state = {
-    ...defaultState
-}, action) => reducer(state, action)

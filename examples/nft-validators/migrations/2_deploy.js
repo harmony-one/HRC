@@ -16,18 +16,17 @@ module.exports = function (deployer, network, accounts) {
 	const price = '1000000000000000000';
 
 	const urls = []
-	for (let i = 0; i < 10; i++) {
-		urls.push('https://placedog.net/' + (500 + 10 * i) + '/500')
+	//there are 18 validator images total
+	for (let i = 1; i <= 18; i++) {
+		urls.push(`https://validators-public.s3-us-west-1.amazonaws.com/${(i).toString().padStart(4, '0')}.jpg`)
 	}
-	urls.unshift('https://media.giphy.com/media/eYilisUwipOEM/giphy.gif')
-	urls.unshift('https://media.giphy.com/media/69FmYZBku9m81vhGH3/giphy.gif')
 
 	deployer.then(function () {
 		// return deployer.deploy(HRC20, hrc20Name, hrc20Symbol, hrc20Decimals, hrc20MinterSupply).then(function (hrc20) {
 			return deployer.deploy(HRC721, name, symbol).then(function (hrc721) {
 				// return deployer.deploy(HRC721Crowdsale, owner, hrc20.address, hrc721.address).then(async function (sale) {
 				return deployer.deploy(HRC721Auction, owner, hrc721.address).then(async function (sale) {
-					for (let i = 0; i < 2; i++) {
+					for (let i = 0; i < 18; i++) {
 						console.log(urls[i])
 						await sale.addItem(1, price, urls[i])
 					}
