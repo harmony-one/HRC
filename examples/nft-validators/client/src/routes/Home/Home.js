@@ -13,7 +13,7 @@ export default function Home(props) {
     const {
         harmonyState: { active, allowToggle },
         hrc721State: { balances },
-        auctionState: { activeName },
+        auctionState: { activeName, isOpen },
     } = props
     
     const [name, setName] = useState(null)
@@ -27,13 +27,22 @@ export default function Home(props) {
 
             <section>
                 <div className={bubble}>
-                    <h2>Current Name:</h2>
-                    <p>{activeName.length > 0 ? activeName : 'anonymous'}</p>
+                    <h3>{ isOpen ? 'The Auction is Open!' : 'The Auction is Closed'}</h3>
+                    { isOpen && <button
+                        className={button}
+                        onClick={() => navigate('/auction')}
+                    >Go To Auction</button>}
+                </div>
+            </section>
+
+            <section>
+                <div className={bubble}>
+                    <h3>Current Name: {activeName && activeName.length > 0 ? activeName : 'anonymous'}</h3>
                     <Form
                         {...{
                             inline: true,
                             active,
-                            title: 'Set Your Name',
+                            title: 'Update Your Name',
                             fields: [
                                 { label: 'Name', type: 'text', onChange: (val) => setName(val)},
                             ],
@@ -43,23 +52,21 @@ export default function Home(props) {
                 </div>
             </section>
 
-            {active && balances[active.name] && Object.keys(balances[active.name]).length === 0 &&
+            {active && balances[active.address] && Object.keys(balances[active.address]).length === 0 &&
                 <section>
                     <div className={bubble}>
                         <h2>No Items!</h2>
-                        <p>Bid on an NFT</p>
-                        <button 
-                            className={button}
-                            onClick={() => navigate('/auction')}
-                        >Auction</button>
                     </div>
                 </section>
             }
 
-            {active && balances[active.name] && Object.keys(balances[active.name]).length > 0 &&
+            {active && balances[active.address] && Object.keys(balances[active.address]).length > 0 &&
                 <section>
+                    <div style={{marginBottom:16}} className={bubble}>
+                        <h2>My Items</h2>
+                    </div>
                     <Inventory {...props}
-                        balance={active && balances && balances[active.name]}
+                        balance={active && balances && balances[active.address]}
                         wallet={true}
                     />
                 </section>

@@ -1,47 +1,26 @@
 
 @import './../../theme/theme.module.scss';
 
-.inventory {
-    width: calc(100% + 32px);
-    margin-left: -$margin;
-    display: flex;
-    flex-wrap:wrap;
+.itemClass {
+    margin: 0 $margin;
+    margin-left: 0;
+    width: 100%;
     > div {
         width: 100%;
-        margin-bottom: $margin;
-        > div:first-child {
-            background: white;
-            color: black;
-            p {
-                padding: $margin;
-            }
-        }
+    }
+    padding-bottom: $double;
+    .bidButton {
+        display: inline;
     }
 }
-@media only screen and (min-width : 415px) {
-    .inventory {
-        > div {
-            padding-left: $margin;
-            width: calc(50% - 24px);
-        }
-    }
-}
-@media only screen and (min-width : 1281px) {
-    .inventory {
-        > div {
-            padding: 0;
-            padding-left: $margin;
-            width: calc(25% - 20px);
-        }
-    }
-}
+
+
 
 .image {
     position: relative;
     z-index: 2;
     display: flex;
     width: 100%;
-    max-height: 375px;
     box-shadow: $shadow;
     > img {
         object-fit: cover;
@@ -70,22 +49,16 @@
 }
 
 .stats {
+    text-align: left;
     box-shadow: $shadow;
     position: relative;
     color: black;
     background: white;
     z-index: 4;
-    padding: $margin;
+    padding: $margin 0;
     justify-content: space-between;
     > p {
-        margin: 0;
-    }
-}
-
-.bidButton {
-    margin: $margin;
-    text-align: right;
-    button {
+        padding: 0 $margin;
         margin: 0;
     }
 }

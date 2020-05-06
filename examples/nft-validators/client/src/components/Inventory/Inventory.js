@@ -1,6 +1,7 @@
 
 import React from 'react'
 import { useDispatch } from 'react-redux'
+import { navigate } from '@reach/router'
 import { updateDialogState } from './../../redux/harmony'
 import { purchase, buyTokenOnSale } from './../../redux/auction'
 import { setSell } from './../../redux/hrc721'
@@ -8,18 +9,17 @@ import Form from './../../components/Form/Form'
 
 import { inventory, image, stats, purchaseButton, soldOut } from './Inventory.module.scss'
 
-
 const RenderItem = ({item, hidePrice, id, byline, isSoldOut = false}) => {
     return <div>
     <div className={[image, isSoldOut ? soldOut : ''].join(' ')}>
-        <img src={item.url} alt="dog" />
+        <img src={item.url} onClick={() => navigate('/token/' + (item.index + 1))} />
         
         {hidePrice ? <p style={{opacity: 0}}></p> : <p>Price: {item.price}</p> }
         <p>{id}</p>
     </div>
-    <div className={stats}>
+    {/* <div className={stats}>
         {byline && <p>{byline}</p>}
-    </div>
+    </div> */}
 </div>
 }
 
@@ -60,7 +60,7 @@ export default function Inventory(props) {
                             id: 'Token ID: ' + tokenId,
                             byline: salePrice !== '0' ? `Selling for: ${salePrice} ONE` : `Not for Sale`
                         }} />
-                        <div className={purchaseButton}>
+                        {/* <div className={purchaseButton}>
                             <button onClick={() => dispatch(updateDialogState({
                                 open: true,
                                 content: <Form
@@ -76,7 +76,7 @@ export default function Inventory(props) {
                             }))}>{
                                 salePrice !== '0' ? 'Update Sale' : 'Sell Token'
                             }</button>
-                        </div>
+                        </div> */}
                     </div>
                     :
 

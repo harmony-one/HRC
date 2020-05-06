@@ -5,6 +5,8 @@
 .inventory {
     width: calc(100% + 32px);
     margin-left: -$margin;
+    display: flex;
+    flex-wrap: wrap;
     > div {
         margin-bottom: $margin;
         > div:first-child {
@@ -13,6 +15,23 @@
             p {
                 padding: $margin;
             }
+        }
+    }
+}
+@media only screen and (min-width : 415px) {
+    .inventory {
+        > div {
+            padding-left: $margin;
+            width: calc(50% - 24px);
+        }
+    }
+}
+@media only screen and (min-width : 1281px) {
+    .inventory {
+        > div {
+            padding: 0;
+            padding-left: $margin;
+            width: calc(25% - 20px);
         }
     }
 }

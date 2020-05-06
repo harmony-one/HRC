@@ -3,7 +3,7 @@ import { navigate, useLocation } from "@reach/router"
 import { useDispatch } from 'react-redux'
 import { fortmaticSignOut } from '../../redux/fortmatic'
 import { setActive } from '../../redux/harmony'
-import { toggleAuction } from '../../redux/auction'
+import { toggleAuction, distribute, withdraw } from '../../redux/auction'
 import AvatarImage from '../../img/avatar.png'
 
 import { root, menu, menuOpen, avatar, button } from './Header.module.scss'
@@ -27,7 +27,7 @@ const titles = {
 export default function Header({
     history,
     harmonyState: { network, active, allowToggle },
-    auctionState: { activeName },
+    auctionState: { activeName, isOpen, funds },
     // hrc20State: { hrc20balances },
 }) {
 
@@ -54,7 +54,7 @@ export default function Header({
             <div className={[menu, isMenuOpen ? menuOpen : ''].join(' ')}>
                 <div onClick={() => setMenuOpen(false)}></div>
                 <div>
-                    <h3>{ activeName.length > 0 ? activeName : 'anonymous' }</h3>
+                    <h3>{ activeName && activeName.length > 0 ? activeName : 'anonymous' }</h3>
                     <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
 
                     {
@@ -97,20 +97,37 @@ export default function Header({
                             goTo('/auction')
                             setMenuOpen(false)
                         }}><i className="fas fa-store fa-lg"></i><span>Auction</span></p>
-                        <p onClick={async () => {
+                        {/* <p onClick={async () => {
                             await dispatch(fortmaticSignOut())
                             setMenuOpen(false)
                             goTo('/signin')
-                        }}><i className="fas fa-sign-out-alt"></i><span>SignOut</span></p>
+                        }}><i className="fas fa-sign-out-alt"></i><span>SignOut</span></p> */}
                         {
                             admins.includes(active.address) && <>
                                 <p>Admin Only</p>
-                                <p onClick={async () => {
-                                    await dispatch(toggleAuction({ value: true }))
-                                }}><i className="fas fa-check"></i><span>Open Auction</span></p>
-                                <p onClick={async () => {
-                                    await dispatch(toggleAuction({ value: true }))
-                                }}><i className="fas fa-times"></i><span>Close Auction</span></p>
+                                { 
+                                    !isOpen ?
+                                    <>
+                                        <p>Raised: {funds}</p>
+                                        <p onClick={async () => {
+                                            await dispatch(toggleAuction({ value: true }))
+                                        }}><i className="fas fa-check"></i><span>Open Auction</span></p>
+                                        <p onClick={async () => {
+                                            await dispatch(distribute())
+                                        }}><i className="fas fa-user"></i><span>Distribute NFTs</span></p>
+                                        <p onClick={async () => {
+                                            await dispatch(withdraw())
+                                        }}><i className="fas fa-coins"></i><span>Withdraw Funds</span></p>
+                                    </>
+                                    :
+                                    <>
+                                        <p onClick={async () => {
+                                            await dispatch(toggleAuction({ value: false }))
+                                        }}><i className="fas fa-times"></i><span>Close Auction</span></p>
+                                    </>
+                                }
+                               
+                                
                             </>
                         }
                     </section>

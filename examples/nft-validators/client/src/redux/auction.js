@@ -4,11 +4,13 @@ import HRC721Auction from '../build/contracts/HRC721Auction.json'
 // import { approveHRC20 } from './hrc20'
 import { updateProcessing, getBalances } from './harmony'
 
+
+
 //state
 const defaultState = {
     totalItems: 0,
     items: [],
-    raised: 0,
+    funds: 0,
     minted: 0,
     activeName: '',
     tokenContract: null,
@@ -84,7 +86,8 @@ export const makeBid = ({ index, amount }) => async (dispatch, getState) => {
         console.log('receipt', receipt)
     }).on('confirmation', async (confirmationNumber, receipt) => {
         console.log('confirmationNumber', confirmationNumber, receipt)
-        dispatch(getInventory())
+        dispatch(getBalances())
+        dispatch(getItem(index, true))
         dispatch(updateProcessing(false))
     }).on('error', console.error)
 }
@@ -127,51 +130,83 @@ export const addItem = ({ Limit, Price, Link }) => async (dispatch, getState) =>
 Update inventory (some of this should be cached locally, could be cloud as well)
 ********************************/
 
-
-export const getInventory = () => async (dispatch, getState) => {
+export const getItem = (i, dispatchItem = false) => async (dispatch, getState) => {
+    if (dispatchItem) {
+        console.log('getItem', i)
+    }
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Auction)
     const args = {
         gasLimit: '4000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
+    const limit = parseInt(await contract.methods.getLimit(i).call(args), 10)
+    const minted = parseInt(await contract.methods.getMinted(i).call(args), 10)
+    let price = (await contract.methods.getPrice(i).call(args)).toString()
+    price = new hmy.utils.Unit(price).asWei().toEther().toString()
+    const url = await contract.methods.getUrl(i).call(args)
+    
+    //get all bids for item
+    let totalBids = await contract.methods.totalBids(i).call(args)
+    totalBids = totalBids ? parseInt(totalBids.toNumber()) : 0
+    
+    // for dispatchItem we get all bids, otherwise just get the last bid (gallery view)
+    const bids = []
+    let j = !dispatchItem ? totalBids - 1 : 0
+    if (j < 0) j = 0
+    for (; j < totalBids; j++) {
+        let amount = parseInt(await contract.methods.getBidAmount(i, j).call(args), 10)
+        amount = new hmy.utils.Unit(amount).asWei().toEther().toString()
+        let owner = await contract.methods.getBidOwnerName(i, j).call(args)
+        if (owner.length === 0) owner = 'anonymous'
+        bids.push({ index: j, amount, owner })
+    }
+    // if (bids.length === 0) {
+    //     bids.push({ index: 0, amount: price, owner: 'House' })
+    // }
+    //order of bids
+    bids.sort((a, b) => b.index - a.index)
 
+    const item = {
+        index: i, limit, minted, price,
+        url, isSoldOut: minted == limit,
+        bids
+    }
+
+    if (dispatchItem) {
+        const { items } = getState().auctionReducer
+        items.splice(i, 1, item)
+        dispatch({type: type, items})
+    }
+    return item
+}
+
+export const getInventory = () => async (dispatch, getState) => {
+    console.log('getInventory')
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Auction)
+    const args = {
+        gasLimit: '4000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+    }
+    //get
+    let funds = (await hmy.blockchain.getBalance({ address: contract.address }).catch((err) => {
+        console.log(err);
+    }))
+    if (funds) {
+        funds = new hmy.utils.Unit(funds.result).asWei().toEther().toString()
+    }
+    //get state
     const isOpen = await contract.methods.isOpen().call(args)
-    dispatch({type, isOpen})
-
     const activeName = await contract.methods.getName(active.address).call(args)
-    dispatch({type, activeName})
-
+    dispatch({type, activeName, isOpen, funds})
+    //get items
     let totalItems = await contract.methods.totalItems().call(args)
     totalItems = totalItems ? parseInt(totalItems.toNumber()) : 0
     // console.log(totalItems)
     const items = []
     for (let i = 0; i < totalItems; i++) {
-        const limit = parseInt(await contract.methods.getLimit(i).call(args), 10)
-        const minted = parseInt(await contract.methods.getMinted(i).call(args), 10)
-        let price = (await contract.methods.getPrice(i).call(args)).toString()
-        price = new hmy.utils.Unit(price).asWei().toEther().toString()
-        const url = await contract.methods.getUrl(i).call(args)
-        
-        //get all bids for item
-        let totalBids = await contract.methods.totalBids(i).call(args)
-        totalBids = totalBids ? parseInt(totalBids.toNumber()) : 0
-        const bids = []
-        for (let j = 0; j < totalBids; j++) {
-            let amount = parseInt(await contract.methods.getBidAmount(i, j).call(args), 10)
-            amount = new hmy.utils.Unit(amount).asWei().toEther().toString()
-            let owner = await contract.methods.getBidOwnerName(i, j).call(args)
-            if (owner.length === 0) owner = 'anonymous'
-            bids.push({ index: j, amount, owner })
-        }
-        // if (bids.length === 0) {
-        //     bids.push({ index: 0, amount: price, owner: 'House' })
-        // }
+        const item = await dispatch(getItem(i))
         //update state
-        items.push({
-            index: i, limit, minted, price,
-            url, isSoldOut: minted == limit,
-            bids
-        })
+        items.push(item)
     }
     // console.log(items)
     dispatch({type: type, items})
@@ -179,6 +214,40 @@ export const getInventory = () => async (dispatch, getState) => {
 
 export const auctionInit = () => async (dispatch, getState) => {
     dispatch(getInventory())
+}
+
+
+/********************************
+Should just work if auction is closed!
+********************************/
+
+export const distribute = () => async (dispatch, getState) => {
+    dispatch(updateProcessing(true))
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Auction)
+    const tx = contract.methods.distribute().send({
+        from: active.address,
+        gasLimit: '2000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+    }).on('confirmation', async (confirmation) => {
+        console.log('confirmation', confirmation)
+        if (confirmation === 'REJECTED') alert('Unable to distribute NFTs')
+        dispatch(getInventory())
+        dispatch(updateProcessing(false))
+    }).on('error', console.error)
+}
+export const withdraw = () => async (dispatch, getState) => {
+    dispatch(updateProcessing(true))
+    const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Auction)
+    const tx = contract.methods.withdraw().send({
+        from: active.address,
+        gasLimit: '2000000',
+        gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
+    }).on('confirmation', async (confirmation) => {
+        console.log('confirmation', confirmation)
+        if (confirmation === 'REJECTED') alert('Unable to withdraw Auction funds from contract. Hint: try distributing the NFTs first!')
+        dispatch(getInventory())
+        dispatch(updateProcessing(false))
+    }).on('error', console.error)
 }
 
 

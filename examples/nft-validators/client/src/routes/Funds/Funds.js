@@ -13,6 +13,7 @@ export default function Home(props) {
     const {
         harmonyState: { active, bech32Addresses, allowToggle },
         // hrc20State: { hrc20balances },
+        auctionState: { activeName },
     } = props
 
     const [link, setLink] = useState(null)
@@ -30,7 +31,7 @@ export default function Home(props) {
             <section>
                 {active &&
                     <div className={bubble}>
-                        <h3>{active.name}</h3>
+                        <h3>{ activeName && activeName.length > 0 ? activeName : 'anonymous' }</h3>
                         <p>ONE: {active.balanceONE}</p>
                         {/* <p>USD: {hrc20balance}</p> */}
                         { allowToggle &&

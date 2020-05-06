@@ -14,6 +14,8 @@ contract("HRC721", (accounts) => {
 	const oneTenth = 	bn('100000000000000000');
 	const price = 	bn('100000000000000000'); // one tenth of ONE
 	const alice = accounts[0], bob = accounts[1]
+
+	const items = 4
 	
 	it("should be deployed", async () => {
 		hrc721 = await HRC721.deployed()
@@ -23,7 +25,7 @@ contract("HRC721", (accounts) => {
 
 	it("should have 18 items deployed", async () => {
 		const totalItems = await auction.totalItems()
-		assert.equal(totalItems.toString(), '18')
+		assert.equal(totalItems.toString(), items.toString())
 	})
 
 	/********************************
@@ -136,6 +138,22 @@ contract("HRC721", (accounts) => {
 	Close the auction and distribute NFTs
 	********************************/
 	
+
+	it("should NOT allow the minter / owner to withdraw the balance BEFORE distributing NFTs", async () => {
+		const balanceBefore = bn(await web3.eth.getBalance(alice))
+		//distribute
+		await auction.withdraw({
+			from: alice,
+			gasLimit,
+			gasPrice
+		}).catch((e) => {
+			// console.log(e)
+		})
+		const balanceAfter = bn(await web3.eth.getBalance(alice))
+		console.log(balanceBefore.toString(), balanceAfter.toString())
+		// spent some gas, this isn't perfect but it checks if values are close enough
+		assert.equal(balanceBefore.toString().slice(0, 5), balanceAfter.toString().slice(0, 5))
+	})
 	it("should allow the minter / owner to close the action and distribute NFTs", async () => {
 		await auction.toggleIsOpen(false, {
 			from: alice,

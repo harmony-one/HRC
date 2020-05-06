@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { route, gradient, bubble, button } from './Auction.module.scss'
 
 import { Gallery } from './Gallery'
+import { getInventory } from '../../redux/auction'
 
 export default function Auction(props) {
 
@@ -16,7 +17,7 @@ export default function Auction(props) {
     const dispatch = useDispatch()
     
     useEffect(() => {
-        // dispatch(getMarket())
+        dispatch(getInventory())
     }, [active])
 
     if (!active) return null
@@ -25,12 +26,13 @@ export default function Auction(props) {
     return (
         <div className={route}>
 
-            <section>
-                <div className={bubble}>
-                    <h2>Validator Auction</h2>
-                    <p>{isOpen ? 'The Auction is Open' : 'The Auction is Closed'}</p>
-                </div>
-            </section>
+            { !isOpen &&
+                <section>
+                    <div className={bubble}>
+                        <p>The Auction is Closed</p>
+                    </div>
+                </section>
+            }
 
             <section className={gradient}>
                 <Gallery items={items} dispatch={dispatch} active={active} />

@@ -56,7 +56,7 @@ export const getTokens = (account) => async (dispatch, getState) => {
             balance[itemIndex] = [{tokenId, salePrice}]
         }
     }
-    balances = { ...balances, [account.name]: balance }
+    balances = { ...balances, [account.address]: balance }
     dispatch({type, balances })
 }
 

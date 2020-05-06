@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "start": "pkill node; cp ./../.env ./.env; cp ./../config.js ./config.js; parcel ./src/index.html --open > output.log &"
+    "start": "pkill node; cp ./../.env ./.env; cp ./../config.js ./config.js; parcel ./src/index.html --open > output.log &",
+    "build": "pkill node; cp ./../.env ./.env; cp ./../config.js ./config.js; parcel build ./src/index.html"
   },
   "author": "@mattdlockyer matt@harmony.one",
   "license": "ISC",

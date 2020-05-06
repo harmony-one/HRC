@@ -101,17 +101,16 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
         return
     }
     let result
-    if (account.isExt) {
-        result = (await hmyExt.blockchain.getBalance({ address: account.address }).catch((err) => {
+    if (false && account.isExt) {
+        result = (await hmyExt.blockchain.getBalance({ address: account.address, shardID: 0 }).catch((err) => {
             console.log(err);
         })).result
     } else {
-        result = (await hmy.blockchain.getBalance({ address: account.address }).catch((err) => {
+        result = (await hmy.blockchain.getBalance({ address: account.address, shardID: 0 }).catch((err) => {
             console.log(err);
         })).result
     }
     account.balanceONE = weiToOne(hmy, result)
-
     dispatch({ type, [account.name]: account })
 }
 
@@ -134,7 +133,6 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
         await dispatch(harmonyInit());
         ({ hmy, hmyExt } = getState().harmonyReducer)
     }
-    
 
     // 0x7c41e0668b551f4f902cfaec05b5bdca68b124ce
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
@@ -147,7 +145,7 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
     } else {
         account = await getExtAccount(hmyExt)
         account.name = 'My Account'
-        console.log(account)
+        console.log('Using Extension', account)
     }
 
     const bech32Addresses = [account.bech32Address, minter.bech32Address]

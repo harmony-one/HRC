@@ -14,6 +14,7 @@ import SignIn from './routes/SignIn/SignIn'
 import Funds from './routes/Funds/Funds'
 import Create from './routes/Create/Create'
 import Auction from './routes/Auction/Auction'
+import AuctionItem from './routes/AuctionItem/AuctionItem'
 // import Store from './routes/Store/Store'
 // import Market from './routes/Market/Market'
 import LoadingGIF from './img/loading.gif'
@@ -64,6 +65,7 @@ export default connect(
 				<Funds {...props} path="/funds" />
 				<Create {...props} path="/create" />
 				<Auction {...props} path="/auction" />
+				<AuctionItem {...props} path="/token/:id" />
 				{/* <Store {...props} path="/store" />
 				<Market {...props} path="/market" /> */}
 			</Router>

@@ -14,6 +14,7 @@ module.exports = function (deployer, network, accounts) {
 	const name = "HarmonyHRC721"
 	const symbol = "HRC721"
 	const price = '1000000000000000000';
+	const numItemsDeployed = 6
 
 	const urls = []
 	//there are 18 validator images total
@@ -26,7 +27,7 @@ module.exports = function (deployer, network, accounts) {
 			return deployer.deploy(HRC721, name, symbol).then(function (hrc721) {
 				// return deployer.deploy(HRC721Crowdsale, owner, hrc20.address, hrc721.address).then(async function (sale) {
 				return deployer.deploy(HRC721Auction, owner, hrc721.address).then(async function (sale) {
-					for (let i = 0; i < 18; i++) {
+					for (let i = 0; i < numItemsDeployed; i++) {
 						console.log(urls[i])
 						await sale.addItem(1, price, urls[i])
 					}

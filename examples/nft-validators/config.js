@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 let network, net, privateKey, url
-let HRC721Crowdsale, HRC721, Migrations 
+let HRC721Auction, HRC721
 
 const ENV = process.env.ENV
 const gasLimit = process.env.GAS_LIMIT
@@ -18,19 +18,17 @@ switch(ENV) {
     case 'testnet': {
         network = 1;
         net = 2;
-        // url = process.env.TESTNET_0_URL
-        // HRC721Crowdsale = process.env.TESTNET_HRC721CROWDSALE
-        // HRC721 = process.env.TESTNET_HRC721
-        // Migrations = process.env.TESTNET_MIGRATIONS
+        url = process.env.TESTNET_0_URL
+        HRC721Auction = process.env.TESTNET_HRC721Auction
+        HRC721 = process.env.TESTNET_HRC721
         break;
     }
     case 'mainnet': {
         network = 2;
         net = 1;
-        // url = process.env.MAINNET_0_URL
-        // HRC721Crowdsale = process.env.MAINNET_HRC721CROWDSALE
-        // HRC721 = process.env.MAINNET_HRC721
-        // Migrations = process.env.MAINNET_MIGRATIONS
+        url = process.env.MAINNET_0_URL
+        HRC721Auction = process.env.MAINNET_HRC721Auction
+        HRC721 = process.env.MAINNET_HRC721
         break;
     }
 }
@@ -47,6 +45,7 @@ export default {
     port: 3000,
     filterMyAddress: true,
     //use these if not deploying contract or targeting a different deployment on (same or ) different network
-    HRC721Crowdsale, HRC721, Migrations
+    HRC721Auction,
+    HRC721
 }
 

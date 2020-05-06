@@ -68,11 +68,17 @@ contract HRC721Auction is MinterRole, ReentrancyGuard {
 			if (tbs > 0) { //bid exists
 				_mint(bids[index][tbs - 1].owner, index); //highest bid wins
 			}
+			delete bids[index]; // remove all bids for this item
         }
 	}
 	// withdraw the funds
 	function withdraw() public onlyMinter {
 		require(isOpen == false); // auction must be closed
+		uint256 totalItemsLength = totalItems();
+		for (uint256 index = 0; index < totalItemsLength; index++) {
+			uint256 tbs = totalBids(index);
+			require(tbs == 0); // there cannot be any bids on any items
+        }
 		address payable payableOwner = address(uint160(owner));
 		payableOwner.transfer(address(this).balance);
 	}

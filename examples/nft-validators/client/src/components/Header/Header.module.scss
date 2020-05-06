@@ -28,6 +28,11 @@
 }
 
 .menu {
+    z-index: 2000;
+    position: fixed;
+    top: 0; right: 0;
+    width: 0;
+    transition: 0s;
     p {
         display: flex;
         align-items: center;
@@ -41,11 +46,6 @@
     button {
         margin-left: $margin;
     }
-    z-index: 2000;
-    position: fixed;
-    top: 0; right: 0;
-    width: 0;
-    transition: 0s;
     > div {
         transition: cubic-bezier(0.215, 0.610, 0.355, 1) .32s;
     }
@@ -62,6 +62,7 @@
         box-shadow: $shadow;
         width: 300px;
         height: 100vh;
+        overflow-y:scroll;
         transform: translateX(350px);
         
         > h3 {
