@@ -44,12 +44,11 @@ module.exports = {
           { gasLimit: gasLimit, gasPrice: gasPrice},
         );
         const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
-        console.log(newAcc)
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
     },
-    mainnet0: {
+    mainnet: {
       network_id: '1', 
       provider: () => {
         const truffleProvider = new TruffleProvider(

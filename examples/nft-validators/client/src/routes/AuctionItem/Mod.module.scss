@@ -1,0 +1,64 @@
+
+@import './../../theme/theme.module.scss';
+
+.itemClass {
+    margin: 0 $margin;
+    margin-left: 0;
+    width: 100%;
+    > div {
+        width: 100%;
+    }
+    padding-bottom: $double;
+    .bidButton {
+        display: inline;
+    }
+}
+
+
+
+.image {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    box-shadow: $shadow;
+    > img {
+        object-fit: cover;
+        width: 100%;
+    }
+    > p {
+        color: black;
+        position: absolute;
+        bottom: 0;
+        background: white;
+        margin: 0;
+        padding: $half !important;
+        z-index: 3;
+        font-weight: bold;
+    }
+    > p:nth-child(2) {
+        left: 0;
+    }
+    > p:nth-child(3) {
+        right: 0;
+    }
+}
+
+.soldOut {
+    filter: grayscale(0.9);
+}
+
+.stats {
+    text-align: left;
+    box-shadow: $shadow;
+    position: relative;
+    color: black;
+    background: white;
+    z-index: 4;
+    padding: $margin 0;
+    justify-content: space-between;
+    > p {
+        padding: 0 $margin;
+        margin: 0;
+    }
+}

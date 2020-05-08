@@ -8,6 +8,8 @@ const local_url = process.env.LOCAL_0_URL;
 const testnet_mnemonic = process.env.TESTNET_MNEMONIC
 const testnet_private_key = process.env.TESTNET_PRIVATE_KEY
 const testnet_url = process.env.TESTNET_0_URL
+//const testnet_0_url = process.env.TESTNET_0_URL
+//const testnet_1_url = process.env.TESTNET_1_URL
 //Mainnet
 const mainnet_mnemonic = process.env.MAINNET_MNEMONIC
 const mainnet_private_key = process.env.MAINNET_PRIVATE_KEY
@@ -44,11 +46,38 @@ module.exports = {
           { gasLimit: gasLimit, gasPrice: gasPrice},
         );
         const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
-        console.log(newAcc)
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
     },
+//    testnet0: {
+//      network_id: '2', 
+//      provider: () => {
+//        const truffleProvider = new TruffleProvider(
+//          testnet_0_url,
+//          { memonic: testnet_mnemonic },
+//          { shardID: 0, chainId: 2 },
+//          { gasLimit: gasLimit, gasPrice: gasPrice },
+//        );
+//        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
+//        truffleProvider.setSigner(newAcc);
+//        return truffleProvider;
+//      },
+//    },
+//    testnet1: {
+//      network_id: '2', 
+//      provider: () => {
+//        const truffleProvider = new TruffleProvider(
+//          testnet_1_url,
+//          { memonic: testnet_mnemonic },
+//          { shardID: 1, chainId: 2 },
+//          { gasLimit: gasLimit, gasPrice: gasPrice },
+//        );
+//        const newAcc = truffleProvider.addByPrivateKey(testnet_private_key);
+//        truffleProvider.setSigner(newAcc);
+//        return truffleProvider;
+//      },
+//    },
     mainnet0: {
       network_id: '1', 
       provider: () => {
