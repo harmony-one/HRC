@@ -1,0 +1,23 @@
+
+@import './../../theme/Theme.module.scss';
+
+.root {
+    
+}
+
+.logoutButton {
+    > i {
+        transform: rotateZ(180deg);
+        border: 1px solid $light;
+        border-right: none;
+        border-top: none;
+        background: white;
+        font-size: $margin;
+        z-index: 100;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        padding: $margin;
+        min-height: 16px;
+    }
+}

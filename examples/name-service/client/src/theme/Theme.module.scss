@@ -1,0 +1,115 @@
+
+
+@import 'globals';
+
+/********************************
+The root of all routes, can be overridden in Mod.module.scss
+********************************/
+.root {
+    margin: $margin;
+    > h1 {
+        > span {
+            color: $light;
+        }
+        > span:first-child {
+            color: $dark;
+            text-decoration: underline;
+        }
+        
+    } 
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.dialog {
+    margin: 0 32px;
+    padding: $margin;
+    padding-top: 0;
+    background: white;
+    border: 1px solid $light;
+    box-shadow: 0 0 $margin 0 white;
+}
+
+.overlay {
+    animation: fadeIn 0.32s ease-out;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 99999;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100vw;
+    height: 100vh;
+    padding-top: 48px;
+    text-align: center;
+    > img {
+        margin: auto;
+        width: 50%;
+        max-width: 300px;
+    }
+}
+
+* {
+    font-family: 'Ubuntu Mono', monospace;
+    box-sizing: border-box;
+    outline: none !important;
+    color: $dark;
+}
+
+.hidden {
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+img {
+    width: 100%;
+}
+
+input,
+textarea,
+button {
+    background: white;
+    border: 1px solid #DDD;
+    height: 36px;
+    padding: 8px;
+    margin-right: $margin;
+}
+
+input:focus,
+textarea:focus,
+button:focus,
+button:active {
+    border: 1px solid #444;
+}
+
+.marginTop {
+    margin-top: $margin;
+}
+
+input, textarea {
+    width: 100%;
+    min-width: 256px;
+    display: block;
+    margin-bottom: 16px;
+    outline-width: 0;
+}
+
+textarea {
+    min-height: 64px;
+}
+
+.hidden {
+    display: none;
+}
