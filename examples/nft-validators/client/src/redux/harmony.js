@@ -11,6 +11,8 @@ const { ENV, network, net, url } = config
 
 //state
 const defaultState = {
+    isSignedIn: false,
+    accountLocked: false,
     harmony: null,
     hmy: null,
     hmyExt: null,
@@ -101,7 +103,7 @@ export const getBalanceONE = (account) => async (dispatch, getState) => {
         return
     }
     let result
-    if (false && account.isExt) {
+    if (account.isExt) {
         result = (await hmyExt.blockchain.getBalance({ address: account.address, shardID: 0 }).catch((err) => {
             console.log(err);
         })).result
@@ -138,14 +140,18 @@ export const signIn = (authedAccount) => async (dispatch, getState) => {
     const minter = hmy.wallet.addByPrivateKey('45e497bd45a9049bcb649016594489ac67b9f052a6cdf5cb74ee2427a60bf25e')
     minter.name = 'Alice'
     // 0xea877e7412c313cd177959600e655f8ba8c28b40
-    let account
-    if (!hmyExt) {
+    
+    // try to set up the ext account
+    let account = await getExtAccount(hmyExt)
+    if (account.address) {
+        account.name = 'Extension'
+        dispatch({ type, isSignedIn: true })
+        console.log('Using Extension', account)
+    } else {
+        dispatch({ type, accountLocked: true })
+        //set up failed, so use bob
         account = hmy.wallet.addByMnemonic('surge welcome lion goose gate consider taste injury health march debris kick')
         account.name = 'Bob'
-    } else {
-        account = await getExtAccount(hmyExt)
-        account.name = 'My Account'
-        console.log('Using Extension', account)
     }
 
     const bech32Addresses = [account.bech32Address, minter.bech32Address]

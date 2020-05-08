@@ -1,9 +1,9 @@
+import React from 'react'
 import { getReducer, getState } from '../util/redux-util-v2'
 import { getContract } from '../util/hmy-util'
 import HRC721Auction from '../build/contracts/HRC721Auction.json'
 // import { approveHRC20 } from './hrc20'
-import { updateProcessing, getBalances } from './harmony'
-
+import { updateDialogState, updateProcessing, getBalances } from './harmony'
 
 
 //state
@@ -73,6 +73,15 @@ export const setBidName = ({ Name }) => async (dispatch, getState) => {
 
 export const makeBid = ({ index, amount }) => async (dispatch, getState) => {
     console.log('making bid for item', index, amount)
+    const { items } = getState().auctionReducer
+    console.log(parseFloat(items[index].bids[0].amount), parseFloat(amount))
+    if (parseFloat(items[index].bids[0].amount) >= parseFloat(amount)) {
+        updateDialogState(dispatch(updateDialogState({
+            open: true,
+            content:<p>Your bid is too low!</p>
+        })))
+        return
+    }
     dispatch(updateProcessing(true))
     const { hmy, contract, active } = await getContract(getState().harmonyReducer, HRC721Auction)
     const tx = contract.methods.makeBid(index).send({
@@ -84,11 +93,17 @@ export const makeBid = ({ index, amount }) => async (dispatch, getState) => {
         console.log('hash', hash)
     }).on('receipt', function (receipt) {
         console.log('receipt', receipt)
-    }).on('confirmation', async (confirmationNumber, receipt) => {
-        console.log('confirmationNumber', confirmationNumber, receipt)
+    }).on('confirmation', async (confirmation) => {
+        dispatch(updateProcessing(false))
+        if (confirmation === 'REJECTED') {
+            updateDialogState(dispatch(updateDialogState({
+                open: true,
+                content:<p>You were outbid in the same block!</p>
+            })))
+            return
+        }
         dispatch(getBalances())
         dispatch(getItem(index, true))
-        dispatch(updateProcessing(false))
     }).on('error', console.error)
 }
 
@@ -139,37 +154,39 @@ export const getItem = (i, dispatchItem = false) => async (dispatch, getState) =
         gasLimit: '4000000',
         gasPrice: new hmy.utils.Unit('1').asGwei().toWei(),
     }
-    const limit = parseInt(await contract.methods.getLimit(i).call(args), 10)
-    const minted = parseInt(await contract.methods.getMinted(i).call(args), 10)
-    let price = (await contract.methods.getPrice(i).call(args)).toString()
-    price = new hmy.utils.Unit(price).asWei().toEther().toString()
-    const url = await contract.methods.getUrl(i).call(args)
+
+    //check current items, if you don't already have a record of this item
+    const { items } = getState().auctionReducer
+    const item = items[i] || {}
     
     //get all bids for item
     let totalBids = await contract.methods.totalBids(i).call(args)
     totalBids = totalBids ? parseInt(totalBids.toNumber()) : 0
     
     // for dispatchItem we get all bids, otherwise just get the last bid (gallery view)
-    const bids = []
-    let j = !dispatchItem ? totalBids - 1 : 0
-    if (j < 0) j = 0
-    for (; j < totalBids; j++) {
-        let amount = parseInt(await contract.methods.getBidAmount(i, j).call(args), 10)
-        amount = new hmy.utils.Unit(amount).asWei().toEther().toString()
-        let owner = await contract.methods.getBidOwnerName(i, j).call(args)
-        if (owner.length === 0) owner = 'anonymous'
-        bids.push({ index: j, amount, owner })
+    if (!item.bids) item.bids = []
+    if (item.bids.length !== totalBids) {
+        for (let j = item.bids.length; j < totalBids; j++) {
+            let amount = parseInt(await contract.methods.getBidAmount(i, j).call(args), 10)
+            amount = new hmy.utils.Unit(amount).asWei().toEther().toString()
+            let owner = await contract.methods.getBidOwnerName(i, j).call(args)
+            if (owner.length === 0) owner = 'anonymous'
+            item.bids.push({ index: j, amount, owner })
+        }
+        item.bids.sort((a, b) => b.index - a.index)
     }
-    // if (bids.length === 0) {
-    //     bids.push({ index: 0, amount: price, owner: 'House' })
-    // }
-    //order of bids
-    bids.sort((a, b) => b.index - a.index)
-
-    const item = {
-        index: i, limit, minted, price,
-        url, isSoldOut: minted == limit,
-        bids
+    // there's a good chance none of this was set if limit isn't defined
+    if (!item.limit) {
+        item.limit = parseInt(await contract.methods.getLimit(i).call(args), 10)
+    
+        item.minted = parseInt(await contract.methods.getMinted(i).call(args), 10)
+    
+        item.price = (await contract.methods.getPrice(i).call(args)).toString()
+        item.price = new hmy.utils.Unit(item.price).asWei().toEther().toString()
+    
+        item.url = await contract.methods.getUrl(i).call(args)
+        item.isSoldOut = item.minted == item.limit
+        item.index = i
     }
 
     if (dispatchItem) {

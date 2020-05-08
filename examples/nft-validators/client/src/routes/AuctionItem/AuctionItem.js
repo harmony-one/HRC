@@ -12,7 +12,7 @@ export default function AuctionItem(props) {
 
     const {
         id,
-        harmonyState: { active },
+        harmonyState: { active, isSignedIn },
         auctionState: { items, isOpen },
     } = props
 
@@ -45,7 +45,7 @@ export default function AuctionItem(props) {
             <div className={bidButton}>
                 <button onClick={() => navigate('/auction')}>Back to Auction</button>
             </div>
-            { isOpen && !isSoldOut &&
+            { isOpen && !isSoldOut && isSignedIn &&
                 <div className={bidButton}>
                     <button onClick={() => dispatch(updateDialogState({
                         open: true,

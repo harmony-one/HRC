@@ -26,7 +26,7 @@ const titles = {
 
 export default function Header({
     history,
-    harmonyState: { network, active, allowToggle },
+    harmonyState: { network, isSignedIn, active, allowToggle },
     auctionState: { activeName, isOpen, funds },
     // hrc20State: { hrc20balances },
 }) {
@@ -54,17 +54,14 @@ export default function Header({
             <div className={[menu, isMenuOpen ? menuOpen : ''].join(' ')}>
                 <div onClick={() => setMenuOpen(false)}></div>
                 <div>
-                    <h3>{ activeName && activeName.length > 0 ? activeName : 'anonymous' }</h3>
-                    <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
 
-                    {
-                        active && 
+                    <i className={"fas fa-times"} onClick={() => setMenuOpen(false)}></i>
+                    { active && isSignedIn && <>
+                        <h3>{ activeName && activeName.length > 0 ? activeName : 'anonymous' }</h3>
                         <div className={avatar}>
                             <img src={AvatarImage} />
                         </div>
-                    }
 
-                    {active && 
                         <section>
                             { allowToggle &&
                                 <button 
@@ -77,31 +74,37 @@ export default function Header({
                             {/* <p><b>USD:</b>&nbsp;{hrc20balance}</p> */}
                             
                         </section>
+                        </>
                     }
 
                     
                     <section>
-                        <p onClick={() => {
-                            goTo('/')
-                            setMenuOpen(false)
-                        }}><i className="far fa-user-circle fa-lg"></i><span>Account</span></p>
-                        <p onClick={() => {
-                            goTo('/funds')
-                            setMenuOpen(false)
-                        }}><i className="fas fa-coins fa-lg"></i><span>Funds</span></p>
-                        {/* <p onClick={() => {
-                            goTo('/create')
-                            setMenuOpen(false)
-                        }}><i className="fab fa-creative-commons fa-lg"></i><span>Create</span></p> */}
-                        <p onClick={() => {
-                            goTo('/auction')
-                            setMenuOpen(false)
-                        }}><i className="fas fa-store fa-lg"></i><span>Auction</span></p>
-                        {/* <p onClick={async () => {
-                            await dispatch(fortmaticSignOut())
-                            setMenuOpen(false)
-                            goTo('/signin')
-                        }}><i className="fas fa-sign-out-alt"></i><span>SignOut</span></p> */}
+                        { active && isSignedIn && <>
+                            <p onClick={() => {
+                                goTo('/')
+                                setMenuOpen(false)
+                            }}><i className="far fa-user-circle fa-lg"></i><span>Account</span></p>
+                            <p onClick={() => {
+                                goTo('/funds')
+                                setMenuOpen(false)
+                            }}><i className="fas fa-coins fa-lg"></i><span>Funds</span></p>
+                            {/* <p onClick={() => {
+                                goTo('/create')
+                                setMenuOpen(false)
+                            }}><i className="fab fa-creative-commons fa-lg"></i><span>Create</span></p> */}
+                            </>
+                        }
+                            <p onClick={() => {
+                                goTo('/auction')
+                                setMenuOpen(false)
+                            }}><i className="fas fa-store fa-lg"></i><span>Auction</span></p>
+                        
+                        { !isSignedIn && <p onClick={async () => {
+                                await dispatch(fortmaticSignOut())
+                                setMenuOpen(false)
+                                goTo('/signin')
+                            }}><i className="fas fa-sign-out-alt"></i><span>Sign In</span></p>
+                        }
                         {
                             admins.includes(active.address) && <>
                                 <p>Admin Only</p>

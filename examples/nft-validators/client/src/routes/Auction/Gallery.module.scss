@@ -18,23 +18,6 @@
         }
     }
 }
-@media only screen and (min-width : 415px) {
-    .inventory {
-        > div {
-            padding-left: $margin;
-            width: calc(50% - 24px);
-        }
-    }
-}
-@media only screen and (min-width : 1281px) {
-    .inventory {
-        > div {
-            padding: 0;
-            padding-left: $margin;
-            width: calc(25% - 20px);
-        }
-    }
-}
 
 .image {
     position: relative;
@@ -82,8 +65,41 @@
     }
 }
 
+
+@media only screen and (min-width : 415px) {
+    .inventory {
+        > div {
+            padding-left: $margin;
+            width: calc(50% - 24px);
+        }
+    }
+    .stats {
+        border-bottom-left-radius: $margin;
+        border-bottom-right-radius: $margin;
+    }
+    .image {
+        border-top-left-radius: $margin;
+        border-top-right-radius: $margin;
+        > img {
+            border-top-left-radius: $margin;
+            border-top-right-radius: $margin;
+        }
+    }
+}
+@media only screen and (min-width : 1281px) {
+    .inventory {
+        > div {
+            padding: 0;
+            padding-left: $margin;
+            width: calc(25% - 20px);
+        }
+    }
+}
+
+
 .bidButton {
     margin: $margin;
+    margin-right: 0;
     text-align: right;
     button {
         margin: 0;

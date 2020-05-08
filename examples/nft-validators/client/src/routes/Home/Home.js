@@ -11,7 +11,7 @@ import { route, bubble, button } from './Home.module.scss'
 export default function Home(props) {
 
     const {
-        harmonyState: { active, allowToggle },
+        harmonyState: { active, allowToggle, isSignedIn },
         hrc721State: { balances },
         auctionState: { activeName, isOpen },
     } = props
@@ -35,24 +35,40 @@ export default function Home(props) {
                 </div>
             </section>
 
-            <section>
-                <div className={bubble}>
-                    <h3>Current Name: {activeName && activeName.length > 0 ? activeName : 'anonymous'}</h3>
-                    <Form
-                        {...{
-                            inline: true,
-                            active,
-                            title: 'Update Your Name',
-                            fields: [
-                                { label: 'Name', type: 'text', onChange: (val) => setName(val)},
-                            ],
-                            submit: setBidName
-                        }}
-                    />
-                </div>
-            </section>
+            {
+                isSignedIn ? 
 
-            {active && balances[active.address] && Object.keys(balances[active.address]).length === 0 &&
+                <section>
+                    <div className={bubble}>
+                        <h3>Current Name: {activeName && activeName.length > 0 ? activeName : 'anonymous'}</h3>
+                        <Form
+                            {...{
+                                inline: true,
+                                active,
+                                title: 'Update Your Name',
+                                fields: [
+                                    { label: 'Name', type: 'text', onChange: (val) => setName(val)},
+                                ],
+                                submit: setBidName
+                            }}
+                        />
+                    </div>
+                </section>
+                :
+                <section>
+                    <div className={bubble}>
+                        <p>You are not signed in, but you can still go to the auction if it is open.</p>
+                        <button
+                            className={button}
+                            onClick={() => navigate('/signin')}
+                        >Sign In</button>
+                    </div>
+                </section>
+            }
+
+            
+
+            {isSignedIn && active && balances[active.address] && Object.keys(balances[active.address]).length === 0 &&
                 <section>
                     <div className={bubble}>
                         <h2>No Items!</h2>

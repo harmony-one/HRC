@@ -26,12 +26,15 @@ export const getContractInstance = (hmy, artifact) => {
 export const oneToHexAddress = (hmy, address) => hmy.crypto.getAddress(address).basicHex
 
 export const getExtAccount = async (hmyExt) => {
+    if (!hmyExt) return {}
     console.log(url)
     hmyExt.setProvider(url)
-
-    const account = await hmyExt.wallet.getAccount().catch((err) => {
-        console.log(err);
+    let account = {}
+    account = await hmyExt.wallet.getAccount().catch((err) => {
+        account.locked = true
+        console.log(err)
     })
+    if (!account || account.locked) return { locked: true }
     account.isExt = true
     account.bech32Address = account.address
     account.address = hmyExt.crypto.getAddress(account.address).basicHex
