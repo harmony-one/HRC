@@ -29,6 +29,7 @@
     "last 2 Chrome versions"
   ],
   "devDependencies": {
+    "minimist": "^1.2.5",
     "tslib": "^1.11.0"
   }
 }
