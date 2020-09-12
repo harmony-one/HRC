@@ -9,7 +9,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "lowdb": "^1.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "sha.js": "^2.4.11",
     "tslib": "^1.10.0"
   },
