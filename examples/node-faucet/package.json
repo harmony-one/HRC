@@ -5,7 +5,7 @@
   "main": "truffle.js",
   "dependencies": {
     "@harmony-js/core": "^0.1.36",
-    "@openzeppelin/contracts": "^2.5.0",
+    "@openzeppelin/contracts": "^4.4.2",
     "async-mutex": "^0.1.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
