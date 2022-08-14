@@ -8,7 +8,7 @@
   "dependencies": {
     "@harmony-js/contract": "^0.1.36",
     "@harmony-js/core": "^0.1.36",
-    "@openzeppelin/contracts": "^2.4.0",
+    "@openzeppelin/contracts": "^4.7.2",
     "@reach/router": "^1.2.1",
     "chartist": "^0.11.4",
     "dotenv": "^8.2.0",
