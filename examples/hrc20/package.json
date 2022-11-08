@@ -13,7 +13,7 @@
     "chartist": "^0.11.4",
     "parcel": "^1.12.4",
     "parcel-bundler": "^1.12.4",
-    "postcss-modules": "^1.4.1",
+    "postcss-modules": "^1.5.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",
