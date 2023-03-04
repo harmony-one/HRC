@@ -16,7 +16,7 @@
     "@harmony-js/core": "^0.1.36",
     "@openzeppelin/contracts": "^2.4.0",
     "dotenv": "^8.2.0",
-    "truffle": "^5.1.15",
+    "truffle": "^5.7.9",
     "tslib": "^1.11.1"
   }
 }
